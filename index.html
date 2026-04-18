@@ -2,949 +2,1090 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONTAR — Load Faster. Move more cars.</title>
-<meta name="description" content="MONTAR is the first AI-powered platform built for car hauler drivers.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400&family=Space+Grotesk:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MONTAR</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MONTAR">
+<meta name="theme-color" content="#0B1726">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;700&family=Google+Sans+Display:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════
-   MD3 TOKENS
-═══════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
-  --brand:#E8620A;--brand-dk:#B84A00;--brand-lt:#FFF0E6;--brand-on:#fff;
-  --surf:#FAFAF8;--surf1:#F4F2EE;--surf2:#EDEAE5;--surf3:#E5E1DA;--surf-inv:#1C1B18;
-  --on:#1C1B18;--on-v:#4A4740;--on-d:#8A8580;
-  --err:#B3261E;--err-bg:#FDE8E8;--ok:#1A7A52;--ok-bg:#E6F4ED;--warn:#7A5500;--warn-bg:#FFF3D6;
-  --e1:0 1px 2px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.08);
-  --e2:0 1px 2px rgba(0,0,0,.06),0 3px 8px rgba(0,0,0,.1);
-  --e3:0 4px 12px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.06);
-  --fd:'Space Grotesk',sans-serif;--fb:'Nunito Sans',sans-serif;--fm:'Roboto Mono',monospace;
-  --r4:4px;--r8:8px;--r12:12px;--r16:16px;--r24:24px;--rpill:9999px;
-  --pad:clamp(1.25rem,5vw,3.5rem);--max:1200px;--ease:cubic-bezier(.2,0,0,1);
+  --primary:#E8620A;--primary-container:#FFDBC8;--on-primary:#fff;--on-primary-container:#321100;
+  --navy:#0B1726;--navy2:#0F2035;--navy3:#162840;
+  --surface:#FFF8F5;--surface-var:#F5DDD3;--surface-low:#FBF0EB;--surface-container:#F0E0D8;
+  --on-surface:#201A17;--on-surface-var:#53433C;
+  --outline:#85736C;--outline-var:#D8C2BB;
+  --success:#1D6B3E;--success-container:#B7F0CF;
+  --error:#BA1A1A;--error-container:#FFDAD6;
+  --warning:#7B5800;--warning-container:#FFDEA3;
+  --green:#1D9E75;
+  --font:'Google Sans',sans-serif;
+  --mono:'Roboto Mono',monospace;
+  --display:'Google Sans Display',sans-serif;
+  --e1:0 1px 2px rgba(0,0,0,.1),0 1px 3px 1px rgba(0,0,0,.07);
+  --e2:0 1px 2px rgba(0,0,0,.1),0 2px 6px 2px rgba(0,0,0,.07);
+  --e3:0 4px 8px 3px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.1);
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{background:var(--surf);color:var(--on);font-family:var(--fb);font-weight:400;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--surf1)}::-webkit-scrollbar-thumb{background:var(--brand);border-radius:4px}
-img,svg{display:block;max-width:100%}
+html,body{width:100%;height:100%;background:#1A1A2E;display:flex;align-items:center;justify-content:center;font-family:var(--font);overflow:hidden;}
 
-/* ── reveal ── */
-.rv{opacity:0;transform:translateY(18px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
-.rv.on{opacity:1;transform:none}
+/* PHONE FRAME */
+.frame{width:393px;height:852px;background:#000;border-radius:50px;box-shadow:0 0 0 1px #333,0 0 0 3px #1a1a1a,0 40px 120px rgba(0,0,0,.8);position:relative;overflow:hidden;}
+.frame::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:0 0 20px 20px;z-index:200;}
+.status-bar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;z-index:190;pointer-events:none;}
+.status-bar.light .st,.status-bar.light .si{color:#fff;}
+.st{font-size:15px;font-weight:600;color:var(--on-surface);font-family:var(--font);}
+.si{display:flex;gap:6px;align-items:center;}
+.si .material-icons-round{font-size:16px;color:var(--on-surface);}
+.home-ind{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;background:var(--on-surface);border-radius:3px;opacity:.3;z-index:190;}
 
-/* ═══════════════════════════════════
-   NAV
-═══════════════════════════════════ */
-#nav{position:fixed;inset:0 0 auto;z-index:300;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--pad);background:rgba(250,250,248,.93);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
-#nav.up{border-color:var(--surf2);box-shadow:var(--e1)}
-.nav-logo{font-family:var(--fd);font-size:1.3rem;font-weight:700;color:var(--brand);text-decoration:none;letter-spacing:-.01em}
-.nav-links{display:flex;gap:2rem;list-style:none}
-.nav-links a{font-family:var(--fb);font-size:.875rem;font-weight:700;color:var(--on-v);text-decoration:none;transition:color .2s}
-.nav-links a:hover{color:var(--brand)}
-.nav-cta{font-family:var(--fb);font-size:.875rem;font-weight:700;color:#fff;background:var(--brand);padding:.5rem 1.4rem;border-radius:var(--rpill);text-decoration:none;box-shadow:var(--e1);transition:background .2s,transform .2s var(--ease),box-shadow .2s;white-space:nowrap}
-.nav-cta:hover{background:var(--brand-dk);box-shadow:var(--e2);transform:translateY(-1px)}
-@media(max-width:768px){.nav-links{display:none}}
+/* SCREENS */
+.screen{position:absolute;inset:0;background:var(--surface);display:none;flex-direction:column;overflow:hidden;}
+.screen.active{display:flex;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideInR{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes slideInL{from{transform:translateX(-25%);opacity:.6}to{transform:translateX(0);opacity:1}}
+@keyframes slideOutL{from{transform:translateX(0)}to{transform:translateX(-25%);opacity:.5}}
+@keyframes slideOutR{from{transform:translateX(0)}to{transform:translateX(100%)}}
 
-/* ═══════════════════════════════════
-   HERO
-═══════════════════════════════════ */
-#hero{min-height:100svh;padding-top:64px;display:grid;grid-template-columns:1fr 1fr}
-.hl{display:flex;flex-direction:column;justify-content:center;padding:clamp(3rem,6vw,6rem) var(--pad) clamp(3rem,6vw,5rem);background:var(--surf)}
-.h-eye{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--fm);font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin-bottom:1.5rem;opacity:0;animation:fup .6s var(--ease) .1s forwards}
-.eye-dot{width:6px;height:6px;background:var(--brand);border-radius:50%}
-.h-h1{font-family:var(--fd);font-size:clamp(2.4rem,4.5vw,4.5rem);font-weight:700;line-height:1.08;letter-spacing:-.025em;color:var(--on);margin-bottom:1.5rem;opacity:0;animation:fup .7s var(--ease) .22s forwards}
-.h-h1 em{color:var(--brand);font-style:normal}
-.h-sub{font-size:clamp(.95rem,1.15vw,1.05rem);line-height:1.78;color:var(--on-v);max-width:460px;margin-bottom:2.5rem;opacity:0;animation:fup .7s var(--ease) .34s forwards}
-.h-sub strong{color:var(--on);font-weight:700}
-.h-acts{display:flex;gap:.875rem;flex-wrap:wrap;opacity:0;animation:fup .7s var(--ease) .46s forwards}
-.btn-f{display:inline-flex;align-items:center;font-family:var(--fb);font-size:.9375rem;font-weight:700;color:#fff;background:var(--brand);padding:.75rem 1.75rem;border-radius:var(--rpill);text-decoration:none;box-shadow:var(--e1);transition:background .2s,transform .2s var(--ease),box-shadow .2s;white-space:nowrap}
-.btn-f:hover{background:var(--brand-dk);transform:translateY(-2px);box-shadow:var(--e3)}
-.btn-t{display:inline-flex;align-items:center;font-family:var(--fb);font-size:.9375rem;font-weight:700;color:var(--brand);background:var(--brand-lt);padding:.75rem 1.75rem;border-radius:var(--rpill);text-decoration:none;transition:background .2s,transform .2s var(--ease);white-space:nowrap}
-.btn-t:hover{background:#FFE0CC;transform:translateY(-2px)}
-.hr{background:var(--surf1);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(3rem,6vw,5rem) var(--pad);border-left:1px solid var(--surf2);position:relative;overflow:hidden}
-.hr::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--surf2) 1px,transparent 1px),linear-gradient(90deg,var(--surf2) 1px,transparent 1px);background-size:40px 40px;opacity:.5}
-.hr-inner{position:relative;z-index:1;width:100%;max-width:440px}
-.h-stats{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;opacity:0;animation:fup .7s var(--ease) .6s forwards}
-.hs{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r16);padding:1.25rem 1.5rem;box-shadow:var(--e1);transition:box-shadow .2s,transform .2s var(--ease)}
-.hs:hover{box-shadow:var(--e2);transform:translateY(-2px)}
-.hs-n{font-family:var(--fd);font-size:1.75rem;font-weight:700;color:var(--brand);line-height:1;margin-bottom:.25rem}
-.hs-l{font-size:.72rem;color:var(--on-d);font-weight:700;line-height:1.4}
-.zero-card{background:var(--brand);border-radius:var(--r24);padding:1.5rem 1.75rem;display:flex;align-items:center;gap:1rem;opacity:0;animation:fup .7s var(--ease) .76s forwards}
-.zero-n{font-family:var(--fd);font-size:3.5rem;font-weight:700;color:#fff;line-height:1}
-.zero-d{font-size:.875rem;color:rgba(255,255,255,.82);line-height:1.5;font-weight:600}
-@media(max-width:900px){#hero{grid-template-columns:1fr}.hr{border-left:none;border-top:1px solid var(--surf2);padding:2.5rem var(--pad);min-height:0}}
+/* SHARED COMPONENTS */
+.app-bar{padding:54px 4px 0;flex-shrink:0;}
+.app-bar-inner{display:flex;align-items:center;height:64px;padding:0 4px;}
+.app-bar-title{font-family:var(--display);font-size:22px;font-weight:400;color:var(--on-surface);flex:1;padding-left:8px;}
+.app-bar-title.lg{font-size:28px;}
+.icon-btn{width:48px;height:48px;border-radius:50%;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--on-surface);}
+.icon-btn .material-icons-round{font-size:24px;}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:32px;}
+.scroll::-webkit-scrollbar{display:none;}
+.section-lbl{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--primary);padding:16px 16px 8px;}
+.divider{height:1px;background:var(--outline-var);margin:0 16px;}
+.card{background:var(--surface-low);border-radius:12px;margin:8px 16px;overflow:hidden;}
+.card-el{background:var(--surface);border-radius:12px;margin:8px 16px;box-shadow:var(--e1);overflow:hidden;}
+.card-fill{background:var(--surface-container);border-radius:12px;margin:8px 16px;padding:16px;}
+.badge{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:500;gap:4px;}
+.badge-ok{background:var(--success-container);color:var(--success);}
+.badge-warn{background:var(--warning-container);color:var(--warning);}
+.badge-err{background:var(--error-container);color:var(--error);}
+.badge-pri{background:var(--primary-container);color:var(--on-primary-container);}
+.badge-neu{background:var(--surface-var);color:var(--on-surface-var);}
+.btn-fill{height:40px;padding:0 24px;border-radius:20px;background:var(--primary);border:none;font-family:var(--font);font-size:14px;font-weight:500;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+.btn-fill .material-icons-round{font-size:18px;}
+.btn-outline{height:40px;padding:0 24px;border-radius:20px;background:transparent;border:1px solid var(--outline);font-family:var(--font);font-size:14px;font-weight:500;color:var(--primary);cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+.confirm-bar{padding:12px 16px 16px;background:var(--surface);border-top:1px solid var(--outline-var);display:flex;gap:12px;flex-shrink:0;}
+.confirm-bar .btn-outline{flex:1;justify-content:center;}
+.confirm-bar .btn-fill{flex:2;justify-content:center;}
 
-/* ═══════════════════════════════════
-   MARQUEE
-═══════════════════════════════════ */
-.marquee{background:var(--brand);overflow:hidden;padding:.6rem 0;white-space:nowrap}
-.m-inner{display:inline-flex;animation:scrollx 34s linear infinite}
-.m-inner:hover{animation-play-state:paused}
-.mi{font-family:var(--fm);font-size:.66rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.9);padding:0 1.5rem;display:inline-flex;align-items:center;gap:.6rem;flex-shrink:0}
-.mi-dot{width:3px;height:3px;background:rgba(255,255,255,.4);border-radius:50%}
+/* NAV BAR */
+.nav-bar{display:flex;background:var(--surface-low);border-top:1px solid var(--outline-var);flex-shrink:0;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px 0 16px;cursor:pointer;}
+.nav-ind{width:64px;height:32px;border-radius:16px;background:transparent;display:flex;align-items:center;justify-content:center;margin-bottom:4px;}
+.nav-item.active .nav-ind{background:var(--primary-container);}
+.nav-ind .material-icons-round{font-size:22px;color:var(--on-surface-var);}
+.nav-item.active .material-icons-round{color:var(--on-primary-container);}
+.nav-lbl{font-size:12px;color:var(--on-surface-var);font-weight:500;}
+.nav-item.active .nav-lbl{color:var(--on-surface);font-weight:600;}
 
-/* ═══════════════════════════════════
-   SECTION SHELL
-═══════════════════════════════════ */
-.sec{padding:clamp(4rem,7vw,7rem) var(--pad)}
-.si{max-width:var(--max);margin:0 auto}
-.chip{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--fm);font-size:.66rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);background:var(--brand-lt);padding:.28rem .85rem;border-radius:var(--rpill);margin-bottom:1.1rem}
-.sh{font-family:var(--fd);font-size:clamp(1.75rem,3.2vw,3rem);font-weight:700;letter-spacing:-.022em;line-height:1.1;color:var(--on);margin-bottom:1rem}
-.sh em{color:var(--brand);font-style:normal}
-.sb{font-size:1rem;line-height:1.78;color:var(--on-v);max-width:580px}
-.sb strong{color:var(--on);font-weight:700}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2.5rem,5vw,5rem);align-items:start}
-@media(max-width:900px){.two{grid-template-columns:1fr}}
+/* ══ SCREEN 0: SPLASH ════════════════════ */
+#s-splash{background:var(--navy);justify-content:center;align-items:center;}
+.splash-logo{display:flex;flex-direction:column;align-items:center;gap:0;}
+.splash-m{font-family:var(--display);font-size:96px;font-weight:400;color:var(--surface);letter-spacing:-.02em;line-height:1;animation:fadeIn .8s ease forwards;}
+.splash-name{font-family:var(--mono);font-size:13px;letter-spacing:.22em;color:var(--primary);text-transform:uppercase;margin-top:4px;animation:fadeIn .8s .3s ease both;}
+.splash-bar{width:48px;height:3px;background:var(--primary);border-radius:2px;margin-top:20px;animation:fadeIn .6s .6s ease both;}
+.splash-tag{font-size:13px;color:rgba(255,255,255,.4);margin-top:32px;animation:fadeIn .6s 1s ease both;font-weight:300;letter-spacing:.04em;}
 
-/* ═══════════════════════════════════
-   WORLD
-═══════════════════════════════════ */
-#world{background:var(--surf)}
-.stat-cards{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:2rem}
-.sc{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r16);padding:1.25rem 1.5rem;box-shadow:var(--e1);position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s var(--ease)}
-.sc:hover{box-shadow:var(--e3);transform:translateY(-2px)}
-.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--brand)}
-.sc-n{font-family:var(--fd);font-size:1.75rem;font-weight:700;color:var(--brand);display:block;line-height:1;margin-bottom:.25rem}
-.sc-l{font-size:.72rem;color:var(--on-d);line-height:1.4;font-weight:700}
-.bol-wrap{position:sticky;top:80px}
-.bol-tag{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--fm);font-size:.62rem;color:var(--on-d);margin-bottom:.6rem}
-.bol-pulse{width:7px;height:7px;background:var(--brand);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
-.bol-doc{background:#FAFAF8;border:1px solid #E0DDD7;border-radius:var(--r12);overflow:hidden;box-shadow:var(--e3);font-family:var(--fm);font-size:clamp(.48rem,.62vw,.64rem);color:#1C1B18;transform:rotate(-.3deg);transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
-.bol-doc:hover{transform:rotate(0) translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.14)}
-.bol-hd{background:var(--surf-inv);color:var(--surf);padding:.6rem 1.1rem;display:flex;justify-content:space-between;align-items:center}
-.bol-hd-l{font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5)}
-.bol-hd-r{font-size:.5rem;color:var(--brand);letter-spacing:.08em}
-.bol-bd{padding:1rem 1.1rem}
-.bol-title{text-align:center;font-size:.58rem;font-weight:700;border-bottom:1px solid #D5D2CC;padding-bottom:.4rem;margin-bottom:.4rem;letter-spacing:.04em}
-.bol-meta{font-size:.48rem;color:#7A7570;border-bottom:1px solid #E8E5DF;padding-bottom:.3rem;margin-bottom:.3rem}
-.bol-row{display:grid;grid-template-columns:1.7fr 1.2fr .65fr .38fr .62fr .65fr;gap:.2rem;font-size:.5rem;padding:.18rem 0;border-bottom:1px solid #F0EDE7;align-items:center}
-.bol-row.hd{font-weight:700;color:#4A4740;border-bottom:1px solid #D5D2CC;padding-bottom:.28rem;margin-bottom:.18rem}
-.bol-row:last-of-type{border:none}
-.bv{font-weight:700;color:#1C1B18}.bl{color:var(--brand);font-weight:700}
-.bol-foot{font-size:.46rem;color:#9A9590;border-top:1px solid #D5D2CC;padding-top:.3rem;margin-top:.3rem}
-.bol-cap{font-size:.875rem;color:var(--brand);line-height:1.55;margin-top:.8rem;font-style:italic}
-.insight{background:var(--brand-lt);border:1px solid rgba(232,98,10,.18);border-left:4px solid var(--brand);border-radius:var(--r12);padding:1.1rem 1.4rem;margin-top:1.2rem}
-.in-lbl{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);margin-bottom:.4rem;font-weight:500}
-.in-txt{font-size:.875rem;color:var(--on-v);line-height:1.65}
-.in-txt strong{color:var(--on);font-weight:700}
-@media(max-width:900px){.bol-wrap{position:static}}
+/* ══ SCREEN 1: RIG PICKER ════════════════ */
+#s-rig{background:var(--navy);}
+#s-rig .app-bar-title,.s-rig-sub{color:#fff;}
+.rig-intro{padding:0 20px 20px;animation:slideUp .4s ease both;}
+.rig-intro-title{font-family:var(--display);font-size:28px;font-weight:400;color:#fff;line-height:1.15;margin-bottom:8px;}
+.rig-intro-sub{font-size:14px;color:rgba(255,255,255,.5);line-height:1.6;}
 
-/* ═══════════════════════════════════
-   COST / FINANCIAL IMPACT
-═══════════════════════════════════ */
-#cost{background:var(--surf1);border-top:1px solid var(--surf2)}
-.cost-hdr{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,4vw,4rem);align-items:end;margin-bottom:2.5rem}
-@media(max-width:900px){.cost-hdr{grid-template-columns:1fr}}
-.impact-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
-.impact-card{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r24);padding:1.75rem;box-shadow:var(--e1);text-align:center;transition:box-shadow .2s,transform .2s var(--ease)}
-.impact-card:hover{box-shadow:var(--e3);transform:translateY(-3px)}
-.ic-icon{width:48px;height:48px;border-radius:var(--r12);display:flex;align-items:center;justify-content:center;margin:0 auto .875rem;font-size:1.5rem}
-.ic-icon.loss{background:var(--err-bg)}.ic-icon.time{background:var(--warn-bg)}.ic-icon.gain{background:var(--ok-bg)}
-.ic-n{font-family:var(--fd);font-size:2rem;font-weight:700;line-height:1;margin-bottom:.3rem}
-.ic-n.red{color:var(--err)}.ic-n.amber{color:var(--warn)}.ic-n.grn{color:var(--ok)}
-.ic-lbl{font-size:.78rem;color:var(--on-d);font-weight:700;line-height:1.4}
-@media(max-width:600px){.impact-row{grid-template-columns:1fr}}
-.calc-card{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r24);padding:clamp(1.5rem,3vw,2.5rem);box-shadow:var(--e2);margin-bottom:1.5rem}
-.calc-ttl{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--on);margin-bottom:.3rem}
-.calc-sub{font-size:.875rem;color:var(--on-d);margin-bottom:1.75rem}
-.ctrls{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem 2rem;margin-bottom:1.75rem}
-.ctrl label{display:flex;justify-content:space-between;align-items:baseline;font-size:.8125rem;font-weight:700;color:var(--on-v);margin-bottom:.5rem}
-.cv{font-family:var(--fm);font-size:.875rem;color:var(--brand);font-weight:500}
-input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:4px;background:var(--surf2);border-radius:4px;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--brand);box-shadow:var(--e2);cursor:pointer;transition:transform .15s var(--ease)}
-input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
-input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--brand);border:none;cursor:pointer}
-.res-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}@media(max-width:600px){.res-row{grid-template-columns:1fr}}
-.res-card{border-radius:var(--r16);padding:1.25rem;text-align:center}
-.res-card.pot{background:var(--ok-bg);border:1px solid rgba(26,122,82,.15)}
-.res-card.tl{background:var(--warn-bg);border:1px solid rgba(122,85,0,.15)}
-.res-card.ml{background:var(--err-bg);border:1px solid rgba(179,38,30,.15)}
-.res-lbl{font-size:.7rem;font-weight:700;color:var(--on-d);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.06em}
-.res-n{font-family:var(--fd);font-size:1.5rem;font-weight:700;line-height:1;margin-bottom:.25rem}
-.res-card.pot .res-n{color:var(--ok)}.res-card.tl .res-n{color:var(--warn)}.res-card.ml .res-n{color:var(--err)}
-.res-sub{font-size:.7rem;color:var(--on-d)}
-@media(max-width:600px){.ctrls{grid-template-columns:1fr}.res-row{grid-template-columns:1fr}}
-.chart-card{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r24);padding:clamp(1.5rem,3vw,2.5rem);box-shadow:var(--e1)}
-.ch-hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem}
-.ch-ttl{font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--on)}
-.ch-sub{font-size:.8rem;color:var(--on-d);margin-top:.15rem}
-.legend{display:flex;gap:1rem;flex-wrap:wrap}
-.leg-item{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--on-v);font-weight:700}
-.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-.leg-dot.l{background:#F28B82}.leg-dot.g{background:#81C995}
-.ch-area{display:flex;align-items:flex-end;gap:clamp(.5rem,1.5vw,1.25rem);height:240px;padding-bottom:2rem;border-bottom:2px solid var(--surf2);position:relative;margin-bottom:1.5rem}
-.ch-area::before{content:'';position:absolute;left:0;right:0;top:0;border-top:1px dashed var(--surf2)}
-.dg{display:flex;align-items:flex-end;gap:4px;flex:1;height:100%;position:relative}
-.bar{flex:1;border-radius:6px 6px 0 0;min-height:2px;transition:height 1s var(--ease);position:relative;cursor:default;overflow:visible}
-.bar.l{background:#F28B82}.bar.g{background:#81C995}
-.bar.l:hover{background:#EF6C6C}.bar.g:hover{background:#5DB87A}
-.dlbl{position:absolute;bottom:-1.6rem;left:0;right:0;text-align:center;font-size:.68rem;color:var(--on-d);font-weight:700}
-.time-split{display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:center}
-.donut-wrap{position:relative;width:180px;height:180px;flex-shrink:0}
-.donut-wrap svg{transform:rotate(-90deg)}
-.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.dn{font-family:var(--fd);font-size:1.9rem;font-weight:700;color:var(--err);line-height:1}
-.dl{font-size:.7rem;color:var(--on-d);font-weight:700;margin-top:.2rem}
-.donut-legend{display:flex;flex-direction:column;gap:.75rem}
-.dl-item{display:flex;align-items:center;gap:.7rem}
-.dl-sw{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-.dl-tn{font-family:var(--fd);font-size:.95rem;font-weight:700;color:var(--on)}
-.dl-tl{font-size:.75rem;color:var(--on-d);font-weight:700}
-@media(max-width:640px){.time-split{grid-template-columns:1fr}.donut-wrap{margin:0 auto}}
+/* drum-roll scroll picker */
+.picker-wrap{position:relative;height:240px;overflow:hidden;margin:0 16px;}
+.picker-fade-top{position:absolute;top:0;left:0;right:0;height:72px;background:linear-gradient(to bottom,var(--navy),transparent);z-index:10;pointer-events:none;}
+.picker-fade-bot{position:absolute;bottom:0;left:0;right:0;height:72px;background:linear-gradient(to top,var(--navy),transparent);z-index:10;pointer-events:none;}
+.picker-selector{position:absolute;top:50%;left:0;right:0;height:56px;transform:translateY(-50%);border-top:1px solid rgba(232,98,10,.5);border-bottom:1px solid rgba(232,98,10,.5);z-index:5;pointer-events:none;}
+.picker-list{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;padding:92px 0;}
+.picker-list::-webkit-scrollbar{display:none;}
+.picker-item{height:56px;display:flex;align-items:center;padding:0 20px;scroll-snap-align:center;cursor:pointer;transition:opacity .2s;}
+.picker-item .pi-name{font-size:17px;font-weight:500;color:#fff;}
+.picker-item .pi-sub{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px;}
+.picker-item.selected .pi-name{color:var(--primary);}
+.picker-item.selected .pi-sub{color:rgba(232,98,10,.6);}
 
-/* ═══════════════════════════════════
-   PROBLEM
-═══════════════════════════════════ */
-#problem{background:var(--surf)}
-.prob-hdr{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,4vw,4rem);align-items:end;margin-bottom:2.5rem}
-@media(max-width:900px){.prob-hdr{grid-template-columns:1fr}}
-.moments{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.moment{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r24);overflow:hidden;box-shadow:var(--e1);transition:box-shadow .2s,transform .2s var(--ease)}
-.moment:hover{box-shadow:var(--e3);transform:translateY(-3px)}
-.m-stripe{height:4px;background:var(--brand)}
-.m-body{padding:1.75rem}
-.m-chip{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--brand-lt);border-radius:var(--r12);font-family:var(--fm);font-size:.7rem;font-weight:700;color:var(--brand);margin-bottom:1rem}
-.m-lbl{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);font-weight:500;margin-bottom:.5rem}
-.m-ttl{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--on);line-height:1.25;margin-bottom:.75rem;letter-spacing:-.01em}
-.m-cost{display:flex;align-items:flex-start;gap:.5rem;background:var(--err-bg);border-radius:var(--r8);padding:.5rem .75rem;margin-bottom:.875rem}
-.m-ci{font-size:1rem}
-.m-ct{font-family:var(--fm);font-size:.7rem;color:var(--err);font-weight:500;line-height:1.45}
-.m-p{font-size:.875rem;color:var(--on-v);line-height:1.72}
-.m-p strong{color:var(--on);font-weight:700}
-@media(max-width:900px){.moments{grid-template-columns:1fr}}
-.pullquote{margin-top:2.5rem;background:var(--brand);border-radius:var(--r24);padding:clamp(2rem,3vw,3rem);display:flex;gap:1.25rem;align-items:flex-start}
-.pq-mk{font-size:4rem;line-height:.75;color:rgba(255,255,255,.22);font-style:italic;flex-shrink:0;font-family:Georgia,serif}
-.pq-tx{font-size:clamp(.95rem,1.35vw,1.15rem);color:rgba(255,255,255,.9);line-height:1.62;font-style:italic}
+.rig-details{margin:12px 16px 0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;}
+.rig-details-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:10px;}
+.rig-specs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.rig-spec{background:rgba(255,255,255,.05);border-radius:8px;padding:10px 12px;}
+.rig-spec .rs-val{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--primary);}
+.rig-spec .rs-lbl{font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;}
 
-/* ═══════════════════════════════════
-   SOLUTION
-═══════════════════════════════════ */
-#solution{background:var(--surf1);border-top:1px solid var(--surf2)}
-.sol-hdr{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,4vw,4rem);align-items:end;margin-bottom:2.5rem}
-@media(max-width:900px){.sol-hdr{grid-template-columns:1fr}}
-.sol-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem}@media(max-width:860px){.sol-cards{grid-template-columns:1fr}}
-.sol-card{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r24);overflow:hidden;box-shadow:var(--e1);transition:box-shadow .2s,transform .2s var(--ease)}
-.sol-card:hover{box-shadow:var(--e3);transform:translateY(-3px)}
-.sol-top{height:4px;background:var(--brand)}
-.sol-bd{padding:1.75rem}
-.sol-tag{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);font-weight:500;margin-bottom:.4rem}
-.sol-ttl{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--on);line-height:1.25;margin-bottom:.875rem}
-.sol-p{font-size:.9rem;color:var(--on-v);line-height:1.75}
-.sol-p strong{color:var(--on);font-weight:700}
-@media(max-width:600px){.sol-cards{grid-template-columns:1fr}}
-.collab-card{background:var(--surf-inv);border-radius:var(--r24);padding:clamp(2rem,3vw,3rem);display:grid;grid-template-columns:auto 1fr;gap:clamp(1.5rem,3vw,3rem);align-items:center;margin-bottom:1rem}
-.collab-hl{font-family:var(--fd);font-size:clamp(1.25rem,2vw,1.75rem);font-weight:700;color:var(--surf);line-height:1.15;letter-spacing:-.02em;white-space:nowrap}
-.collab-hl span{color:var(--brand)}
-.collab-p{font-size:.9375rem;color:rgba(255,255,255,.62);line-height:1.78}
-.collab-p strong{color:var(--surf);font-weight:700}
-@media(max-width:600px){.collab-card{grid-template-columns:1fr}.collab-hl{white-space:normal}}
-.formats-card{background:var(--brand-lt);border:1px solid rgba(232,98,10,.18);border-left:4px solid var(--brand);border-radius:var(--r16);padding:1.2rem 1.75rem;display:flex;gap:1.25rem;align-items:baseline;flex-wrap:wrap;margin-bottom:1.5rem}
-.fmt-lbl{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);font-weight:500;white-space:nowrap;flex-shrink:0}
-.fmt-p{font-size:.9rem;color:var(--on-v);line-height:1.65}
-.fmt-p strong{color:var(--on);font-weight:700}
-.outcomes{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
-.out{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r16);padding:1.25rem;box-shadow:var(--e1);transition:box-shadow .2s,transform .2s var(--ease)}
-.out:hover{box-shadow:var(--e2);transform:translateY(-2px)}
-.out-ic{font-size:1.4rem;margin-bottom:.6rem}
-.out-t{font-size:.9rem;font-weight:700;color:var(--on);margin-bottom:.3rem}
-.out-b{font-size:.78rem;color:var(--on-d);line-height:1.6}
-@media(max-width:900px){.outcomes{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.outcomes{grid-template-columns:1fr}}
+.rig-cta{margin:16px;animation:slideUp .4s .2s ease both;}
+.rig-cta .btn-fill{width:100%;justify-content:center;height:52px;border-radius:16px;font-size:16px;}
 
-/* ═══════════════════════════════════
-   TEAM
-═══════════════════════════════════ */
-#team{background:var(--surf)}
-.team-hdr{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,4vw,4rem);align-items:end;margin-bottom:2.5rem}
-@media(max-width:900px){.team-hdr{grid-template-columns:1fr}}
-.people{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
-.pcard{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r24);overflow:hidden;box-shadow:var(--e1);transition:box-shadow .2s,transform .2s var(--ease)}
-.pcard:hover{box-shadow:var(--e3);transform:translateY(-3px)}
-.p-top{background:var(--surf-inv);padding:1.5rem 1.75rem;display:flex;align-items:center;gap:1rem}
-.avatar{width:52px;height:52px;background:var(--brand);border-radius:var(--r12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.avatar span{font-family:var(--fd);font-size:1rem;font-weight:700;color:#fff}
-.p-name{font-family:var(--fd);font-size:1.2rem;font-weight:700;color:var(--surf);margin-bottom:.2rem}
-.p-role{font-size:.75rem;color:rgba(255,255,255,.5);font-weight:600;line-height:1.4}
-.p-bio-wrap{padding:1.75rem}
-.p-bio{font-size:.9rem;color:var(--on-v);line-height:1.78}
-.p-bio strong{color:var(--on);font-weight:700}
-@media(max-width:900px){.people{grid-template-columns:1fr}}
-.caps{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
-.cap{background:var(--surf1);border:1px solid var(--surf2);border-radius:var(--r16);padding:1.25rem;transition:box-shadow .2s,transform .2s var(--ease)}
-.cap:hover{box-shadow:var(--e2);transform:translateY(-2px)}
-.cap-n{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--brand-lt);border-radius:var(--r8);font-family:var(--fm);font-size:.65rem;color:var(--brand);font-weight:700;margin-bottom:.75rem}
-.cap-t{font-size:.9rem;font-weight:700;color:var(--on);margin-bottom:.3rem}
-.cap-b{font-size:.78rem;color:var(--on-d);line-height:1.6}
-@media(max-width:900px){.caps{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.caps{grid-template-columns:1fr}}
+/* ══ SCREEN 2: HOME ══════════════════════ */
+.greeting-card{margin:8px 16px 0;background:linear-gradient(135deg,var(--navy) 0%,#1E3048 100%);border-radius:16px;padding:24px;color:#fff;position:relative;overflow:hidden;}
+.greeting-card::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(232,98,10,.12);}
+.greeting-card::before{content:'';position:absolute;right:20px;bottom:-30px;width:80px;height:80px;border-radius:50%;background:rgba(232,98,10,.08);}
+.g-name{font-size:14px;opacity:.7;margin-bottom:4px;}
+.g-title{font-family:var(--display);font-size:24px;font-weight:500;margin-bottom:16px;}
+.g-stats{display:flex;gap:24px;}
+.g-stat .n{font-family:var(--mono);font-size:22px;font-weight:500;color:#E8620A;}
+.g-stat .l{font-size:11px;opacity:.6;margin-top:2px;}
+.scan-action{margin:16px;background:var(--primary);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;cursor:pointer;box-shadow:var(--e2);}
+.scan-icon{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.scan-icon .material-icons-round{font-size:28px;color:#fff;}
+.scan-text .t{font-size:16px;font-weight:600;color:#fff;}
+.scan-text .s{font-size:13px;color:rgba(255,255,255,.75);margin-top:2px;}
+.list-item{display:flex;align-items:center;padding:12px 16px;min-height:56px;cursor:pointer;gap:0;}
+.li-lead{width:40px;height:40px;border-radius:50%;background:var(--primary-container);display:flex;align-items:center;justify-content:center;margin-right:16px;flex-shrink:0;}
+.li-lead .material-icons-round{font-size:20px;color:var(--on-primary-container);}
+.li-content{flex:1;}
+.li-headline{font-size:16px;font-weight:500;color:var(--on-surface);}
+.li-support{font-size:14px;color:var(--on-surface-var);margin-top:2px;}
 
-/* ═══════════════════════════════════
-   PILOT
-═══════════════════════════════════ */
-#pilot{background:var(--surf1);border-top:1px solid var(--surf2)}
-.phases{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin:2.5rem 0}
-.phase{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r24);overflow:hidden;box-shadow:var(--e1);transition:box-shadow .2s,transform .2s var(--ease)}
-.phase:hover{box-shadow:var(--e3);transform:translateY(-3px)}
-.ph-stripe{height:4px}
-.p1 .ph-stripe{background:var(--ok)}.p2 .ph-stripe{background:var(--brand)}
-.ph-in{padding:2rem}
-.ph-tag{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-d);font-weight:500;margin-bottom:.4rem}
-.ph-name{font-family:var(--fd);font-size:1.35rem;font-weight:700;color:var(--on);letter-spacing:-.01em;line-height:1.2;margin-bottom:1rem}
-.ph-p{font-size:.9rem;color:var(--on-v);line-height:1.75}
-.ph-p strong{color:var(--on);font-weight:700}
-.badge{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--fm);font-size:.65rem;font-weight:500;padding:.3rem .8rem;border-radius:var(--rpill);margin-top:1.25rem}
-.badge.a{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(26,122,82,.18)}
-.badge.c{background:var(--brand-lt);color:var(--brand-dk);border:1px solid rgba(232,98,10,.18)}
-.bdot{width:5px;height:5px;border-radius:50%}
-.badge.a .bdot{background:var(--ok);animation:pulse 1.5s infinite}
-.badge.c .bdot{background:var(--brand)}
-@media(max-width:600px){.phases{grid-template-columns:1fr}}
-.origins-card{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r24);padding:clamp(1.5rem,3vw,2.5rem);box-shadow:var(--e1)}
-.or-hd{font-family:var(--fm);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);font-weight:500;margin-bottom:1.75rem}
-.or-cols{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
-.or-reg{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-d);font-weight:500;padding-bottom:.6rem;border-bottom:1px solid var(--surf2);margin-bottom:.875rem}
-.or-list{list-style:none;display:flex;flex-direction:column;gap:.5rem}
-.or-list li{display:flex;gap:.6rem;align-items:baseline;font-size:.875rem;color:var(--on-v);line-height:1.5}
-.or-list li::before{content:'';width:5px;height:5px;background:var(--brand);border-radius:50%;flex-shrink:0;margin-top:.42rem}
-.or-list strong{color:var(--on);font-weight:700}
-@media(max-width:600px){.or-cols{grid-template-columns:1fr}}
+/* ══ SCREEN 3: SCAN ══════════════════════ */
+#s-scan{background:#000;}
+.viewfinder{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(0,0,0,.6) 0%,rgba(0,0,0,.15) 30%,rgba(0,0,0,.15) 70%,rgba(0,0,0,.6) 100%);}
+.bol-mock{width:310px;background:#F5F2ED;border-radius:4px;padding:14px;font-family:var(--mono);font-size:7.5px;color:#1A1A1A;line-height:1.75;box-shadow:0 20px 60px rgba(0,0,0,.5);transform:perspective(600px) rotateX(3deg);}
+.bol-mock .bh{text-align:center;font-weight:700;font-size:7px;letter-spacing:.05em;border-bottom:1px solid #ccc;padding-bottom:3px;margin-bottom:3px;}
+.bol-mock .bm{font-size:5.5px;color:#666;margin-bottom:3px;}
+.bol-mock .bcols{display:grid;grid-template-columns:26mm 18mm 9mm 7mm;font-size:5.5px;font-weight:700;color:#555;border-bottom:1px solid #ccc;padding-bottom:2px;margin-bottom:2px;}
+.bol-mock .brow{display:grid;grid-template-columns:26mm 18mm 9mm 7mm;font-size:5.5px;padding:1px 0;border-bottom:1px dotted #ddd;}
+.brow .bv{font-weight:600;color:#0B1726;}
+.brow .bl{color:#E8620A;font-weight:700;}
+.scan-frame{position:absolute;width:330px;height:210px;top:50%;left:50%;transform:translate(-50%,-50%);}
+.sc{position:absolute;width:22px;height:22px;border-color:#E8620A;border-style:solid;}
+.sc.tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0;}
+.sc.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0;}
+.sc.bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px;}
+.sc.br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0;}
+.scan-line{position:absolute;left:4px;right:4px;height:2px;background:linear-gradient(90deg,transparent,#E8620A,transparent);top:0;animation:scanDown 2s ease-in-out infinite;}
+@keyframes scanDown{0%{top:4px;opacity:1}90%{opacity:1}100%{top:calc(100% - 4px);opacity:0}}
+.scan-bottom{padding:16px 24px 32px;background:linear-gradient(transparent,rgba(0,0,0,.92));text-align:center;}
+.scan-status{font-size:16px;color:#fff;font-weight:500;margin-bottom:6px;}
+.scan-sub{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:16px;}
+.vin-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(29,107,62,.8);border-radius:20px;padding:5px 12px;font-family:var(--mono);font-size:10.5px;color:#fff;margin:2px;animation:fadeIn .3s ease both;}
+.vin-chip .material-icons-round{font-size:13px;color:#4ADE80;}
 
-/* ═══════════════════════════════════
-   VISION
-═══════════════════════════════════ */
-#vision{background:var(--surf)}
-.vis-g{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2.5rem,5vw,5rem);align-items:start}
-@media(max-width:900px){.vis-g{grid-template-columns:1fr}}
-.roadmap{margin-top:2rem}
-.rm{display:grid;grid-template-columns:32px 1fr;gap:1rem;padding-bottom:1.75rem}
-.rm:last-child{padding-bottom:0}
-.rm-tr{display:flex;flex-direction:column;align-items:center;padding-top:3px}
-.rm-dot{width:12px;height:12px;border-radius:50%;background:var(--brand);flex-shrink:0;box-shadow:0 0 0 3px var(--brand-lt)}
-.rm-dot.f{background:var(--surf2);box-shadow:0 0 0 3px var(--surf2)}
-.rm-line{width:2px;flex:1;background:var(--surf2);margin-top:5px}
-.rm-t{font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--on);margin-bottom:.25rem;line-height:1.3}
-.rm-t.dim{color:var(--on-d);font-weight:600}
-.rm-b{font-size:.85rem;color:var(--on-d);line-height:1.68}
-.dest-card{background:var(--brand);border-radius:var(--r24);padding:clamp(2rem,3vw,3rem);position:relative;overflow:hidden}
-.dest-card::after{content:'';position:absolute;top:-50%;right:-20%;width:60%;height:160%;background:rgba(255,255,255,.04);border-radius:50%}
-.dest-lbl{font-family:var(--fm);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.48);margin-bottom:.8rem;font-weight:500}
-.dest-q{font-size:clamp(1.05rem,1.7vw,1.3rem);color:#fff;line-height:1.52;font-style:italic;margin-bottom:1.2rem;font-family:Georgia,serif;position:relative;z-index:2}
-.dest-sub{font-size:.9rem;color:rgba(255,255,255,.7);line-height:1.72;position:relative;z-index:2}
-.journey-card{background:var(--surf1);border:1px solid var(--surf2);border-radius:var(--r24);padding:1.75rem;margin-top:1.25rem}
-.jrny-lbl{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-d);font-weight:500;margin-bottom:1.5rem}
-.jsteps{display:flex;align-items:flex-start;position:relative}
-.jsteps::before{content:'';position:absolute;top:14px;left:14px;right:14px;height:2px;background:var(--surf2);z-index:0}
-.jstep{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1}
-.jdot{width:28px;height:28px;border-radius:50%;background:var(--surf);border:2px solid var(--surf2);display:flex;align-items:center;justify-content:center;margin-bottom:.65rem;font-family:var(--fm);font-size:.55rem;font-weight:700;color:var(--on-d)}
-.jstep.active .jdot{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 0 0 4px var(--brand-lt)}
-.jlbl{font-size:.68rem;color:var(--on-d);line-height:1.4;font-weight:700;padding:0 .15rem}
-.jstep.active .jlbl{color:var(--brand);font-weight:700}
-.nc-card{background:var(--surf);border:1px solid var(--surf2);border-radius:var(--r24);padding:1.75rem;margin-top:1.25rem}
-.nc-hd{font-family:var(--fm);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-d);font-weight:500;margin-bottom:1rem}
-.nc-g{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
-.nc-t{font-size:.9rem;font-weight:700;color:var(--on);margin-bottom:.3rem}
-.nc-b{font-size:.78rem;color:var(--on-d);line-height:1.6}
-@media(max-width:480px){.nc-g{grid-template-columns:1fr}}
+/* ══ SCREEN 4: DECODE ════════════════════ */
+.decode-sum{margin:8px 16px 0;background:var(--primary-container);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:16px;}
+.decode-sum .dn{font-family:var(--display);font-size:40px;font-weight:400;color:var(--on-primary-container);line-height:1;}
+.decode-sum .dt{font-size:16px;font-weight:500;color:var(--on-primary-container);}
+.decode-sum .ds{font-size:13px;color:var(--on-surface-var);margin-top:2px;}
+.veh-card{margin:5px 16px;background:var(--surface);border-radius:12px;box-shadow:var(--e1);padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.veh-rank{width:30px;height:30px;border-radius:50%;background:var(--surface-container);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:600;color:var(--on-surface-var);flex-shrink:0;}
+.veh-info{flex:1;min-width:0;}
+.veh-name{font-size:14px;font-weight:500;color:var(--on-surface);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.veh-vin{font-family:var(--mono);font-size:11px;color:var(--on-surface-var);margin-top:2px;}
+.veh-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
 
-/* ═══════════════════════════════════
-   CONTACT
-═══════════════════════════════════ */
-#contact{background:var(--surf-inv);padding:clamp(5rem,8vw,8rem) var(--pad)}
-.cta-g{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:clamp(3rem,5vw,6rem);align-items:center}
-.cta-h{font-family:var(--fd);font-size:clamp(2rem,3.8vw,3.5rem);font-weight:700;color:var(--surf);letter-spacing:-.025em;line-height:1.05;margin-bottom:1rem}
-.cta-p{font-size:1rem;color:rgba(255,255,255,.58);line-height:1.75;margin-bottom:2rem}
-.cta-btn{display:inline-flex;align-items:center;font-family:var(--fb);font-size:.9375rem;font-weight:700;background:var(--brand);color:#fff;padding:.875rem 2rem;border-radius:var(--rpill);text-decoration:none;box-shadow:var(--e2);transition:background .2s,transform .2s var(--ease)}
-.cta-btn:hover{background:var(--brand-dk);transform:translateY(-2px)}
-.cta-pts{display:flex;flex-direction:column;gap:.9rem}
-.cta-pt{display:flex;align-items:baseline;gap:.75rem;font-size:.9375rem;color:rgba(255,255,255,.6);line-height:1.55}
-.cta-pt::before{content:'';width:5px;height:5px;background:var(--brand);border-radius:50%;flex-shrink:0;margin-top:.44rem}
-.cta-pt strong{color:#fff;font-weight:700}
-@media(max-width:900px){.cta-g{grid-template-columns:1fr}}
-footer{background:#111;border-top:1px solid rgba(255,255,255,.06);padding:1.75rem var(--pad);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem}
-.foot-logo{font-family:var(--fd);font-size:1rem;font-weight:700;color:var(--brand)}
-.foot-meta{font-family:var(--fm);font-size:.62rem;color:rgba(255,255,255,.2)}
+/* ══ SCREEN 5: SLOTS ══════════════════════ */
+.wt-card{margin:8px 16px 0;background:var(--navy);border-radius:16px;padding:20px;color:#fff;}
+.wt-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+.wt-lbl{font-size:13px;opacity:.65;}
+.wt-val{font-family:var(--display);font-size:28px;font-weight:400;color:#fff;line-height:1;margin-top:4px;}
+.wt-limit{font-size:11px;opacity:.45;margin-top:2px;}
+.wt-ok{background:rgba(29,158,117,.2);border:1px solid rgba(29,158,117,.4);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;color:#4ADE80;display:flex;align-items:center;gap:4px;}
+.wt-track{height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;}
+.wt-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#1D9E75,#E8620A);width:80.6%;}
+.wt-labels{display:flex;justify-content:space-between;margin-top:6px;font-size:9.5px;opacity:.45;}
+.rig-vis{margin:10px 16px 0;background:var(--surface-low);border-radius:12px;padding:14px;}
+.rv-lbl{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--on-surface-var);margin-bottom:10px;}
+.deck-row{display:flex;gap:3px;align-items:center;margin-bottom:6px;}
+.deck-lbl{font-size:9px;color:var(--on-surface-var);width:28px;text-align:right;padding-right:5px;flex-shrink:0;}
+.slot{flex:1;height:42px;border-radius:7px;background:var(--surface-container);border:1.5px solid var(--outline-var);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
+.slot.filled{background:var(--primary-container);border-color:var(--primary);}
+.slot.rev{background:#FFDEA3;border-color:#E8A70A;}
+.slot .sn{font-family:var(--mono);font-size:8.5px;font-weight:600;color:var(--on-surface-var);}
+.slot .sv{font-size:7px;font-weight:500;color:var(--on-primary-container);text-align:center;padding:0 1px;line-height:1.2;}
+.slot.filled .sn{color:var(--primary);}
+.slot.rev .sn{color:#7B5800;}
+.slot-list-item{display:flex;align-items:center;padding:11px 16px;gap:13px;border-bottom:1px solid var(--outline-var);cursor:pointer;}
+.slot-list-item:last-child{border-bottom:none;}
+.sl-num{width:34px;height:34px;border-radius:9px;background:var(--primary-container);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;color:var(--primary);flex-shrink:0;}
+.sl-info{flex:1;}
+.sl-name{font-size:14px;font-weight:500;color:var(--on-surface);}
+.sl-vin{font-family:var(--mono);font-size:11px;color:var(--on-surface-var);margin-top:1px;}
+.sl-right{text-align:right;}
+.sl-wt{font-family:var(--mono);font-size:12px;color:var(--on-surface-var);}
+.sl-reason{font-size:11px;color:var(--primary);margin-top:2px;}
 
-/* ═══════════════════════════════════
-   KEYFRAMES
-═══════════════════════════════════ */
-@keyframes fup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-@keyframes scrollx{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+/* ══ SCREEN 6: WARNING ════════════════════ */
+.warn-banner{margin:8px 16px 0;background:var(--error-container);border-radius:12px;padding:16px;display:flex;gap:12px;align-items:flex-start;}
+.warn-banner .material-icons-round{color:var(--error);font-size:24px;flex-shrink:0;}
+.warn-title{font-size:14px;font-weight:600;color:var(--error);margin-bottom:4px;}
+.warn-body{font-size:13px;color:var(--on-surface);line-height:1.5;}
+.reason-card{margin:8px 16px 0;background:var(--surface);border-radius:12px;box-shadow:var(--e1);overflow:hidden;}
+.reason-hdr{padding:13px 16px 9px;border-bottom:1px solid var(--outline-var);}
+.reason-title{font-size:14px;font-weight:600;color:var(--on-surface);}
+.reason-sub{font-size:12px;color:var(--on-surface-var);margin-top:2px;}
+.reason-row{display:flex;align-items:center;padding:9px 16px;gap:12px;border-bottom:1px solid var(--outline-var);}
+.reason-row:last-child{border-bottom:none;}
+.ri-ok .material-icons-round{color:var(--success);font-size:20px;}
+.ri-warn .material-icons-round{color:var(--warning);font-size:20px;}
+.ri-err .material-icons-round{color:var(--error);font-size:20px;}
+.rl{flex:1;}
+.rl-lbl{font-size:13px;font-weight:500;color:var(--on-surface);}
+.rl-val{font-family:var(--mono);font-size:11px;color:var(--on-surface-var);margin-top:1px;}
+.override-bar{padding:12px 16px 16px;background:var(--surface);border-top:1px solid var(--outline-var);flex-shrink:0;}
+.btn-err{height:40px;padding:0 24px;border-radius:20px;background:var(--error-container);border:none;font-family:var(--font);font-size:14px;font-weight:500;color:var(--error);cursor:pointer;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-bottom:8px;}
+.btn-err .material-icons-round{font-size:18px;}
+
+/* ══ SCREEN 7: YARD MAP ══════════════════ */
+.map-cont{flex:1;position:relative;background:#DDD5C8;overflow:hidden;min-height:300px;}
+/* asphalt base */
+.asphalt{position:absolute;inset:0;background:#C8C0B4;}
+/* painted rows */
+.row-section{position:absolute;}
+.row-section .row-label{position:absolute;font-family:var(--mono);font-size:8px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.05em;}
+.drive-lane{position:absolute;background:#B8B0A4;}
+.spot{position:absolute;border:1px solid rgba(255,255,255,.25);border-radius:1px;}
+.spot.empty{background:rgba(255,255,255,.12);}
+.spot.target{background:rgba(232,98,10,.25);border:1.5px solid rgba(232,98,10,.8);}
+.spot.done{background:rgba(29,107,62,.25);border:1.5px solid rgba(29,107,62,.7);}
+/* painted slot number on asphalt */
+.slot-paint{position:absolute;font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(255,255,255,.55);text-align:center;pointer-events:none;}
+/* section divider */
+.section-divider{position:absolute;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;}
+.section-name{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.5);text-transform:uppercase;}
+/* route SVG */
+.route-svg{position:absolute;inset:0;width:100%;height:100%;}
+/* map pins */
+.mpin{position:absolute;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%);z-index:20;cursor:pointer;}
+.pin-bub{border-radius:20px 20px 20px 4px;padding:4px 8px;font-size:9.5px;font-weight:600;font-family:var(--mono);box-shadow:var(--e2);white-space:nowrap;}
+.pin-bub.active{background:var(--navy);color:#fff;animation:pulse 1.5s ease-in-out infinite;}
+.pin-bub.done{background:#1D6B3E;color:#fff;}
+.pin-bub.todo{background:var(--primary);color:#fff;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.pin-dot{width:6px;height:6px;border-radius:50%;margin-top:-1px;}
+.pin-dot.active{background:var(--navy);}
+.pin-dot.done{background:#1D6B3E;}
+.pin-dot.todo{background:var(--primary);}
+/* you-are-here */
+.you-here{position:absolute;z-index:25;transform:translate(-50%,-50%);}
+.yh-ring{width:20px;height:20px;border-radius:50%;background:rgba(232,98,10,.3);border:2px solid var(--primary);animation:yh 2s ease-in-out infinite;}
+@keyframes yh{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.5}}
+.yh-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:var(--primary);}
+/* bottom sheet */
+.map-sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:0 0 16px;flex-shrink:0;box-shadow:0 -2px 10px rgba(0,0,0,.1);}
+.sheet-handle{width:32px;height:4px;background:var(--outline-var);border-radius:2px;margin:12px auto 14px;}
+.next-stop{margin:0 16px 12px;background:var(--primary);border-radius:12px;padding:13px 16px;display:flex;align-items:center;gap:12px;}
+.ns-num{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
+.ns-info{flex:1;}
+.ns-lbl{font-size:10px;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.08em;}
+.ns-name{font-size:15px;font-weight:600;color:#fff;margin-top:2px;}
+.ns-dist{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.65);margin-top:1px;}
+.stop-q{display:flex;gap:7px;padding:0 16px;overflow-x:auto;}
+.stop-q::-webkit-scrollbar{display:none;}
+.sq-chip{flex-shrink:0;background:var(--surface-container);border-radius:8px;padding:7px 10px;min-width:66px;border:1.5px solid transparent;}
+.sq-chip.active{border-color:var(--primary);}
+.sq-chip.done{opacity:.5;}
+.sqn{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--primary);}
+.sq-chip.done .sqn{color:var(--success);}
+.sql{font-family:var(--mono);font-size:9.5px;color:var(--on-surface-var);}
+.sqv{font-size:8.5px;color:var(--on-surface-var);}
+
+/* ══ SCREEN 8: LOAD CONFIRM ══════════════ */
+.lc-hero{margin:8px 16px 0;background:linear-gradient(135deg,var(--navy) 0%,#1a3a20 100%);border-radius:16px;padding:24px;color:#fff;text-align:center;position:relative;overflow:hidden;}
+.lc-icon{width:64px;height:64px;border-radius:50%;background:rgba(29,158,117,.25);border:2px solid rgba(29,158,117,.5);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.lc-icon .material-icons-round{font-size:32px;color:#4ADE80;}
+.lc-title{font-family:var(--display);font-size:24px;font-weight:500;margin-bottom:6px;}
+.lc-sub{font-size:14px;opacity:.65;line-height:1.5;}
+.lc-check-item{display:flex;align-items:center;padding:11px 16px;gap:14px;border-bottom:1px solid var(--outline-var);}
+.lc-check-item:last-child{border-bottom:none;}
+.lc-chk{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lc-chk.ok{background:var(--success-container);}
+.lc-chk.ok .material-icons-round{color:var(--success);font-size:18px;}
+.lc-text{flex:1;}
+.lc-lbl{font-size:14px;font-weight:500;color:var(--on-surface);}
+.lc-val{font-size:12px;color:var(--on-surface-var);margin-top:2px;}
+
+/* ══ SCREEN 9: DELIVERY ══════════════════ */
+.dealer-hero{margin:8px 16px 0;background:var(--navy2);border-radius:16px;overflow:hidden;}
+.dealer-map-preview{height:140px;position:relative;background:#2A3A4A;overflow:hidden;}
+/* simple dealer area map */
+.dmap-road-h{position:absolute;background:#3A4A5A;height:18px;}
+.dmap-road-v{position:absolute;background:#3A4A5A;width:18px;}
+.dmap-block{position:absolute;border-radius:3px;}
+.dmap-dealer{position:absolute;background:rgba(232,98,10,.3);border:2px solid var(--primary);border-radius:4px;display:flex;align-items:center;justify-content:center;}
+.dmap-dealer-lbl{font-family:var(--mono);font-size:8px;font-weight:700;color:var(--primary);}
+.dmap-arrow{position:absolute;z-index:10;}
+.dmap-you{position:absolute;z-index:15;transform:translate(-50%,-50%);}
+.dmap-ring{width:16px;height:16px;border-radius:50%;background:rgba(232,98,10,.4);border:2px solid var(--primary);animation:yh 2s ease-in-out infinite;}
+.dmap-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:6px;height:6px;border-radius:50%;background:var(--primary);}
+.dmap-route{position:absolute;inset:0;}
+.dealer-info{padding:14px 16px 16px;}
+.di-name{font-size:16px;font-weight:600;color:#fff;margin-bottom:2px;}
+.di-addr{font-size:13px;color:rgba(255,255,255,.5);}
+.dealer-badge-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.note-card{margin:6px 16px;background:var(--surface);border-radius:12px;box-shadow:var(--e1);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
+.nc-icon{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.nc-icon.orange{background:var(--primary-container);}
+.nc-icon.blue{background:#D3E4FF;}
+.nc-icon.green{background:var(--success-container);}
+.nc-icon.warn{background:var(--warning-container);}
+.nc-icon .material-icons-round{font-size:18px;}
+.nc-icon.orange .material-icons-round{color:var(--on-primary-container);}
+.nc-icon.blue .material-icons-round{color:#0B57D0;}
+.nc-icon.green .material-icons-round{color:var(--success);}
+.nc-icon.warn .material-icons-round{color:var(--warning);}
+.nc-content{flex:1;}
+.nc-title{font-size:13px;font-weight:600;color:var(--on-surface);margin-bottom:3px;}
+.nc-body{font-size:13px;color:var(--on-surface-var);line-height:1.55;}
+.approach-card{margin:6px 16px;background:var(--navy);border-radius:12px;padding:16px;}
+.ac-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.ac-title .material-icons-round{font-size:18px;color:var(--primary);}
+.ac-step{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;}
+.ac-step:last-child{margin-bottom:0;}
+.ac-num{width:22px;height:22px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;}
+.ac-text{font-size:12px;color:rgba(255,255,255,.65);line-height:1.5;padding-top:2px;}
+.ac-text strong{color:#fff;font-weight:500;}
 </style>
 </head>
 <body>
 
-<nav id="nav">
-  <a href="#hero" class="nav-logo">MONTAR</a>
-  <ul class="nav-links">
-    <li><a href="#world">The Problem</a></li>
-    <li><a href="#solution">Solution</a></li>
-    <li><a href="#team">Team</a></li>
-    <li><a href="#pilot">Pilot</a></li>
-    <li><a href="#vision">Vision</a></li>
-  </ul>
-  <a href="mailto:aispuro.adan.r@gmail.com" class="nav-cta">Get in touch</a>
-</nav>
+<div class="frame">
+<div class="status-bar light" id="statusBar">
+  <span class="st">9:41</span>
+  <div class="si"><span class="material-icons-round">signal_cellular_4_bar</span><span class="material-icons-round">wifi</span><span class="material-icons-round">battery_full</span></div>
+</div>
+<div class="home-ind"></div>
 
-<!-- HERO -->
-<section id="hero">
-  <div class="hl">
-    <div class="h-eye"><span class="eye-dot"></span>AI in the physical space · Auto transport · Seattle, WA</div>
-    <h1 class="h-h1">Every car on a<br>dealer lot was<br><em>loaded by hand.</em></h1>
-    <p class="h-sub">No software. No optimization. No guidance. A driver receives a paper list and figures it out from memory — <strong>the same way they did 40 years ago.</strong> MONTAR is changing that.</p>
-    <div class="h-acts">
-      <a href="#contact" class="btn-f">Get in touch</a>
-      <a href="#world" class="btn-t">See the problem ↓</a>
+<!-- ══════════════════════════════════════ -->
+<!-- S0: SPLASH                             -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen active" id="s-splash" style="background:var(--navy);">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <div class="splash-logo">
+      <div class="splash-m">M</div>
+      <div class="splash-name">MONTAR</div>
+      <div class="splash-bar"></div>
+      <div class="splash-tag">Load Faster. Move more cars.</div>
     </div>
-  </div>
-  <div class="hr">
-    <div class="hr-inner">
-      <div class="h-stats">
-        <div class="hs"><div class="hs-n">$10.5B</div><div class="hs-l">US vehicle shipping market</div></div>
-        <div class="hs"><div class="hs-n">15.9M</div><div class="hs-l">Vehicles moved annually</div></div>
-        <div class="hs"><div class="hs-n">4,500</div><div class="hs-l">US car hauling carriers</div></div>
-        <div class="hs"><div class="hs-n">$62B</div><div class="hs-l">US automotive logistics</div></div>
-      </div>
-      <div class="zero-card">
-        <div class="zero-n">$0</div>
-        <div class="zero-d">Purpose-built software<br>for the driver.<br>Until MONTAR.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- MARQUEE -->
-<div class="marquee" aria-hidden="true">
-  <div class="m-inner">
-    <span class="mi">Ford <span class="mi-dot"></span></span><span class="mi">Toyota <span class="mi-dot"></span></span><span class="mi">Honda <span class="mi-dot"></span></span><span class="mi">GM <span class="mi-dot"></span></span><span class="mi">Nissan <span class="mi-dot"></span></span><span class="mi">Hyundai <span class="mi-dot"></span></span><span class="mi">BMW <span class="mi-dot"></span></span><span class="mi">Volkswagen <span class="mi-dot"></span></span><span class="mi">Stellantis <span class="mi-dot"></span></span><span class="mi">Mercedes-Benz <span class="mi-dot"></span></span><span class="mi">Subaru <span class="mi-dot"></span></span><span class="mi">Kia <span class="mi-dot"></span></span><span class="mi">Mazda <span class="mi-dot"></span></span><span class="mi">Volvo <span class="mi-dot"></span></span><span class="mi">Rivian <span class="mi-dot"></span></span><span class="mi">Tesla <span class="mi-dot"></span></span><span class="mi">Lexus <span class="mi-dot"></span></span><span class="mi">Acura <span class="mi-dot"></span></span><span class="mi">Infiniti <span class="mi-dot"></span></span><span class="mi">Genesis <span class="mi-dot"></span></span><span class="mi">Mitsubishi <span class="mi-dot"></span></span><span class="mi">BNSF Orillia · Renton WA <span class="mi-dot"></span></span><span class="mi">BNSF Logistics Park Seattle · Kent WA <span class="mi-dot"></span></span><span class="mi">BNSF Hobart Yard · Los Angeles CA <span class="mi-dot"></span></span><span class="mi">BNSF San Bernardino CA <span class="mi-dot"></span></span><span class="mi">UP ICTF · Los Angeles CA <span class="mi-dot"></span></span><span class="mi">UP Global IV · Stockton CA <span class="mi-dot"></span></span><span class="mi">UP Lathrop CA <span class="mi-dot"></span></span><span class="mi">Port of Long Beach CA <span class="mi-dot"></span></span><span class="mi">Port of Los Angeles · San Pedro CA <span class="mi-dot"></span></span><span class="mi">Port of Tacoma WA <span class="mi-dot"></span></span><span class="mi">Port of Seattle WA <span class="mi-dot"></span></span><span class="mi">Port Hueneme · Oxnard CA <span class="mi-dot"></span></span><span class="mi">Port of Oakland CA <span class="mi-dot"></span></span><span class="mi">Port of Portland OR <span class="mi-dot"></span></span><span class="mi">National City Terminal · San Diego CA <span class="mi-dot"></span></span>
-    <span class="mi">Ford <span class="mi-dot"></span></span><span class="mi">Toyota <span class="mi-dot"></span></span><span class="mi">Honda <span class="mi-dot"></span></span><span class="mi">GM <span class="mi-dot"></span></span><span class="mi">Nissan <span class="mi-dot"></span></span><span class="mi">Hyundai <span class="mi-dot"></span></span><span class="mi">BMW <span class="mi-dot"></span></span><span class="mi">Volkswagen <span class="mi-dot"></span></span><span class="mi">Stellantis <span class="mi-dot"></span></span><span class="mi">Mercedes-Benz <span class="mi-dot"></span></span><span class="mi">Subaru <span class="mi-dot"></span></span><span class="mi">Kia <span class="mi-dot"></span></span><span class="mi">Mazda <span class="mi-dot"></span></span><span class="mi">Volvo <span class="mi-dot"></span></span><span class="mi">Rivian <span class="mi-dot"></span></span><span class="mi">Tesla <span class="mi-dot"></span></span><span class="mi">Lexus <span class="mi-dot"></span></span><span class="mi">Acura <span class="mi-dot"></span></span><span class="mi">Infiniti <span class="mi-dot"></span></span><span class="mi">Genesis <span class="mi-dot"></span></span><span class="mi">Mitsubishi <span class="mi-dot"></span></span><span class="mi">BNSF Orillia · Renton WA <span class="mi-dot"></span></span><span class="mi">BNSF Logistics Park Seattle · Kent WA <span class="mi-dot"></span></span><span class="mi">BNSF Hobart Yard · Los Angeles CA <span class="mi-dot"></span></span><span class="mi">BNSF San Bernardino CA <span class="mi-dot"></span></span><span class="mi">UP ICTF · Los Angeles CA <span class="mi-dot"></span></span><span class="mi">UP Global IV · Stockton CA <span class="mi-dot"></span></span><span class="mi">UP Lathrop CA <span class="mi-dot"></span></span><span class="mi">Port of Long Beach CA <span class="mi-dot"></span></span><span class="mi">Port of Los Angeles · San Pedro CA <span class="mi-dot"></span></span><span class="mi">Port of Tacoma WA <span class="mi-dot"></span></span><span class="mi">Port of Seattle WA <span class="mi-dot"></span></span><span class="mi">Port Hueneme · Oxnard CA <span class="mi-dot"></span></span><span class="mi">Port of Oakland CA <span class="mi-dot"></span></span><span class="mi">Port of Portland OR <span class="mi-dot"></span></span><span class="mi">National City Terminal · San Diego CA <span class="mi-dot"></span></span>
   </div>
 </div>
 
-<!-- WORLD -->
-<section id="world" class="sec">
-  <div class="si">
-    <div class="two">
+<!-- ══════════════════════════════════════ -->
+<!-- S1: RIG PICKER                         -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="s-rig" style="background:var(--navy);">
+  <div class="app-bar" style="background:transparent;">
+    <div class="app-bar-inner" style="padding-top:0;">
+      <div style="width:48px;"></div>
+      <div class="app-bar-title" style="color:#fff;text-align:center;padding-left:0;">Select Your Rig</div>
+      <div style="width:48px;"></div>
+    </div>
+  </div>
+
+  <div class="scroll" style="padding-bottom:0;">
+    <div class="rig-intro">
+      <div class="rig-intro-title">What are you<br>hauling in today?</div>
+      <div class="rig-intro-sub">MONTAR calibrates load logic to your specific trailer configuration.</div>
+    </div>
+
+    <div class="picker-wrap" id="rigPicker">
+      <div class="picker-fade-top"></div>
+      <div class="picker-fade-bot"></div>
+      <div class="picker-selector"></div>
+      <div class="picker-list" id="pickerList">
+        <div class="picker-item" data-idx="0">
+          <div><div class="pi-name">Cottrell CX-09LS</div><div class="pi-sub">9-car · Stinger-steer · QuickLoader</div></div>
+        </div>
+        <div class="picker-item" data-idx="1">
+          <div><div class="pi-name">Cottrell CX-07S</div><div class="pi-sub">7-car · Stinger-steer · Standard</div></div>
+        </div>
+        <div class="picker-item" data-idx="2">
+          <div><div class="pi-name">Boydstun 9-Series</div><div class="pi-sub">9-car · Hydraulic deck · Wide body</div></div>
+        </div>
+        <div class="picker-item" data-idx="3">
+          <div><div class="pi-name">Kaufman KFM-9</div><div class="pi-sub">9-car · Stinger · Aluminum frame</div></div>
+        </div>
+        <div class="picker-item" data-idx="4">
+          <div><div class="pi-name">Delavan 5-car</div><div class="pi-sub">5-car · Single deck · Short haul</div></div>
+        </div>
+        <div class="picker-item" data-idx="5">
+          <div><div class="pi-name">Cottrell CX-05</div><div class="pi-sub">5-car · Stinger · Regional routes</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rig-details" id="rigDetails">
+      <div class="rig-details-title" id="rigDetailName">Cottrell CX-09LS</div>
+      <div class="rig-specs" id="rigSpecs">
+        <div class="rig-spec"><div class="rs-val">9</div><div class="rs-lbl">Max slots</div></div>
+        <div class="rig-spec"><div class="rs-val">80 ft</div><div class="rs-lbl">Length</div></div>
+        <div class="rig-spec"><div class="rs-val">47K lbs</div><div class="rs-lbl">Max cargo</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rig-cta">
+    <button class="btn-fill" onclick="goTo('s-home')">
+      <span class="material-icons-round">check</span>
+      Confirm Rig — Start Loading
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- S2: HOME                              -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="s-home">
+  <div class="app-bar">
+    <div class="app-bar-inner">
+      <div class="app-bar-title lg">MONTAR</div>
+      <button class="icon-btn"><span class="material-icons-round">notifications_none</span></button>
+      <button class="icon-btn"><span class="material-icons-round">account_circle</span></button>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="greeting-card">
+      <div class="g-name">Good morning, Adan</div>
+      <div class="g-title">Ready to load?</div>
+      <div class="g-stats">
+        <div class="g-stat"><div class="n">7</div><div class="l">Loads this week</div></div>
+        <div class="g-stat"><div class="n">63</div><div class="l">Vehicles moved</div></div>
+        <div class="g-stat"><div class="n">100%</div><div class="l">DOT compliant</div></div>
+      </div>
+    </div>
+
+    <div class="scan-action" onclick="goTo('s-scan')">
+      <div class="scan-icon"><span class="material-icons-round">document_scanner</span></div>
+      <div class="scan-text"><div class="t">Scan Load Sheet</div><div class="s">Start a new load · Cottrell CX-09LS</div></div>
+      <span class="material-icons-round" style="color:#fff;font-size:20px;">arrow_forward</span>
+    </div>
+
+    <div class="section-lbl">Recent Loads</div>
+    <div class="card-el" style="margin-bottom:0;">
+      <div class="list-item">
+        <div class="li-lead"><span class="material-icons-round">local_shipping</span></div>
+        <div class="li-content"><div class="li-headline">BNSF Orillia → Renton Toyota</div><div class="li-support">9 vehicles · 41,200 lbs · Yesterday</div></div>
+        <span class="badge badge-ok" style="margin-left:8px;"><span class="material-icons-round" style="font-size:12px;">check</span>Done</span>
+      </div>
+      <div class="divider"></div>
+      <div class="list-item">
+        <div class="li-lead"><span class="material-icons-round">local_shipping</span></div>
+        <div class="li-content"><div class="li-headline">Port of Long Beach → Chino</div><div class="li-support">8 vehicles · 38,800 lbs · Mon</div></div>
+        <span class="badge badge-ok" style="margin-left:8px;"><span class="material-icons-round" style="font-size:12px;">check</span>Done</span>
+      </div>
+      <div class="divider"></div>
+      <div class="list-item">
+        <div class="li-lead"><span class="material-icons-round">local_shipping</span></div>
+        <div class="li-content"><div class="li-headline">BNSF Miraloma → Fontana</div><div class="li-support">9 vehicles · 43,600 lbs · Sun</div></div>
+        <span class="badge badge-ok" style="margin-left:8px;"><span class="material-icons-round" style="font-size:12px;">check</span>Done</span>
+      </div>
+    </div>
+
+    <div class="section-lbl">Active Rig</div>
+    <div class="card-fill">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:15px;font-weight:600;color:var(--on-surface);">Cottrell CX-09LS</div>
+          <div style="font-size:13px;color:var(--on-surface-var);margin-top:2px;">9-car stinger · Plate: 7A82341</div>
+        </div>
+        <span class="badge badge-pri">9 slots</span>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:12px;">
+        <div><div style="font-size:11px;color:var(--on-surface-var);">GVWR Limit</div><div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--on-surface);margin-top:2px;">80,000 lbs</div></div>
+        <div><div style="font-size:11px;color:var(--on-surface-var);">Tare Weight</div><div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--on-surface);margin-top:2px;">~33,000 lbs</div></div>
+        <div><div style="font-size:11px;color:var(--on-surface-var);">Max Cargo</div><div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--primary);margin-top:2px;">~47,000 lbs</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-bar">
+    <div class="nav-item active"><div class="nav-ind"><span class="material-icons-round">home</span></div><span class="nav-lbl">Home</span></div>
+    <div class="nav-item"><div class="nav-ind"><span class="material-icons-round">receipt_long</span></div><span class="nav-lbl">Loads</span></div>
+    <div class="nav-item"><div class="nav-ind"><span class="material-icons-round">map</span></div><span class="nav-lbl">Yards</span></div>
+    <div class="nav-item"><div class="nav-ind"><span class="material-icons-round">person</span></div><span class="nav-lbl">Profile</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- S3: SCAN                               -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="s-scan" style="background:#000;">
+  <div class="status-bar light" style="position:absolute;z-index:199;">
+    <span class="st" style="color:#fff;">9:41</span>
+    <div class="si"><span class="material-icons-round" style="color:#fff;">signal_cellular_4_bar</span><span class="material-icons-round" style="color:#fff;">wifi</span><span class="material-icons-round" style="color:#fff;">battery_full</span></div>
+  </div>
+  <div style="padding:54px 4px 0;display:flex;align-items:center;flex-shrink:0;">
+    <button class="icon-btn" onclick="goBack('s-home')" style="color:#fff;"><span class="material-icons-round">arrow_back</span></button>
+    <span style="font-size:18px;font-weight:500;color:#fff;padding-left:8px;">Scan Load Sheet</span>
+  </div>
+  <div class="viewfinder" onclick="goTo('s-decode')" style="cursor:pointer;">
+    <div class="bol-mock">
+      <div class="bh">MASTER UNIFORM STRAIGHT BILL OF LADING — UNITED ROAD</div>
+      <div class="bm">CARRIER: United Road · ORIGIN: BNSF ORILLIA – RENTON WA · LOAD: 041625-09</div>
+      <div class="bcols"><span>VIN#</span><span>MODEL</span><span>DEALER</span><span>LOC</span></div>
+      <div class="brow"><span class="bv">4T1G11AK8PU123481</span><span>CAMRY XSE V6</span><span>05210-WA</span><span class="bl">T042</span></div>
+      <div class="brow"><span class="bv">2T3P1RFV8PW847263</span><span>RAV4 XLE PREM</span><span>05210-WA</span><span class="bl">T043</span></div>
+      <div class="brow"><span class="bv">3TMLB5JN3SM178449</span><span>TACOMA TRD 4X4</span><span>05318-WA</span><span class="bl">T071</span></div>
+      <div class="brow"><span class="bv">5TDHZRBH9MS523875</span><span>HIGHLANDER XLE</span><span>05318-WA</span><span class="bl">T072</span></div>
+      <div class="brow"><span class="bv">4T1DAACK6SU566558</span><span>COROLLA SE CVT</span><span>05441-WA</span><span class="bl">T048</span></div>
+      <div class="brow"><span class="bv">2T3P1RFV2SC561402</span><span>RAV4 ADVENTURE</span><span>05318-WA</span><span class="bl">T049</span></div>
+      <div class="brow"><span class="bv">4T1DAACK1SU559372</span><span>CAMRY LE HYBRID</span><span>05210-WA</span><span class="bl">T044</span></div>
+      <div class="brow"><span class="bv">4T1DAACK8SU046040</span><span>CAMRY XSE AWD</span><span>05210-WA</span><span class="bl">T045</span></div>
+      <div class="brow" style="border-bottom:none;"><span class="bv">5TDHZRBH9MS500001</span><span>HIGHLANDER XSE</span><span>05318-WA</span><span class="bl">T073</span></div>
+      <div style="font-size:5px;color:#888;border-top:1px solid #ccc;margin-top:3px;padding-top:2px;">TOTAL UNITS = 9</div>
+    </div>
+    <div class="scan-frame">
+      <div class="sc tl"></div><div class="sc tr"></div><div class="sc bl"></div><div class="sc br"></div>
+      <div class="scan-line"></div>
+    </div>
+  </div>
+  <div class="scan-bottom">
+    <div class="scan-status">Detecting VINs...</div>
+    <div class="scan-sub">Hold steady over the load sheet</div>
+    <div class="vin-chip"><span class="material-icons-round">check_circle</span>4T1G11AK8PU123481</div>
+    <div class="vin-chip" style="animation-delay:.15s"><span class="material-icons-round">check_circle</span>2T3P1RFV8PW847263</div>
+    <div class="vin-chip" style="animation-delay:.3s"><span class="material-icons-round">check_circle</span>3TMLB5JN3SM178449</div>
+    <div class="vin-chip" style="animation-delay:.45s"><span class="material-icons-round">check_circle</span>5TDHZRBH9MS523875</div>
+    <div class="vin-chip" style="animation-delay:.6s"><span class="material-icons-round">check_circle</span>4T1DAACK6SU566558</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- S4: DECODE                             -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="s-decode">
+  <div class="app-bar">
+    <div class="app-bar-inner">
+      <button class="icon-btn" onclick="goBack('s-scan')"><span class="material-icons-round">arrow_back</span></button>
+      <div class="app-bar-title">Vehicles Decoded</div>
+      <button class="icon-btn"><span class="material-icons-round">more_vert</span></button>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="decode-sum">
+      <div class="dn">9</div>
       <div>
-        <div class="chip rv">01 — The world it runs on</div>
-        <h2 class="sh rv">A $10.5B industry.<br><em>No software</em> for the driver.</h2>
-        <p class="sb rv" style="margin-bottom:1rem">Ford, Toyota, Honda, GM, Nissan, Hyundai — every vehicle sold at a dealership travels the same last mile. Loaded onto a car hauler at a rail yard or port. Driven to its destination.</p>
-        <p class="sb rv">Car haulers move new OEM vehicles, auction inventory from Manheim and ADESA, dealer-to-dealer trades, and fleet remarketing. <strong>Every load type. Every origin. No purpose-built operations software for any of it.</strong> Every product in this industry was built for the back office. The driver has been an afterthought since the beginning.</p>
-        <div class="stat-cards rv" style="transition-delay:.1s">
-          <div class="sc"><span class="sc-n">$10.5B</span><span class="sc-l">US vehicle shipping services (IBISWorld 2025)</span></div>
-          <div class="sc"><span class="sc-n">15.9M</span><span class="sc-l">New vehicles sold annually (Statista 2025)</span></div>
-          <div class="sc"><span class="sc-n">4,500</span><span class="sc-l">US car hauling carriers</span></div>
-          <div class="sc"><span class="sc-n">$62B</span><span class="sc-l">US automotive logistics (Mordor 2025)</span></div>
+        <div class="dt">Vehicles detected</div>
+        <div class="ds">BNSF Orillia · Load 041625-09</div>
+        <div style="margin-top:6px;"><span class="badge badge-ok"><span class="material-icons-round" style="font-size:12px;">check</span>All VINs verified</span></div>
+      </div>
+    </div>
+    <div class="section-lbl">Decoded Vehicles</div>
+    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">1</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry XSE V6</div><div class="veh-vin">4T1G11AK8PU123481</div></div><div class="veh-meta"><span class="badge badge-neu">3,572 lbs</span><span class="badge badge-pri" style="font-size:10px;">T042</span></div></div>
+    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">2</div><div class="veh-info"><div class="veh-name">2025 Toyota RAV4 XLE Premium</div><div class="veh-vin">2T3P1RFV8PW847263</div></div><div class="veh-meta"><span class="badge badge-neu">4,015 lbs</span><span class="badge badge-pri" style="font-size:10px;">T043</span></div></div>
+    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">3</div><div class="veh-info"><div class="veh-name">2025 Toyota Tacoma TRD 4x4</div><div class="veh-vin">3TMLB5JN3SM178449</div></div><div class="veh-meta"><span class="badge badge-warn">4,480 lbs</span><span class="badge badge-pri" style="font-size:10px;">T071</span></div></div>
+    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">4</div><div class="veh-info"><div class="veh-name">2025 Toyota Highlander XLE</div><div class="veh-vin">5TDHZRBH9MS523875</div></div><div class="veh-meta"><span class="badge badge-warn">4,705 lbs</span><span class="badge badge-pri" style="font-size:10px;">T072</span></div></div>
+    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">5</div><div class="veh-info"><div class="veh-name">2025 Toyota Corolla SE CVT</div><div class="veh-vin">4T1DAACK6SU566558</div></div><div class="veh-meta"><span class="badge badge-neu">3,097 lbs</span><span class="badge badge-pri" style="font-size:10px;">T048</span></div></div>
+    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">6</div><div class="veh-info"><div class="veh-name">2025 Toyota RAV4 Adventure</div><div class="veh-vin">2T3P1RFV2SC561402</div></div><div class="veh-meta"><span class="badge badge-neu">4,015 lbs</span><span class="badge badge-pri" style="font-size:10px;">T049</span></div></div>
+    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">7</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry LE Hybrid</div><div class="veh-vin">4T1DAACK1SU559372</div></div><div class="veh-meta"><span class="badge badge-neu">3,616 lbs</span><span class="badge badge-pri" style="font-size:10px;">T044</span></div></div>
+    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">8</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry XSE AWD</div><div class="veh-vin">4T1DAACK8SU046040</div></div><div class="veh-meta"><span class="badge badge-neu">3,682 lbs</span><span class="badge badge-pri" style="font-size:10px;">T045</span></div></div>
+    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">9</div><div class="veh-info"><div class="veh-name">2025 Toyota Highlander XSE</div><div class="veh-vin">5TDHZRBH9MS500001</div></div><div class="veh-meta"><span class="badge badge-warn">4,705 lbs</span><span class="badge badge-pri" style="font-size:10px;">T073</span></div></div>
+  </div>
+  <div class="confirm-bar">
+    <button class="btn-outline" onclick="goBack('s-scan')">Re-scan</button>
+    <button class="btn-fill" onclick="goTo('s-slots')"><span class="material-icons-round">auto_awesome</span>Optimize Load</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- S5: SLOTS                              -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="s-slots">
+  <div class="app-bar">
+    <div class="app-bar-inner">
+      <button class="icon-btn" onclick="goBack('s-decode')"><span class="material-icons-round">arrow_back</span></button>
+      <div class="app-bar-title">Load Plan</div>
+      <button class="icon-btn"><span class="material-icons-round">info_outline</span></button>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="wt-card">
+      <div class="wt-header">
+        <div><div class="wt-lbl">Total Load Weight</div><div class="wt-val">37,887 lbs</div><div class="wt-limit">Limit: 47,000 lbs available cargo</div></div>
+        <div class="wt-ok"><span class="material-icons-round" style="font-size:14px;">check_circle</span>DOT OK</div>
+      </div>
+      <div class="wt-track"><div class="wt-fill"></div></div>
+      <div class="wt-labels"><span>0</span><span>37,887 / 47,000 lbs (80.6%)</span><span>47K</span></div>
+    </div>
+    <div class="rig-vis">
+      <div class="rv-lbl">Cottrell CX-09LS — Slot Plan</div>
+      <div class="deck-row">
+        <div class="deck-lbl">Top</div>
+        <div class="slot rev"><div class="sn">1</div><div class="sv" style="color:#7B5800;">Camry↺</div></div>
+        <div class="slot filled" onclick="goTo('s-warning')"><div class="sn">2</div><div class="sv">RAV4</div></div>
+        <div class="slot filled"><div class="sn">3</div><div class="sv">Tacoma</div></div>
+        <div class="slot filled"><div class="sn">4</div><div class="sv">Corolla</div></div>
+        <div class="slot filled"><div class="sn">5</div><div class="sv">RAV4 Adv</div></div>
+      </div>
+      <div class="deck-row">
+        <div class="deck-lbl">Bot</div>
+        <div class="slot filled"><div class="sn">6</div><div class="sv">Highlander</div></div>
+        <div class="slot filled"><div class="sn">7</div><div class="sv">Camry H</div></div>
+        <div class="slot filled"><div class="sn">8</div><div class="sv">Camry XSE</div></div>
+        <div class="slot filled"><div class="sn">9</div><div class="sv">Highlander</div></div>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--on-surface-var);display:flex;align-items:center;gap:4px;">
+        <span class="material-icons-round" style="font-size:14px;color:var(--warning);">info</span>
+        Slot 1 reversed · Tap slot 2 to see adjustment panel
+      </div>
+    </div>
+    <div class="section-lbl">Slot Assignments</div>
+    <div class="card-el" style="margin-top:0;">
+      <div class="slot-list-item" onclick="goTo('s-warning')"><div class="sl-num">1</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry XSE V6</div><div class="sl-vin">4T1G11AK8PU123481</div></div><div class="sl-right"><div class="sl-wt">3,572 lbs</div><div class="sl-reason">Reversed · Cab-over</div></div></div>
+      <div class="slot-list-item" onclick="goTo('s-warning')"><div class="sl-num">2</div><div class="sl-info"><div class="sl-name">2025 Toyota RAV4 XLE Premium</div><div class="sl-vin">2T3P1RFV8PW847263</div></div><div class="sl-right"><div class="sl-wt">4,015 lbs</div><div class="sl-reason">Height clearance ✓</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">3</div><div class="sl-info"><div class="sl-name">2025 Toyota Tacoma TRD 4x4</div><div class="sl-vin">3TMLB5JN3SM178449</div></div><div class="sl-right"><div class="sl-wt">4,480 lbs</div><div class="sl-reason">Axle weight ✓</div></div></div>
+      <div class="slot-list-item"><div class="sl-num" style="background:var(--surface-container);color:var(--on-surface-var);">4</div><div class="sl-info"><div class="sl-name">2025 Toyota Corolla SE CVT</div><div class="sl-vin">4T1DAACK6SU566558</div></div><div class="sl-right"><div class="sl-wt">3,097 lbs</div><div class="sl-reason">Lightest top deck</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">5</div><div class="sl-info"><div class="sl-name">2025 Toyota RAV4 Adventure</div><div class="sl-vin">2T3P1RFV2SC561402</div></div><div class="sl-right"><div class="sl-wt">4,015 lbs</div><div class="sl-reason">Height clearance ✓</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">6</div><div class="sl-info"><div class="sl-name">2025 Toyota Highlander XLE</div><div class="sl-vin">5TDHZRBH9MS523875</div></div><div class="sl-right"><div class="sl-wt">4,705 lbs</div><div class="sl-reason">Bottom deck ✓</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">7</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry LE Hybrid</div><div class="sl-vin">4T1DAACK1SU559372</div></div><div class="sl-right"><div class="sl-wt">3,616 lbs</div><div class="sl-reason">Weight balance ✓</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">8</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry XSE AWD</div><div class="sl-vin">4T1DAACK8SU046040</div></div><div class="sl-right"><div class="sl-wt">3,682 lbs</div><div class="sl-reason">Rear axle ✓</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">9</div><div class="sl-info"><div class="sl-name">2025 Toyota Highlander XSE</div><div class="sl-vin">5TDHZRBH9MS500001</div></div><div class="sl-right"><div class="sl-wt">4,705 lbs</div><div class="sl-reason">Bottom deck ✓</div></div></div>
+    </div>
+  </div>
+  <div class="confirm-bar">
+    <button class="btn-outline" onclick="goBack('s-decode')">Edit</button>
+    <button class="btn-fill" onclick="goTo('s-warning')"><span class="material-icons-round">check</span>Confirm Plan</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- S6: WARNING                            -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="s-warning">
+  <div class="app-bar">
+    <div class="app-bar-inner">
+      <button class="icon-btn" onclick="goBack('s-slots')"><span class="material-icons-round">arrow_back</span></button>
+      <div class="app-bar-title">Slot 1 — Adjustment</div>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="warn-banner">
+      <span class="material-icons-round">warning</span>
+      <div><div class="warn-title">Clearance Warning</div><div class="warn-body">Moving the Highlander XLE to Slot 1 creates a height clearance issue. At 70.9" it exceeds the deck clearance of 60.5".</div></div>
+    </div>
+    <div class="reason-card">
+      <div class="reason-hdr"><div class="reason-title">Why Camry XSE belongs in Slot 1</div><div class="reason-sub">Reasoning behind this assignment</div></div>
+      <div class="reason-row"><div class="ri-ok"><span class="material-icons-round">straighten</span></div><div class="rl"><div class="rl-lbl">Height clearance</div><div class="rl-val">Camry 56.9" · Deck clearance 60.5" · Margin 3.6"</div></div><span class="badge badge-ok">OK</span></div>
+      <div class="reason-row"><div class="ri-ok"><span class="material-icons-round">scale</span></div><div class="rl"><div class="rl-lbl">Front axle weight</div><div class="rl-val">Contributes 1,420 lbs to steer axle · Limit 12,000 lbs</div></div><span class="badge badge-ok">OK</span></div>
+      <div class="reason-row"><div class="ri-warn"><span class="material-icons-round">rotate_right</span></div><div class="rl"><div class="rl-lbl">Loading sequence</div><div class="rl-val">Slot 1 loads reversed — cab-over position required</div></div><span class="badge badge-warn">Note</span></div>
+      <div class="reason-row"><div class="ri-err"><span class="material-icons-round">height</span></div><div class="rl"><div class="rl-lbl">Your change — Highlander XLE</div><div class="rl-val">70.9" exceeds Slot 1 clearance by 10.4"</div></div><span class="badge badge-err">Fail</span></div>
+    </div>
+    <div class="card-fill" style="margin-top:6px;">
+      <div style="font-size:13px;font-weight:600;color:var(--on-surface);margin-bottom:5px;">MONTAR's suggestion</div>
+      <div style="font-size:13px;color:var(--on-surface-var);line-height:1.55;">Keep the Camry XSE in Slot 1. The Highlander XLE has adequate clearance and better weight distribution on the bottom deck in Slot 6.</div>
+    </div>
+  </div>
+  <div class="override-bar">
+    <button class="btn-err"><span class="material-icons-round">warning</span>Override — I'll take responsibility</button>
+    <button class="btn-fill" onclick="goTo('s-map')" style="width:100%;justify-content:center;height:40px;border-radius:20px;font-family:var(--font);font-size:14px;font-weight:500;"><span class="material-icons-round">check</span>Accept MONTAR's Plan</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- S7: YARD MAP                           -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="s-map">
+  <div class="app-bar">
+    <div class="app-bar-inner">
+      <button class="icon-btn" onclick="goBack('s-warning')"><span class="material-icons-round">arrow_back</span></button>
+      <div class="app-bar-title">Yard Route</div>
+      <button class="icon-btn"><span class="material-icons-round">tune</span></button>
+    </div>
+  </div>
+  <div class="map-cont">
+    <!-- asphalt -->
+    <div class="asphalt"></div>
+    <!-- section header banners -->
+    <div style="position:absolute;top:0;left:0;right:0;height:22px;background:rgba(0,0,0,.35);display:flex;align-items:center;padding:0 10px;">
+      <span style="font-family:var(--mono);font-size:8px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.12em;">BNSF ORILLIA AUTOMOTIVE FACILITY — RENTON WA</span>
+    </div>
+    <!-- drive lanes -->
+    <div class="drive-lane" style="left:0;right:0;top:52px;height:20px;"></div>
+    <div class="drive-lane" style="left:0;right:0;top:140px;height:20px;"></div>
+    <div class="drive-lane" style="left:0;right:0;top:228px;height:20px;"></div>
+    <div class="drive-lane" style="left:0;right:0;top:280px;height:20px;"></div>
+    <!-- center vertical drive lane -->
+    <div class="drive-lane" style="left:186px;width:20px;top:22px;bottom:0;"></div>
+
+    <!-- ROW T-A (top) -->
+    <div style="position:absolute;left:8px;top:26px;font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;">ROW T-A</div>
+    <!-- spots T040-T049 left of center -->
+    <div class="spot empty" style="left:10px;top:30px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:40px;top:30px;width:26px;height:18px;"></div>
+    <div class="spot target" style="left:70px;top:30px;width:26px;height:18px;"></div><!-- T042 -->
+    <div class="spot target" style="left:100px;top:30px;width:26px;height:18px;"></div><!-- T043 -->
+    <div class="spot target" style="left:130px;top:30px;width:26px;height:18px;"></div><!-- T044 -->
+    <div class="spot target" style="left:160px;top:30px;width:26px;height:18px;"></div><!-- T045 -->
+    <!-- spots right of center -->
+    <div class="spot empty" style="left:210px;top:30px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:240px;top:30px;width:26px;height:18px;"></div>
+    <div class="spot target" style="left:270px;top:30px;width:26px;height:18px;"></div><!-- T048 -->
+    <div class="spot target" style="left:300px;top:30px;width:26px;height:18px;"></div><!-- T049 -->
+    <div class="spot empty" style="left:330px;top:30px;width:26px;height:18px;"></div>
+    <!-- slot labels -->
+    <div class="slot-paint" style="left:70px;top:30px;width:26px;height:18px;line-height:18px;">T042</div>
+    <div class="slot-paint" style="left:100px;top:30px;width:26px;height:18px;line-height:18px;">T043</div>
+    <div class="slot-paint" style="left:130px;top:30px;width:26px;height:18px;line-height:18px;">T044</div>
+    <div class="slot-paint" style="left:160px;top:30px;width:26px;height:18px;line-height:18px;">T045</div>
+    <div class="slot-paint" style="left:270px;top:30px;width:26px;height:18px;line-height:18px;">T048</div>
+    <div class="slot-paint" style="left:300px;top:30px;width:26px;height:18px;line-height:18px;">T049</div>
+
+    <!-- ROW T-B -->
+    <div style="position:absolute;left:8px;top:76px;font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;">ROW T-B</div>
+    <div class="spot empty" style="left:10px;top:78px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:40px;top:78px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:70px;top:78px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:100px;top:78px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:130px;top:78px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:210px;top:78px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:240px;top:78px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:270px;top:78px;width:26px;height:18px;"></div>
+
+    <!-- ROW T-C -->
+    <div style="position:absolute;left:8px;top:164px;font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;">ROW T-C</div>
+    <div class="spot empty" style="left:10px;top:166px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:40px;top:166px;width:26px;height:18px;"></div>
+    <div class="spot target" style="left:70px;top:166px;width:26px;height:18px;"></div><!-- T071 -->
+    <div class="spot target" style="left:100px;top:166px;width:26px;height:18px;"></div><!-- T072 -->
+    <div class="spot empty" style="left:130px;top:166px;width:26px;height:18px;"></div>
+    <div class="spot target" style="left:210px;top:166px;width:26px;height:18px;"></div><!-- T073 -->
+    <div class="spot empty" style="left:240px;top:166px;width:26px;height:18px;"></div>
+    <div class="slot-paint" style="left:70px;top:166px;width:26px;height:18px;line-height:18px;">T071</div>
+    <div class="slot-paint" style="left:100px;top:166px;width:26px;height:18px;line-height:18px;">T072</div>
+    <div class="slot-paint" style="left:210px;top:166px;width:26px;height:18px;line-height:18px;">T073</div>
+
+    <!-- ROW T-D -->
+    <div style="position:absolute;left:8px;top:252px;font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;">ROW T-D</div>
+    <div class="spot empty" style="left:10px;top:254px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:40px;top:254px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:70px;top:254px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:100px;top:254px;width:26px;height:18px;"></div>
+    <div class="spot empty" style="left:210px;top:254px;width:26px;height:18px;"></div>
+
+    <!-- SVG route -->
+    <svg class="route-svg" viewBox="0 0 393 310" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto">
+          <path d="M0,0 L0,5 L7,2.5 z" fill="#E8620A" opacity=".85"/>
+        </marker>
+      </defs>
+      <!-- entry from bottom left → row A left -->
+      <path d="M30,305 L30,160 L196,160 L196,72 L83,72 L83,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".8" marker-end="url(#arr)"/>
+      <!-- T042 → T043 -->
+      <path d="M83,50 L113,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".8" marker-end="url(#arr)"/>
+      <!-- T043 → T044 -->
+      <path d="M113,50 L143,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".7" marker-end="url(#arr)"/>
+      <!-- T044 → T045 -->
+      <path d="M143,50 L173,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".7" marker-end="url(#arr)"/>
+      <!-- cross to right side → T048 -->
+      <path d="M173,50 L196,50 L196,72 L283,72 L283,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".6" marker-end="url(#arr)"/>
+      <!-- T048 → T049 -->
+      <path d="M283,50 L313,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".6" marker-end="url(#arr)"/>
+      <!-- T049 → row C → T071 -->
+      <path d="M313,50 L313,72 L196,72 L196,160 L83,160 L83,178" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".55" marker-end="url(#arr)"/>
+      <!-- T071 → T072 -->
+      <path d="M83,178 L113,178" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".55" marker-end="url(#arr)"/>
+      <!-- T072 → T073 right side -->
+      <path d="M113,178 L196,178 L196,160 L223,160 L223,178" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".5" marker-end="url(#arr)"/>
+    </svg>
+
+    <!-- You are here -->
+    <div class="you-here" style="left:30px;top:305px;">
+      <div class="yh-ring"><div class="yh-dot"></div></div>
+    </div>
+
+    <!-- Map pins — first two done, rest todo, T071 is active/next -->
+    <div class="mpin" style="left:83px;top:47px;"><div class="pin-bub done">T042 ✓</div><div class="pin-dot done"></div></div>
+    <div class="mpin" style="left:113px;top:47px;"><div class="pin-bub done">T043 ✓</div><div class="pin-dot done"></div></div>
+    <div class="mpin" style="left:83px;top:163px;"><div class="pin-bub active">T071 · Next →</div><div class="pin-dot active"></div></div>
+    <div class="mpin" style="left:113px;top:163px;"><div class="pin-bub todo">T072</div><div class="pin-dot todo"></div></div>
+    <div class="mpin" style="left:223px;top:163px;"><div class="pin-bub todo">T073</div><div class="pin-dot todo"></div></div>
+  </div>
+
+  <!-- bottom sheet -->
+  <div class="map-sheet">
+    <div class="sheet-handle"></div>
+    <div class="next-stop">
+      <div class="ns-num">3</div>
+      <div class="ns-info">
+        <div class="ns-lbl">Next stop</div>
+        <div class="ns-name">Bay T071 — Tacoma TRD 4x4</div>
+        <div class="ns-dist">~280 ft · Row T-C · Toyota section</div>
+      </div>
+      <span class="material-icons-round" style="color:#fff;font-size:22px;">navigation</span>
+    </div>
+    <div class="stop-q">
+      <div class="sq-chip done"><div class="sqn">✓ 1</div><div class="sql">T042</div><div class="sqv">Camry XSE</div></div>
+      <div class="sq-chip done"><div class="sqn">✓ 2</div><div class="sql">T043</div><div class="sqv">RAV4 XLE</div></div>
+      <div class="sq-chip active"><div class="sqn">3</div><div class="sql">T071</div><div class="sqv">Tacoma TRD</div></div>
+      <div class="sq-chip"><div class="sqn">4</div><div class="sql">T072</div><div class="sqv">Highlander</div></div>
+      <div class="sq-chip"><div class="sqn">5</div><div class="sql">T048</div><div class="sqv">Corolla</div></div>
+      <div class="sq-chip"><div class="sqn">6</div><div class="sql">T049</div><div class="sqv">RAV4 Adv</div></div>
+      <div class="sq-chip"><div class="sqn">7</div><div class="sql">T044</div><div class="sqv">Camry H</div></div>
+      <div class="sq-chip"><div class="sqn">8</div><div class="sql">T045</div><div class="sqv">Camry XSE</div></div>
+      <div class="sq-chip"><div class="sqn">9</div><div class="sql">T073</div><div class="sqv">Highlander</div></div>
+    </div>
+    <div style="padding:12px 16px 0;">
+      <button class="btn-fill" onclick="goTo('s-loadcomplete')" style="width:100%;justify-content:center;height:44px;border-radius:12px;font-size:15px;">
+        <span class="material-icons-round">check_circle</span>
+        All Vehicles Loaded
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- S8: LOAD COMPLETE                      -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="s-loadcomplete">
+  <div class="app-bar">
+    <div class="app-bar-inner">
+      <button class="icon-btn" onclick="goBack('s-map')"><span class="material-icons-round">arrow_back</span></button>
+      <div class="app-bar-title">Load Complete</div>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="lc-hero">
+      <div class="lc-icon"><span class="material-icons-round">check_circle</span></div>
+      <div class="lc-title">All 9 vehicles loaded</div>
+      <div class="lc-sub">Load 041625-09 · BNSF Orillia, Renton WA<br>Ready for departure</div>
+    </div>
+
+    <div class="section-lbl">Load Summary</div>
+    <div class="card-el" style="margin-top:0;">
+      <div class="lc-check-item"><div class="lc-chk ok"><span class="material-icons-round">scale</span></div><div class="lc-text"><div class="lc-lbl">Weight verified</div><div class="lc-val">37,887 lbs · 80.6% of capacity · DOT compliant</div></div></div>
+      <div class="divider"></div>
+      <div class="lc-check-item"><div class="lc-chk ok"><span class="material-icons-round">straighten</span></div><div class="lc-text"><div class="lc-lbl">All clearances confirmed</div><div class="lc-val">9 vehicles · 2 decks · No conflicts</div></div></div>
+      <div class="divider"></div>
+      <div class="lc-check-item"><div class="lc-chk ok"><span class="material-icons-round">inventory_2</span></div><div class="lc-text"><div class="lc-lbl">All VINs accounted for</div><div class="lc-val">9 Toyota vehicles · Load 041625-09</div></div></div>
+      <div class="divider"></div>
+      <div class="lc-check-item"><div class="lc-chk ok"><span class="material-icons-round">timer</span></div><div class="lc-text"><div class="lc-lbl">Yard time</div><div class="lc-val">48 minutes · Avg: 62 min · Saved ~14 min</div></div></div>
+    </div>
+
+    <div class="section-lbl">Delivery</div>
+    <div class="card-el" style="margin-top:0;padding:14px 16px;margin-bottom:0;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-container);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span class="material-icons-round" style="color:var(--on-primary-container);font-size:22px;">store</span></div>
+        <div style="flex:1;">
+          <div style="font-size:15px;font-weight:600;color:var(--on-surface);">Renton Toyota</div>
+          <div style="font-size:13px;color:var(--on-surface-var);margin-top:2px;">501 SW 41st St, Renton, WA 98057</div>
+        </div>
+        <span class="badge badge-pri">9 units</span>
+      </div>
+    </div>
+  </div>
+  <div class="confirm-bar" style="padding:16px;">
+    <button class="btn-fill" onclick="goTo('s-delivery')" style="width:100%;justify-content:center;height:48px;border-radius:14px;font-size:15px;"><span class="material-icons-round">navigation</span>Navigate to Delivery</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- S9: DELIVERY                           -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="s-delivery">
+  <div class="app-bar">
+    <div class="app-bar-inner">
+      <button class="icon-btn" onclick="goBack('s-loadcomplete')"><span class="material-icons-round">arrow_back</span></button>
+      <div class="app-bar-title">Delivery</div>
+      <button class="icon-btn"><span class="material-icons-round">more_vert</span></button>
+    </div>
+  </div>
+  <div class="scroll">
+
+    <!-- dealer map preview -->
+    <div class="dealer-hero">
+      <div class="dealer-map-preview">
+        <!-- roads -->
+        <div class="dmap-road-h" style="top:0;left:0;right:0;height:24px;"></div><!-- SW 41st St top -->
+        <div class="dmap-road-h" style="bottom:0;left:0;right:0;height:20px;"></div><!-- bottom road -->
+        <div class="dmap-road-v" style="left:0;top:0;bottom:0;width:20px;"></div><!-- left road -->
+        <div class="dmap-road-v" style="right:60px;top:0;bottom:0;width:18px;"></div><!-- Rainier Ave N -->
+
+        <!-- city blocks -->
+        <div class="dmap-block" style="left:24px;top:28px;width:110px;height:50px;background:#3A4A5A;"></div>
+        <div class="dmap-block" style="left:24px;top:84px;right:82px;height:40px;background:#3A4A5A;"></div>
+
+        <!-- dealer lot -->
+        <div class="dmap-dealer" style="left:140px;top:28px;width:110px;height:96px;">
+          <div class="dmap-dealer-lbl">RENTON TOYOTA</div>
+        </div>
+
+        <!-- optimal approach arrow -->
+        <svg class="dmap-route" viewBox="0 0 393 140" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="darr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#E8620A"/>
+            </marker>
+          </defs>
+          <!-- approach route: from south on Rainier, turn onto lot -->
+          <path d="M315,140 L315,80 L254,80 L254,40" stroke="#E8620A" stroke-width="2.5" fill="none" marker-end="url(#darr)" opacity=".9"/>
+        </svg>
+
+        <!-- you are here indicator (incoming on Rainier) -->
+        <div class="dmap-you" style="left:315px;top:130px;">
+          <div class="dmap-ring"><div class="dmap-dot"></div></div>
+        </div>
+
+        <!-- entrance label -->
+        <div style="position:absolute;left:148px;top:12px;font-family:var(--mono);font-size:7px;font-weight:700;color:var(--primary);letter-spacing:.06em;">MAIN ENTRANCE</div>
+        <div style="position:absolute;right:8px;top:60px;font-family:var(--mono);font-size:7px;color:rgba(255,255,255,.4);letter-spacing:.05em;writing-mode:vertical-lr;">RAINIER AVE N</div>
+        <div style="position:absolute;top:4px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:7px;color:rgba(255,255,255,.4);letter-spacing:.05em;">SW 41ST ST</div>
+      </div>
+      <div class="dealer-info">
+        <div class="di-name">Renton Toyota</div>
+        <div class="di-addr">501 SW 41st St, Renton, WA 98057</div>
+        <div class="dealer-badge-row">
+          <span class="badge badge-pri"><span class="material-icons-round" style="font-size:12px;">local_shipping</span>9 units</span>
+          <span class="badge badge-ok"><span class="material-icons-round" style="font-size:12px;">access_time</span>~24 min away</span>
+          <span class="badge badge-neu">New cars only</span>
         </div>
       </div>
-      <div class="bol-wrap rv" style="transition-delay:.15s">
-        <div class="bol-tag"><div class="bol-pulse"></div>Real United Road Bill of Lading — BNSF Orillia, Renton WA</div>
-        <div class="bol-doc">
-          <div class="bol-hd"><span class="bol-hd-l">United Road Services · Load 041625-09</span><span class="bol-hd-r">● 9 units assigned</span></div>
-          <div class="bol-bd">
-            <div class="bol-title">MASTER UNIFORM STRAIGHT BILL OF LADING</div>
-            <div class="bol-meta">ORIGIN: BNSF ORILLIA – RENTON WA &nbsp;·&nbsp; NOTIFY: 04/16/2025 &nbsp;·&nbsp; DESTINATION: RENTON WA</div>
-            <div class="bol-row hd"><span>VIN#</span><span>MODEL</span><span>DEALER</span><span>CLR</span><span>PARK LOC.</span><span>CITY</span></div>
-            <div class="bol-row"><span class="bv">4T1G11AK8PU123481</span><span>CAMRY XSE</span><span>05210-WA</span><span>040</span><span class="bl">T042</span><span>RENTON</span></div>
-            <div class="bol-row"><span class="bv">2T3P1RFV8PW847263</span><span>RAV4 XLE</span><span>05210-WA</span><span>040</span><span class="bl">T043</span><span>RENTON</span></div>
-            <div class="bol-row"><span class="bv">3TMLB5JN3SM178449</span><span>TACOMA TRD</span><span>05318-WA</span><span>750</span><span class="bl">T071</span><span>RENTON</span></div>
-            <div class="bol-row"><span class="bv">5TDHZRBH9MS523875</span><span>HIGHLANDER</span><span>05318-WA</span><span>040</span><span class="bl">T072</span><span>RENTON</span></div>
-            <div class="bol-row"><span class="bv">4T1DAACK6SU566558</span><span>COROLLA SE</span><span>05441-WA</span><span>1F7</span><span class="bl">T048</span><span>RENTON</span></div>
-            <div class="bol-row"><span class="bv">2T3P1RFV2SC561402</span><span>RAV4 ADV</span><span>05318-WA</span><span>1G3</span><span class="bl">T049</span><span>RENTON</span></div>
-            <div class="bol-row"><span class="bv">4T1DAACK1SU559372</span><span>CAMRY HYB</span><span>05210-WA</span><span>202</span><span class="bl">T044</span><span>RENTON</span></div>
-            <div class="bol-foot">TOTAL UNITS = 9 &nbsp;&nbsp; MBUSA REPRESENTATIVE ________________________ &nbsp;&nbsp; DATE __________</div>
-          </div>
-        </div>
-        <p class="bol-cap">Nine vehicles. Nine bay locations. No slot assignments, no weight check, no route. The driver figures it out alone — every load, every day.</p>
-        <div class="insight"><div class="in-lbl">The back-office problem</div><p class="in-txt">Dispatch software, TMS platforms, ELD systems — every product was built for the carrier owner and fleet manager. <strong>The driver moving $500K of vehicles at a time has never had a product built for them. MONTAR is the first.</strong></p></div>
-      </div>
+    </div>
+
+    <!-- approach guidance -->
+    <div class="approach-card" style="margin-top:6px;">
+      <div class="ac-title"><span class="material-icons-round">navigation</span>Optimal Approach</div>
+      <div class="ac-step"><div class="ac-num">1</div><div class="ac-text">Take <strong>Rainier Ave N southbound</strong> — wider lanes, no overhead clearance issues, easier rig maneuver.</div></div>
+      <div class="ac-step"><div class="ac-num">2</div><div class="ac-text"><strong>Do not use SW 41st St entrance</strong> — tight turn radius for 80-foot rig. Tight residential block on the approach.</div></div>
+      <div class="ac-step"><div class="ac-num">3</div><div class="ac-text">Enter via <strong>Rainier Ave N driveway</strong> on the east side of the lot. Swing wide on entry.</div></div>
+      <div class="ac-step"><div class="ac-num">4</div><div class="ac-text">Park rig <strong>north–south orientation</strong>, driver side facing the service bay. New vehicle receiving is on the north end.</div></div>
+    </div>
+
+    <!-- delivery notes -->
+    <div class="section-lbl">Delivery Notes</div>
+    <div class="note-card">
+      <div class="nc-icon orange"><span class="material-icons-round">meeting_room</span></div>
+      <div class="nc-content"><div class="nc-title">Check-in</div><div class="nc-body">Ask for the receiving manager at the front service desk. Do not unload until they sign the BOL. Hours: 7am–5pm Mon–Sat.</div></div>
+    </div>
+    <div class="note-card">
+      <div class="nc-icon blue"><span class="material-icons-round">local_parking</span></div>
+      <div class="nc-content"><div class="nc-title">Staging area</div><div class="nc-body">Unload vehicles onto the north staging lot — the paved area directly behind the showroom. Drive-through unload only, no backing required from the Rainier entrance.</div></div>
+    </div>
+    <div class="note-card">
+      <div class="nc-icon warn"><span class="material-icons-round">warning_amber</span></div>
+      <div class="nc-content"><div class="nc-title">Low clearance notice</div><div class="nc-body">Covered walkway between showroom and service bay is 14'6". Keep clear — do not pull rig under canopy.</div></div>
+    </div>
+    <div class="note-card">
+      <div class="nc-icon green"><span class="material-icons-round">person</span></div>
+      <div class="nc-content"><div class="nc-title">Dealer contact</div><div class="nc-body">Mike Torres — Receiving Manager · (425) 555-0182. Call ahead if arriving after 4pm or if load has any damage to note.</div></div>
+    </div>
+
+    <!-- drop-off sequence -->
+    <div class="section-lbl">Unload Sequence</div>
+    <div class="card-el" style="margin-top:0;">
+      <div class="slot-list-item"><div class="sl-num" style="background:var(--success-container);color:var(--success);">6</div><div class="sl-info"><div class="sl-name">Highlander XLE → Slot A1</div><div class="sl-vin">5TDHZRBH9MS523875 · Bottom deck first</div></div><div class="sl-right"><div class="sl-reason">Unload first</div></div></div>
+      <div class="slot-list-item"><div class="sl-num" style="background:var(--success-container);color:var(--success);">7</div><div class="sl-info"><div class="sl-name">Camry LE Hybrid → Slot A2</div><div class="sl-vin">4T1DAACK1SU559372</div></div><div class="sl-right"><div class="sl-reason">Bottom deck</div></div></div>
+      <div class="slot-list-item"><div class="sl-num" style="background:var(--success-container);color:var(--success);">8</div><div class="sl-info"><div class="sl-name">Camry XSE AWD → Slot A3</div><div class="sl-vin">4T1DAACK8SU046040</div></div><div class="sl-right"><div class="sl-reason">Bottom deck</div></div></div>
+      <div class="slot-list-item"><div class="sl-num" style="background:var(--success-container);color:var(--success);">9</div><div class="sl-info"><div class="sl-name">Highlander XSE → Slot A4</div><div class="sl-vin">5TDHZRBH9MS500001</div></div><div class="sl-right"><div class="sl-reason">Bottom deck</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">1</div><div class="sl-info"><div class="sl-name">Camry XSE V6 → Slot B1</div><div class="sl-vin">4T1G11AK8PU123481 · Top deck</div></div><div class="sl-right"><div class="sl-reason">After bottom</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">2</div><div class="sl-info"><div class="sl-name">RAV4 XLE Premium → Slot B2</div><div class="sl-vin">2T3P1RFV8PW847263</div></div><div class="sl-right"><div class="sl-reason">Top deck</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">3</div><div class="sl-info"><div class="sl-name">Tacoma TRD 4x4 → Slot B3</div><div class="sl-vin">3TMLB5JN3SM178449</div></div><div class="sl-right"><div class="sl-reason">Top deck</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">4</div><div class="sl-info"><div class="sl-name">Corolla SE CVT → Slot B4</div><div class="sl-vin">4T1DAACK6SU566558</div></div><div class="sl-right"><div class="sl-reason">Top deck</div></div></div>
+      <div class="slot-list-item"><div class="sl-num">5</div><div class="sl-info"><div class="sl-name">RAV4 Adventure → Slot B5</div><div class="sl-vin">2T3P1RFV2SC561402</div></div><div class="sl-right"><div class="sl-reason">Top deck</div></div></div>
+    </div>
+
+    <div style="padding:16px;">
+      <button class="btn-fill" style="width:100%;justify-content:center;height:48px;border-radius:14px;font-size:15px;background:var(--green);">
+        <span class="material-icons-round">check_circle</span>
+        Confirm Delivery Complete
+      </button>
     </div>
   </div>
-</section>
+</div>
 
-<!-- COST / FINANCIAL IMPACT -->
-<section id="cost" class="sec">
-  <div class="si">
-    <div class="cost-hdr">
-      <div>
-        <div class="chip rv">02 — The cost of doing nothing</div>
-        <h2 class="sh rv">Time is money.<br><em>The yard eats both.</em></h2>
-      </div>
-      <div class="rv" style="transition-delay:.1s">
-        <p class="sb">A car hauler earns per vehicle delivered — not per hour. Every minute lost in the yard is income that never arrives. Revenue per vehicle scales with distance — local runs pay $80–150/unit with multiple runs per day, while long-haul routes pay $300–600+/unit. <strong>Bad loads cost money at every scale.</strong></p>
-      </div>
-    </div>
-
-    <div class="impact-row rv">
-      <div class="impact-card"><div class="ic-icon loss">💸</div><div class="ic-n red">$150+</div><div class="ic-lbl">Lost per vehicle left behind on a local run — more on regional &amp; long-haul</div></div>
-      <div class="impact-card"><div class="ic-icon time">⏱</div><div class="ic-n amber">2–4 hrs</div><div class="ic-lbl">Time lost per bad configuration incident — inside a 14-hr HOS window</div></div>
-      <div class="impact-card"><div class="ic-icon gain">📈</div><div class="ic-n grn">+1–2 runs</div><div class="ic-lbl">Additional daily runs recovered with MONTAR (local haul)</div></div>
-    </div>
-
-    <!-- DRIVER CALCULATOR -->
-    <div class="calc-card rv" style="transition-delay:.1s">
-      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.3rem">
-        <div style="background:var(--brand-lt);border-radius:var(--r8);padding:.25rem .65rem;font-family:var(--fm);font-size:.6rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.08em">Per Truck</div>
-        <div class="calc-ttl">Driver income loss calculator</div>
-      </div>
-      <div class="calc-sub">Estimates income lost per truck per week. Local drivers run multiple shorter routes; long-haul drivers run fewer but higher-value loads.</div>
-      <div class="ctrls">
-        <div class="ctrl">
-          <label>Route type <span class="cv" id="v-rtype">Local</span></label>
-          <input type="range" id="rtype" min="0" max="2" value="0" step="1">
-          <div style="display:flex;justify-content:space-between;font-family:var(--fm);font-size:.6rem;color:var(--on-d);margin-top:.25rem"><span>Local</span><span>Regional</span><span>Long-haul</span></div>
-        </div>
-        <div class="ctrl"><label>Bad loads per week (this truck) <span class="cv" id="v-inc">3</span></label><input type="range" id="incidents" min="1" max="7" value="3"></div>
-        <div class="ctrl"><label>Delay per incident (hrs) <span class="cv" id="v-delay">2</span></label><input type="range" id="delay" min="0.5" max="4" value="2" step="0.5"></div>
-        <div class="ctrl"><label>Vehicles per load <span class="cv" id="v-vpl">9</span></label><input type="range" id="vpl" min="6" max="9" value="9"></div>
-      </div>
-      <div id="route-hint" style="font-family:var(--fm);font-size:.68rem;color:var(--brand);background:var(--brand-lt);border-radius:var(--r8);padding:.5rem .875rem;margin-bottom:1.25rem">📍 Local: ~$80–150/vehicle · 3–5 runs/day · Short distances</div>
-      <div class="res-row">
-        <div class="res-card pot"><div class="res-lbl">Weekly Revenue Potential</div><div class="res-n" id="r-pot">$18,900</div><div class="res-sub">This truck, full loads all week</div></div>
-        <div class="res-card tl"><div class="res-lbl">Weekly Hours Lost</div><div class="res-n" id="r-time">6 hrs</div><div class="res-sub">Inside your 14-hr HOS window</div></div>
-        <div class="res-card ml"><div class="res-lbl">Weekly Income Lost</div><div class="res-n" id="r-loss">$1,890</div><div class="res-sub">This truck only</div></div>
-      </div>
-    </div>
-
-    <!-- FLEET CALCULATOR -->
-    <div class="calc-card rv" style="transition-delay:.18s;margin-top:1rem">
-      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.3rem">
-        <div style="background:#EAF5FF;border-radius:var(--r8);padding:.25rem .65rem;font-family:var(--fm);font-size:.6rem;font-weight:700;color:#0066BB;text-transform:uppercase;letter-spacing:.08em">Fleet View</div>
-        <div class="calc-ttl">Fleet-wide weekly impact</div>
-      </div>
-      <div class="calc-sub">See the total weekly revenue impact across your entire fleet. Inputs are per-truck averages.</div>
-      <div class="ctrls">
-        <div class="ctrl"><label>Fleet size (trucks) <span class="cv" id="v-fleet">20</span></label><input type="range" id="fleet" min="5" max="200" value="20" step="5"></div>
-        <div class="ctrl"><label>Bad loads per truck per week <span class="cv" id="v-fleet-inc">3</span></label><input type="range" id="fleet-inc" min="1" max="7" value="3"></div>
-        <div class="ctrl"><label>Revenue per vehicle (avg) <span class="cv" id="v-fleet-rate">$140</span></label><input type="range" id="fleet-rate" min="80" max="400" value="140" step="10"></div>
-        <div class="ctrl"><label>Avg delay per incident (hrs) <span class="cv" id="v-fleet-delay">2</span></label><input type="range" id="fleet-delay" min="0.5" max="4" value="2" step="0.5"></div>
-      </div>
-      <div class="res-row" style="grid-template-columns:repeat(4,1fr)">
-        <div class="res-card pot"><div class="res-lbl">Fleet Weekly Potential</div><div class="res-n" id="rf-pot">$1.5M</div><div class="res-sub">All trucks, full loads</div></div>
-        <div class="res-card tl"><div class="res-lbl">Total Hours Lost</div><div class="res-n" id="rf-time">120 hrs</div><div class="res-sub">Across the fleet per week</div></div>
-        <div class="res-card ml"><div class="res-lbl">Fleet Weekly Loss</div><div class="res-n" id="rf-loss">$75,600</div><div class="res-sub">Recoverable with MONTAR</div></div>
-        <div class="res-card" style="background:var(--ok-bg);border:1px solid rgba(26,122,82,.15)"><div class="res-lbl">Annual Impact</div><div class="res-n" style="color:var(--ok)" id="rf-annual">$3.9M</div><div class="res-sub">Annualized fleet loss</div></div>
-      </div>
-    </div>
-
-    <!-- BAR CHART + HOS DONUT -->
-    <div class="chart-card rv" style="transition-delay:.22s">
-      <div class="ch-hd">
-        <div><div class="ch-ttl">Daily runs completed — with vs. without MONTAR</div><div class="ch-sub">Per truck. ⚠ marks indicate a bad load incident day.</div></div>
-        <div class="legend"><div class="leg-item"><div class="leg-dot l"></div>Without MONTAR</div><div class="leg-item"><div class="leg-dot g"></div>With MONTAR</div></div>
-      </div>
-      <div class="ch-area" id="chartArea"></div>
-
-      <!-- HOS DONUT — 14-hour window breakdown -->
-      <div style="margin-top:2rem;padding-top:2rem;border-top:1px solid var(--surf2)">
-        <div style="font-family:var(--fm);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-d);font-weight:500;margin-bottom:1.5rem">DOT Hours of Service — 14-Hour On-Duty Window</div>
-        <div class="time-split">
-          <div class="donut-wrap">
-            <!-- Multi-segment SVG donut representing 14-hour HOS breakdown -->
-            <svg id="hos-svg" viewBox="0 0 140 140" width="180" height="180">
-              <!-- track -->
-              <circle cx="70" cy="70" r="52" fill="none" stroke="#EDEAE5" stroke-width="18"/>
-              <!-- driving (green) -->
-              <circle id="arc-drive" cx="70" cy="70" r="52" fill="none" stroke="#81C995" stroke-width="18"
-                stroke-dasharray="326.7" stroke-dashoffset="326.7" stroke-linecap="butt"
-                transform="rotate(-90 70 70)" style="transition:stroke-dashoffset 1.2s var(--ease)"/>
-              <!-- break (yellow) -->
-              <circle id="arc-break" cx="70" cy="70" r="52" fill="none" stroke="#FDD663" stroke-width="18"
-                stroke-dasharray="326.7" stroke-dashoffset="326.7" stroke-linecap="butt"
-                transform="rotate(-90 70 70)" style="transition:stroke-dashoffset 1.4s var(--ease)"/>
-              <!-- inefficiency (red) -->
-              <circle id="arc-ineff" cx="70" cy="70" r="52" fill="none" stroke="#F28B82" stroke-width="18"
-                stroke-dasharray="326.7" stroke-dashoffset="326.7" stroke-linecap="butt"
-                transform="rotate(-90 70 70)" style="transition:stroke-dashoffset 1.6s var(--ease)"/>
-            </svg>
-            <div class="donut-center">
-              <div style="font-family:var(--fd);font-size:1.4rem;font-weight:700;color:var(--on);line-height:1">14 hrs</div>
-              <div style="font-size:.62rem;color:var(--on-d);font-weight:700;margin-top:.2rem;text-align:center">HOS window</div>
-            </div>
-          </div>
-          <div class="donut-legend">
-            <div class="dl-item"><div class="dl-sw" style="background:#81C995"></div><div><div class="dl-tn" id="dl-drive">8.2 hrs</div><div class="dl-tl">Productive driving &amp; delivery</div></div></div>
-            <div class="dl-item"><div class="dl-sw" style="background:#FDD663"></div><div><div class="dl-tn">0.5 hr</div><div class="dl-tl">Required 30-min break (DOT HOS)</div></div></div>
-            <div class="dl-item"><div class="dl-sw" style="background:#F28B82"></div><div><div class="dl-tn" id="dl-ineff">2.8 hrs</div><div class="dl-tl">Lost to yard &amp; delivery inefficiency</div></div></div>
-            <div class="dl-item"><div class="dl-sw" style="background:#EDEAE5"></div><div><div class="dl-tn" id="dl-remain">2.5 hrs</div><div class="dl-tl">Remaining HOS buffer</div></div></div>
-            <div style="margin-top:.75rem;padding:.6rem .75rem;background:var(--ok-bg);border-radius:var(--r8);border-left:3px solid var(--ok)">
-              <div style="font-family:var(--fm);font-size:.62rem;color:var(--ok);font-weight:700">With MONTAR</div>
-              <div style="font-size:.78rem;color:var(--on-v);margin-top:.2rem">Inefficiency hours become driving hours — <strong id="dl-recovered">2.8 hrs</strong> recovered per shift</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROBLEM -->
-<section id="problem" class="sec">
-  <div class="si">
-    <div class="prob-hdr">
-      <div><div class="chip rv">03 — Three moments that cost money</div><h2 class="sh rv">Every load.<br><em>Every day.</em><br>No software.</h2></div>
-      <div class="rv" style="transition-delay:.1s"><p class="sb">The driver earns per vehicle delivered — not per hour. Every minute lost in the yard is income gone. These three moments happen on nearly every load, at every carrier. <strong>None of them have ever had a software solution.</strong></p></div>
-    </div>
-    <div class="moments rv">
-      <div class="moment"><div class="m-stripe"></div><div class="m-body"><div class="m-chip">01</div><div class="m-lbl">The Yard</div><div class="m-ttl">Loading from memory, every time</div><div class="m-cost"><span class="m-ci">💸</span><span class="m-ct">$150–$300 lost when a vehicle doesn't fit and is left behind</span></div><p class="m-p">The driver receives a paper load sheet. No guidance on configuration, no weight check, no verification. When something goes wrong, vehicles get unloaded and reloaded. <strong>What should take 90 minutes takes half a day.</strong></p></div></div>
-      <div class="moment"><div class="m-stripe"></div><div class="m-body"><div class="m-chip">02</div><div class="m-lbl">The Hunt</div><div class="m-ttl">Navigating the yard without a route</div><div class="m-cost"><span class="m-ci">⏱</span><span class="m-ct">20–45 minutes lost per load walking the yard</span></div><p class="m-p">Bay codes on the load sheet are positions scattered across a facility spanning several city blocks. Some yards have a basic diagram. Most have painted rows on asphalt. <strong>None give the driver an optimized pickup route for their specific load.</strong></p></div></div>
-      <div class="moment"><div class="m-stripe"></div><div class="m-body"><div class="m-chip">03</div><div class="m-lbl">The Delivery</div><div class="m-ttl">Arriving blind at the dealer</div><div class="m-cost"><span class="m-ci">🗺</span><span class="m-ct">15–30 minutes lost per stop at an unfamiliar dealer</span></div><p class="m-p">The load sheet gives an address — not the entrance, the driveway, or how to position an 80-foot rig in a tight street. Experienced drivers know from memory. New drivers guess. <strong>Every wrong approach is income off the next run.</strong></p></div></div>
-    </div>
-    <div class="pullquote rv"><div class="pq-mk">"</div><p class="pq-tx">A bad configuration. A reload. A replacement vehicle that also doesn't fit. What should be a 2-hour run becomes a 5-hour problem. These moments play out every day, at every carrier, across every rail yard and port in North America. The driver pays for all of it.</p></div>
-  </div>
-</section>
-
-<!-- SOLUTION -->
-<section id="solution" class="sec">
-  <div class="si">
-    <div class="sol-hdr">
-      <div><div class="chip rv">04 — The solution</div><h2 class="sh rv">Intelligent.<br><em>Collaborative.</em><br>Built for the yard.</h2></div>
-      <div class="rv" style="transition-delay:.1s"><p class="sb">MONTAR is a mobile platform that operates in the physical space — at the rail yard, at the port, at the dealer lot. AI in the hands of the driver, turning three moments of lost time into a seamless, optimized experience from first vehicle to final delivery.</p></div>
-    </div>
-    <div class="sol-cards rv" style="grid-template-columns:repeat(3,1fr)">
-      <div class="sol-card"><div class="sol-top"></div><div class="sol-bd"><div class="sol-tag">Before the first vehicle moves</div><div class="sol-ttl">The load is optimized and verified</div><p class="sol-p">MONTAR delivers an optimized load plan — verified against legal weight limits, physical rig constraints, and the driver's own preferences. Configuration conflicts are caught before anyone drives up the ramp. <strong>The driver confirms the plan, sees the reasoning, and can adjust with full visibility into the impact of any change.</strong></p></div></div>
-      <div class="sol-card"><div class="sol-top"></div><div class="sol-bd"><div class="sol-tag">In the yard</div><div class="sol-ttl">Every vehicle found in the right order</div><p class="sol-p">Bay codes become a live, sequenced pickup route across the yard — rail yard or port, single OEM or multi-brand. MONTAR maps the vehicle locations and guides the driver through the pickup in the exact sequence the load plan requires. <strong>No backtracking. No wasted steps. Load and go.</strong></p></div></div>
-      <div class="sol-card"><div class="sol-top"></div><div class="sol-bd"><div class="sol-tag">At the dealer door</div><div class="sol-ttl">Intelligently guided delivery — every time</div><p class="sol-p">MONTAR knows the dealer — the right entrance, the correct approach angle, and how to position an 80-foot rig without a wrong turn. Arriving without this information risks damage to the vehicle, the rig, or both. <strong>MONTAR eliminates that risk with guided delivery intelligence at every drop-off.</strong></p></div></div>
-    </div>
-    <div class="collab-card rv"><div class="collab-hl">MONTAR <span>suggests.</span><br>Driver decides.</div><div><p class="collab-p">Every recommendation includes the reasoning. Drivers have years of experience and real preferences — MONTAR learns them and incorporates them within legal limits. If a driver wants to load differently, <strong>MONTAR warns before the first vehicle moves — not after.</strong> The driver stays in control. Every decision becomes an informed one.</p></div></div>
-    <div class="formats-card rv"><div class="fmt-lbl">One platform. Every format.</div><p class="fmt-p">Load sheets are fragmented across hundreds of carriers — each using their own format. <strong>MONTAR ingests all of them.</strong> One driver, multiple carriers, one consistent experience.</p></div>
-    <div class="outcomes rv">
-      <div class="out"><div class="out-ic">🏃</div><div class="out-t">More runs per day</div><p class="out-b">Less time in the yard means more loads — and more income, directly.</p></div>
-      <div class="out"><div class="out-ic">✅</div><div class="out-t">No more surprises</div><p class="out-b">DOT violations and lost loads trace to missing information. MONTAR closes that gap.</p></div>
-      <div class="out"><div class="out-ic">📍</div><div class="out-t">Confidence at every stop</div><p class="out-b">From the rail yard to the dealer lot — the driver knows what to expect.</p></div>
-      <div class="out"><div class="out-ic">🧠</div><div class="out-t">Gets smarter over time</div><p class="out-b">MONTAR learns from every load, every driver, every yard — compounding with every run.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- TEAM -->
-<section id="team" class="sec">
-  <div class="si">
-    <div class="team-hdr">
-      <div><div class="chip rv">05 — The team</div><h2 class="sh rv">Domain knowledge.<br><em>Proven execution.</em></h2></div>
-      <div class="rv" style="transition-delay:.1s"><p class="sb">Built by two people who have shipped real products together before —  from strategy through architecture through delivery. <strong>Domain expertise that can't be Googled. Engineering rigor that Fortune 500 platforms demand.</strong></p></div>
-    </div>
-    <div class="people">
-      <div class="pcard rv">
-        <div class="p-top"><div class="avatar"><span>AA</span></div><div><div class="p-name">Adan Aispuro</div><div class="p-role">CEO & Co-Founder · Product Strategist · CDL Holder · Military Veteran</div></div></div>
-        <div class="p-bio-wrap"><p class="p-bio">A product strategist and operator with a history of taking complex, zero-to-one ideas from concept to real-world deployment. <strong>He has led product strategy and Design Operations at scale, including at Amazon, and has launched products for Fortune 500 companies</strong> — aligning UX, engineering, and business to ship high-impact platforms.<br><br>A military veteran, he brings discipline, resilience, and a bias for execution. <strong>As a former car hauler who still holds a CDL,</strong> he understands firsthand the inefficiencies, constraints, and fragmented workflows in automotive transport. This rare combination of product leadership and lived industry experience positions him to build a category-defining platform grounded in reality, not theory.</p></div>
-      </div>
-      <div class="pcard rv" style="transition-delay:.1s">
-        <div class="p-top"><div class="avatar"><span>FG</span></div><div><div class="p-name">Frank Garcia</div><div class="p-role">Co-Founder · Lead Engineer · Enterprise Platform Builder</div></div></div>
-        <div class="p-bio-wrap"><p class="p-bio">A product-focused engineer and builder with a track record of rapidly delivering scalable, production-ready applications. <strong>He has led the development of complex digital platforms for global brands including Kia</strong> — translating business needs into high-performing, user-centered systems.<br><br>Known for speed, deep systems thinking, and pragmatic execution, he consistently ships solutions that balance technical rigor with real-world usability. <strong>His ability to move from concept to deployed product quickly, while maintaining architectural integrity, makes him a force multiplier</strong> in early-stage environments building ambitious, category-defining platforms.</p></div>
-      </div>
-    </div>
-    <div class="caps rv">
-      <div class="cap"><div class="cap-n">01</div><div class="cap-t">Domain knowledge</div><p class="cap-b">The CEO drove the rig and still holds a CDL. Verified the problem firsthand before writing a line of spec.</p></div>
-      <div class="cap"><div class="cap-n">02</div><div class="cap-t">Product leadership</div><p class="cap-b">Amazon-scale product strategy and Design Operations — aligned UX, engineering, and business from day one.</p></div>
-      <div class="cap"><div class="cap-n">03</div><div class="cap-t">Technical depth</div><p class="cap-b">Production-grade engineering for global brands including Kia. Systems that work under real conditions.</p></div>
-      <div class="cap"><div class="cap-n">04</div><div class="cap-t">Execution velocity</div><p class="cap-b">They have built and shipped together before. They know how to move from insight to deployed product fast.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- PILOT -->
-<section id="pilot" class="sec">
-  <div class="si">
-    <div class="chip rv">06 — Pilot & rollout</div>
-    <h2 class="sh rv" style="margin-bottom:2.5rem">Pilot active. <em>Scale partner committed.</em></h2>
-    <div class="phases">
-      <div class="phase p1 rv"><div class="ph-stripe"></div><div class="ph-in"><div class="ph-tag">Phase 1 — Validation</div><div class="ph-name">Global Auto Transport<br>Chino, California</div><p class="ph-p">A fleet of <strong>7 trucks</strong> operating in Southern California. Shadow mode first — MONTAR runs alongside real driver decisions, the algorithm sharpens. Then live: MONTAR becomes the primary tool. This phase proves the product works before we scale.</p><div class="badge a"><div class="bdot"></div>7 Trucks · Active Pilot</div></div></div>
-      <div class="phase p2 rv" style="transition-delay:.1s"><div class="ph-stripe"></div><div class="ph-in"><div class="ph-tag">Phase 2 — Scale Rollout</div><div class="ph-name">Named Partner<br>Committed · Post-validation</div><p class="ph-p">A fleet of <strong>100 trucks</strong> committed for rollout after Phase 1 validates the core product. The relationship exists — this is not a prospective conversation. Load volume and vehicle diversity across both rail yards and ports will sharpen the platform across every major origin environment on the West Coast.</p><div class="badge c"><div class="bdot"></div>100 Trucks · Post-validation</div></div></div>
-    </div>
-    <div class="origins-card rv">
-      <div class="or-hd">West Coast origin facilities MONTAR serves</div>
-      <div class="or-cols">
-        <div><div class="or-reg">Pacific Northwest — Seattle</div><ul class="or-list"><li><strong>BNSF Orillia</strong>, Renton WA — Toyota primary distribution</li><li><strong>Port of Tacoma</strong> — Subaru, Toyota, BMW, Volkswagen imports</li></ul></div>
-        <div><div class="or-reg">Southern California — Chino</div><ul class="or-list"><li><strong>Port of Long Beach</strong> — Toyota primary import terminal</li><li><strong>Port of LA</strong>, San Pedro — Honda, Nissan, Hyundai, Kia</li><li><strong>Port Hueneme</strong>, Oxnard — Volkswagen, BMW, Volvo, Mazda</li><li><strong>BNSF Miraloma</strong>, Riverside — Ford, GM, Stellantis</li><li><strong>National City Terminal</strong>, San Diego — Toyota, Honda secondary</li></ul></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- VISION -->
-<section id="vision" class="sec">
-  <div class="si">
-    <div class="vis-g">
-      <div>
-        <div class="chip rv">07 — The vision</div>
-        <h2 class="sh rv">We start with the yard.<br><em>We don't stop there.</em></h2>
-        <p class="sb rv" style="margin-top:1rem">Every car hauler driver in North America goes to work without a purpose-built tool. MONTAR starts with the most painful problem and expands through every node in the finished vehicle journey.</p>
-        <div class="roadmap rv" style="transition-delay:.1s;margin-top:2rem">
-          <div class="rm"><div class="rm-tr"><div class="rm-dot"></div><div class="rm-line"></div></div><div><div class="rm-t">Load configuration intelligence</div><div class="rm-b">Optimized load plan, weight-verified, confirmed before the first vehicle moves.</div></div></div>
-          <div class="rm"><div class="rm-tr"><div class="rm-dot"></div><div class="rm-line"></div></div><div><div class="rm-t">Yard map & pickup routing</div><div class="rm-b">Every vehicle found, every route optimized — rail yards and ports.</div></div></div>
-          <div class="rm"><div class="rm-tr"><div class="rm-dot f"></div><div class="rm-line"></div></div><div><div class="rm-t dim">Delivery intelligence</div><div class="rm-b">Dealer layouts, lot orientation, proof of delivery — last mile as optimized as the first.</div></div></div>
-          <div class="rm"><div class="rm-tr"><div class="rm-dot f"></div></div><div><div class="rm-t dim">Full driver operating system</div><div class="rm-b">Inspection, dispatch, navigation — purpose-built for auto transport.</div></div></div>
-        </div>
-      </div>
-      <div>
-        <div class="dest-card rv"><div class="dest-lbl">The destination</div><p class="dest-q">"The operating system for every driver who moves a vehicle before it reaches a consumer."</p><p class="dest-sub">Ford, Toyota, Honda, GM — 15.9 million vehicles a year. Touched by a driver who has never had a product built for them. MONTAR is the first. AI in the physical space, working alongside the driver, at every rail yard and port in North America.</p></div>
-        <div class="journey-card rv" style="transition-delay:.1s">
-          <div class="jrny-lbl">End-to-end vision · Manufacturer → Dealer lot</div>
-          <div class="jsteps">
-            <div class="jstep"><div class="jdot">01</div><div class="jlbl">Manufacturer<br>Plant</div></div>
-            <div class="jstep"><div class="jdot">02</div><div class="jlbl">Rail Yard<br>&amp; Port</div></div>
-            <div class="jstep active"><div class="jdot">03</div><div class="jlbl">Car Hauler<br>Yard</div></div>
-            <div class="jstep"><div class="jdot">04</div><div class="jlbl">In<br>Transit</div></div>
-            <div class="jstep"><div class="jdot">05</div><div class="jlbl">Dealer<br>Lot</div></div>
-          </div>
-        </div>
-        <div class="nc-card rv" style="transition-delay:.15s"><div class="nc-hd">Not competing with</div><div class="nc-g"><div><div class="nc-t">Load boards</div><p class="nc-b">Central Dispatch books the load. MONTAR operates after — in the execution layer that has no incumbent.</p></div><div><div class="nc-t">General fleet tools</div><p class="nc-b">Samsara and Motive serve freight. Neither has domain intelligence for car hauler operations.</p></div></div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="contact">
-  <div class="cta-g">
-    <div class="rv">
-      <h2 class="cta-h">Let's talk.</h2>
-      <p class="cta-p">If you're a carrier, a fleet operator, or an investor who sees the opportunity — we want to hear from you. MONTAR is early and moving fast.</p>
-      <a href="mailto:aispuro.adan.r@gmail.com" class="cta-btn">hello@montarapp.com</a>
-    </div>
-    <div class="cta-pts rv" style="transition-delay:.1s">
-      <div class="cta-pt"><strong>Pilot active</strong> — Global Auto Transport, Chino CA · 7 trucks</div>
-      <div class="cta-pt"><strong>Scale partner committed</strong> — 100 trucks, post-validation</div>
-      <div class="cta-pt"><strong>Problem validated</strong> — driver interviews, hundreds of load sheets analyzed</div>
-      <div class="cta-pt"><strong>Path to United Road</strong> — largest US carrier, 2,500+ trucks</div>
-      <div class="cta-pt"><strong>Based in Seattle, WA</strong> · MONTAR Inc.</div>
-    </div>
-  </div>
-</section>
-<footer><span class="foot-logo">MONTAR</span><span class="foot-meta">© MONTAR Inc. · Seattle, WA · Confidential</span></footer>
+</div><!-- /frame -->
 
 <script>
-// NAV
-const nav=document.getElementById('nav');
-window.addEventListener('scroll',()=>nav.classList.toggle('up',scrollY>60),{passive:true});
-
-// REVEAL
-const ro=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('on')})},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
-document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
-
-// Route type presets: [label, rate, runsPerDay, hint]
-const ROUTES=[
-  ['Local','$80–150',4,'📍 Local: ~$80–150/vehicle · 3–5 runs/day · Short distances within metro area'],
-  ['Regional','$150–300',2,'🛣 Regional: ~$150–300/vehicle · 1–2 runs/day · Moderate distances, same-day return'],
-  ['Long-haul','$300–600+',1,'🗺 Long-haul: ~$300–600+/vehicle · 1 run/1–2 days · Cross-state or cross-country']
+// ── RIG PICKER ──────────────────────────
+const rigData = [
+  { name:'Cottrell CX-09LS', slots:'9', len:'80 ft', cargo:'47K lbs' },
+  { name:'Cottrell CX-07S',  slots:'7', len:'72 ft', cargo:'38K lbs' },
+  { name:'Boydstun 9-Series',slots:'9', len:'82 ft', cargo:'46K lbs' },
+  { name:'Kaufman KFM-9',    slots:'9', len:'79 ft', cargo:'45K lbs' },
+  { name:'Delavan 5-car',    slots:'5', len:'55 ft', cargo:'28K lbs' },
+  { name:'Cottrell CX-05',   slots:'5', len:'58 ft', cargo:'30K lbs' },
 ];
-const RATES=[115,225,450]; // midpoint per route type
 
-// DRIVER CALCULATOR
-function calcDriver(){
-  const rt=+document.getElementById('rtype').value;
-  const inc=+document.getElementById('incidents').value;
-  const delay=+document.getElementById('delay').value;
-  const vpl=+document.getElementById('vpl').value;
+let selectedRig = 0;
 
-  document.getElementById('v-rtype').textContent=ROUTES[rt][0];
-  document.getElementById('v-inc').textContent=inc;
-  document.getElementById('v-delay').textContent=delay;
-  document.getElementById('v-vpl').textContent=vpl;
+const pickerList = document.getElementById('pickerList');
+const rigDetailName = document.getElementById('rigDetailName');
+const rigSpecs = document.getElementById('rigSpecs');
 
-  const rate=RATES[rt];
-  const runsPerDay=ROUTES[rt][2];
-  const hint=document.getElementById('route-hint');
-  if(hint)hint.textContent=ROUTES[rt][3];
-
-  // Weekly potential: 5 days × runs/day × vehicles × rate
-  const weeklyPot=5*runsPerDay*vpl*rate;
-  // Weekly time lost
-  const weeklyTime=(inc*delay).toFixed(1);
-  // Income lost: each hour of delay ≈ 0.5 runs missed (conservative)
-  const weeklyLoss=Math.round(inc*delay*0.5*vpl*rate);
-
-  const fmt=n=>n>=1000?'$'+(n/1000).toFixed(1)+'K':'$'+n.toLocaleString();
-  document.getElementById('r-pot').textContent=fmt(weeklyPot);
-  document.getElementById('r-time').textContent=weeklyTime+' hrs';
-  document.getElementById('r-loss').textContent=fmt(weeklyLoss);
-
-  // HOS donut: 14-hour window
-  // Segments: break=0.5hr fixed, inefficiency=daily delay avg, driving=rest up to 11hr max
-  const dailyIneff=(inc/5)*delay;
-  const HOS=14;
-  const breakHrs=0.5;
-  const driveHrs=Math.min(11, HOS-breakHrs-dailyIneff);
-  const remaining=Math.max(0, HOS-breakHrs-dailyIneff-driveHrs);
-  const C=326.7; // circumference r=52
-
-  // We draw 3 arcs stacked. Each circle starts at same rotation, we offset via dashoffset.
-  // Arc length = fraction × C
-  const driveArc=(driveHrs/HOS)*C;
-  const breakArc=(breakHrs/HOS)*C;
-  const ineffArc=(Math.min(dailyIneff,HOS-breakHrs)/HOS)*C;
-
-  // Drive arc: dasharray=driveArc, dashoffset=0
-  setArc('arc-drive', driveArc, 0);
-  // Break arc: starts after drive
-  setArc('arc-break', breakArc, C-driveArc);
-  // Ineff arc: starts after drive+break
-  setArc('arc-ineff', ineffArc, C-driveArc-breakArc);
-
-  const dd=document.getElementById('dl-drive');
-  const di=document.getElementById('dl-ineff');
-  const dr=document.getElementById('dl-remain');
-  const dc=document.getElementById('dl-recovered');
-  if(dd)dd.textContent=driveHrs.toFixed(1)+' hrs';
-  if(di)di.textContent=dailyIneff.toFixed(1)+' hrs';
-  if(dr)dr.textContent=Math.max(0,remaining).toFixed(1)+' hrs';
-  if(dc)dc.textContent=dailyIneff.toFixed(1)+' hrs';
-
-  buildChart(runsPerDay, rate, delay, inc, vpl);
-}
-
-function setArc(id, arcLen, offset){
-  const el=document.getElementById(id);
-  if(!el)return;
-  el.setAttribute('stroke-dasharray', arcLen+' '+(326.7-arcLen));
-  el.setAttribute('stroke-dashoffset', offset);
-}
-
-// FLEET CALCULATOR
-function calcFleet(){
-  const fleet=+document.getElementById('fleet').value;
-  const inc=+document.getElementById('fleet-inc').value;
-  const rate=+document.getElementById('fleet-rate').value;
-  const delay=+document.getElementById('fleet-delay').value;
-
-  document.getElementById('v-fleet').textContent=fleet;
-  document.getElementById('v-fleet-inc').textContent=inc;
-  document.getElementById('v-fleet-rate').textContent='$'+rate;
-  document.getElementById('v-fleet-delay').textContent=delay;
-
-  // Per truck per week: assume ~2 runs/day × 5 days × 9 vehicles
-  const weeklyPotPerTruck=2*5*9*rate;
-  const fleetPot=weeklyPotPerTruck*fleet;
-  const totalHrsLost=inc*delay*fleet;
-  const lossPerTruck=Math.round(inc*delay*0.5*9*rate);
-  const fleetLoss=lossPerTruck*fleet;
-  const annual=fleetLoss*52;
-
-  const fmt=n=>{
-    if(n>=1000000)return '$'+(n/1000000).toFixed(1)+'M';
-    if(n>=1000)return '$'+(n/1000).toFixed(0)+'K';
-    return '$'+n.toLocaleString();
-  };
-
-  document.getElementById('rf-pot').textContent=fmt(fleetPot);
-  document.getElementById('rf-time').textContent=totalHrsLost.toFixed(0)+' hrs';
-  document.getElementById('rf-loss').textContent=fmt(fleetLoss);
-  document.getElementById('rf-annual').textContent=fmt(annual);
-}
-
-function buildChart(runsPerDay, rate, delay, inc, vpl){
-  const c=document.getElementById('chartArea');
-  if(!c)return;
-  c.innerHTML='';
-
-  const H=200;
-  const days=['Mon','Tue','Wed','Thu','Fri'];
-  const rt=+document.getElementById('rtype').value;
-
-  // Spread bad days across the week in a more natural pattern
-  const nb=Math.min(Math.round(inc*5/7),5);
-  const spread=[0,2,4,1,3];
-  const bad=new Set();
-  for(let i=0;i<nb;i++) bad.add(spread[i]);
-
-  // Route-specific assumptions
-  const runCycle=rt===0 ? 1.5 : rt===1 ? 5 : 10;
-  const baseLossWithout=rt===0 ? 0.35 : rt===1 ? 0.20 : 0.10;
-  const baseLossWith=rt===0 ? 0.08 : rt===1 ? 0.05 : 0.03;
-  const incidentRecovery=0.75; // MONTAR recovers most, but not all, bad-day loss
-
-  days.forEach((d,i)=>{
-    const isBad=bad.has(i);
-
-    // Fractional loss reads better than hard floor() jumps
-    const incidentLoss=isBad ? Math.max(0.35, delay/runCycle) : 0;
-
-    const rOut=Math.max(
-      0.25,
-      Math.min(runsPerDay, runsPerDay-baseLossWithout-incidentLoss)
-    );
-
-    const mitigatedIncidentLoss=isBad ? incidentLoss*(1-incidentRecovery) : 0;
-    const rIn=Math.max(
-      0.25,
-      Math.min(runsPerDay, runsPerDay-baseLossWith-mitigatedIncidentLoss)
-    );
-
-    const hO=Math.round((rOut/runsPerDay)*H);
-    const hI=Math.round((rIn/runsPerDay)*H);
-
-    const revenueOut=Math.round(rOut*vpl*rate);
-    const revenueIn=Math.round(rIn*vpl*rate);
-    const diff=revenueIn-revenueOut;
-
-    const g=document.createElement('div');
-    g.className='dg';
-    g.style.cssText='display:flex;align-items:flex-end;gap:4px;flex:1;height:'+H+'px;position:relative;padding-bottom:0';
-
-    const b1=document.createElement('div');
-    b1.className='bar l';
-    b1.style.height='0';
-    b1.title='Without MONTAR: '+rOut.toFixed(1)+' runs · $'+revenueOut.toLocaleString();
-
-    const lbl1=document.createElement('div');
-    lbl1.style.cssText='position:absolute;top:6px;left:0;right:0;text-align:center;font-family:var(--fm);font-size:.6rem;font-weight:700;color:rgba(180,40,40,.85);pointer-events:none;opacity:0;transition:opacity .4s';
-    lbl1.textContent=rOut.toFixed(1);
-    b1.appendChild(lbl1);
-
-    const b2=document.createElement('div');
-    b2.className='bar g';
-    b2.style.height='0';
-    b2.title='With MONTAR: '+rIn.toFixed(1)+' runs · $'+revenueIn.toLocaleString();
-
-    const lbl2=document.createElement('div');
-    lbl2.style.cssText='position:absolute;top:6px;left:0;right:0;text-align:center;font-family:var(--fm);font-size:.6rem;font-weight:700;color:rgba(20,100,60,.9);pointer-events:none;opacity:0;transition:opacity .4s';
-    lbl2.textContent=rIn.toFixed(1);
-    b2.appendChild(lbl2);
-
-    setTimeout(()=>{
-      b1.style.height=hO+'px';
-      b2.style.height=hI+'px';
-      setTimeout(()=>{
-        lbl1.style.opacity='1';
-        lbl2.style.opacity='1';
-      },500);
-    },120+i*60);
-
-    if(diff>0){
-      const badge=document.createElement('div');
-      badge.style.cssText='position:absolute;top:-28px;left:0;right:0;text-align:center;font-family:var(--fm);font-size:.58rem;font-weight:700;color:var(--ok);background:var(--ok-bg);border-radius:4px;padding:.15rem .3rem;white-space:nowrap;opacity:0;transition:opacity .4s .8s';
-      badge.textContent='+$'+(diff>=1000?(diff/1000).toFixed(1)+'K':diff)+' recovered';
-      g.appendChild(badge);
-      setTimeout(()=>badge.style.opacity='1',900+i*60);
-    }
-
-    const dayLbl=document.createElement('div');
-    dayLbl.className='dlbl';
-    dayLbl.textContent=d+(isBad?' ⚠':'');
-    if(isBad) dayLbl.style.color='var(--err)';
-
-    g.appendChild(b1);
-    g.appendChild(b2);
-    g.appendChild(dayLbl);
-    c.appendChild(g);
+function updateRigDetails(idx) {
+  const r = rigData[idx];
+  rigDetailName.textContent = r.name;
+  rigSpecs.innerHTML = `
+    <div class="rig-spec"><div class="rs-val">${r.slots}</div><div class="rs-lbl">Max slots</div></div>
+    <div class="rig-spec"><div class="rs-val">${r.len}</div><div class="rs-lbl">Length</div></div>
+    <div class="rig-spec"><div class="rs-val">${r.cargo}</div><div class="rs-lbl">Max cargo</div></div>
+  `;
+  document.querySelectorAll('.picker-item').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
   });
 }
 
-// Bind driver calc
-['rtype','incidents','delay','vpl'].forEach(id=>document.getElementById(id)?.addEventListener('input',calcDriver));
-// Bind fleet calc
-['fleet','fleet-inc','fleet-rate','fleet-delay'].forEach(id=>document.getElementById(id)?.addEventListener('input',calcFleet));
+updateRigDetails(0);
 
-// Init both
-calcDriver();
-calcFleet();
+pickerList.addEventListener('scroll', () => {
+  const itemH = 56;
+  const idx = Math.round(pickerList.scrollTop / itemH);
+  const clamped = Math.max(0, Math.min(rigData.length - 1, idx));
+  if (clamped !== selectedRig) {
+    selectedRig = clamped;
+    updateRigDetails(selectedRig);
+  }
+});
 
-// Trigger HOS donut animation on scroll
-const dObs=new IntersectionObserver(e=>{if(e[0].isIntersecting){calcDriver();dObs.disconnect()}},{threshold:.3});
-const hosEl=document.getElementById('hos-svg');
-if(hosEl)dObs.observe(hosEl);
+// ── SCREEN TRANSITIONS ──────────────────
+let current = 's-splash';
+
+function goTo(id) {
+  const from = document.getElementById(current);
+  const to   = document.getElementById(id);
+  to.style.display = 'flex';
+  to.style.animation = 'slideInR .32s cubic-bezier(.2,0,0,1) forwards';
+  from.style.animation = 'slideOutL .32s cubic-bezier(.2,0,0,1) forwards';
+  setTimeout(() => {
+    from.style.display = 'none';
+    from.style.animation = '';
+    from.classList.remove('active');
+    to.style.animation = '';
+    to.classList.add('active');
+    current = id;
+    // status bar color
+    const lightScreens = ['s-splash','s-rig','s-scan'];
+    document.getElementById('statusBar').classList.toggle('light', lightScreens.includes(id));
+  }, 320);
+}
+
+function goBack(id) {
+  const from = document.getElementById(current);
+  const to   = document.getElementById(id);
+  to.style.display = 'flex';
+  to.style.animation = 'slideInL .3s cubic-bezier(.2,0,0,1) forwards';
+  from.style.animation = 'slideOutR .3s cubic-bezier(.2,0,0,1) forwards';
+  setTimeout(() => {
+    from.style.display = 'none';
+    from.style.animation = '';
+    from.classList.remove('active');
+    to.style.animation = '';
+    to.classList.add('active');
+    current = id;
+    const lightScreens = ['s-splash','s-rig','s-scan'];
+    document.getElementById('statusBar').classList.toggle('light', lightScreens.includes(id));
+  }, 300);
+}
+
+// ── SPLASH AUTO-ADVANCE ─────────────────
+setTimeout(() => {
+  goTo('s-rig');
+}, 2200);
+
+// ── iOS PWA FIXES ───────────────────────
+document.addEventListener('touchend', function(e) {
+  const now = Date.now();
+  if (now - (this._lt || 0) < 300) e.preventDefault();
+  this._lt = now;
+}, { passive: false });
 </script>
 </body>
 </html>
