@@ -332,7 +332,8 @@ html.pwa-standalone .frame{
 #s-map .map-tesla-svg{pointer-events:none;}
 #s-map .map-sheet{flex-shrink:0;}
 .map-tesla-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 80px rgba(0,0,0,.5);z-index:3;}
-.map-hud-top{position:absolute;top:0;left:0;right:0;z-index:4;padding:9px 12px 10px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.72);text-align:center;background:linear-gradient(to bottom,rgba(0,0,0,.72),rgba(0,0,0,.15));}
+.map-hud-top{position:absolute;top:0;left:0;right:0;z-index:4;padding:9px 12px 4px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.72);text-align:center;background:linear-gradient(to bottom,rgba(0,0,0,.72),rgba(0,0,0,.15));}
+.map-hud-sub{position:absolute;top:28px;left:0;right:0;z-index:4;padding:0 10px 8px;font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:.06em;color:rgba(255,255,255,.48);text-align:center;text-transform:uppercase;}
 .map-tesla-svg{position:absolute;inset:0;width:100%;height:100%;z-index:1;}
 .map-car-icon{fill:#3d4a5c;stroke:#5c6b82;stroke-width:0.6;}
 .map-car-glass{fill:#8fa3bc;opacity:.85;}
@@ -455,10 +456,33 @@ html.pwa-standalone .frame{
 .ac-text strong{color:#fff;font-weight:500;}
 
 /* ── SCAN: capture confirmation ───────── */
+#s-scan{position:relative;}
 #s-scan .viewfinder{cursor:default;}
+.scan-sheet-preview{position:absolute;inset:max(10px,2vw);width:auto;height:auto;max-width:calc(100% - 20px);max-height:calc(100% - 20px);margin:auto;object-fit:cover;border-radius:14px;box-shadow:0 12px 48px rgba(0,0,0,.55);z-index:2;display:none;}
+#s-scan.has-preview .bol-mock{opacity:.22;transition:opacity .35s ease;}
+#s-scan.has-preview .scan-frame{z-index:3;}
+#s-scan.has-preview .scan-line,#s-scan.scan-state-analyzing .scan-line{animation:none;opacity:.35;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.scan-phase-pick{padding:0 4px 4px;}
+.scan-pick-hint{font-size:17px;font-weight:600;color:#fff;margin-bottom:6px;letter-spacing:-.02em;}
+.scan-pick-sub{font-size:12px;color:rgba(255,255,255,.5);line-height:1.45;margin-bottom:18px;max-width:340px;margin-left:auto;margin-right:auto;}
+.scan-actions-row{display:flex;flex-direction:column;gap:10px;max-width:400px;margin:0 auto;}
+.btn-scan-primary,.btn-scan-secondary{width:100%;min-height:52px;border-radius:14px;font-family:var(--font);font-size:15px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;border:none;transition:transform .12s ease,opacity .2s;}
+.btn-scan-primary{background:linear-gradient(180deg,#ff8c38 0%,var(--primary) 100%);color:#fff;box-shadow:0 4px 20px rgba(232,98,10,.45);}
+.btn-scan-primary:active{transform:scale(.98);}
+.btn-scan-secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.22);}
+.btn-scan-secondary:active{transform:scale(.98);}
+.scan-analyzing-overlay{display:none;position:absolute;inset:0;z-index:30;background:rgba(5,8,12,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px;flex-direction:column;}
+#s-scan.scan-state-analyzing .scan-analyzing-overlay{display:flex;}
+.scan-analyze-card{text-align:center;max-width:300px;}
+.scan-analyze-ring{width:52px;height:52px;margin:0 auto 20px;border-radius:50%;border:3px solid rgba(232,98,10,.25);border-top-color:var(--primary);animation:scanSpin .85s linear infinite;}
+@keyframes scanSpin{to{transform:rotate(360deg)}}
+.scan-analyze-title{font-size:18px;font-weight:600;color:#fff;margin-bottom:8px;letter-spacing:-.02em;}
+.scan-analyze-sub{font-size:13px;color:rgba(255,255,255,.5);line-height:1.45;}
 .scan-phase-done{display:none;}
-#s-scan.sheet-ready .scan-phase-scan{display:none;}
+#s-scan.sheet-ready .scan-phase-pick{display:none;}
 #s-scan.sheet-ready .scan-phase-done{display:block;}
+.scan-phase-done{padding-top:4px;}
 .scan-done-card{background:rgba(29,107,62,.25);border:1px solid rgba(74,222,128,.45);border-radius:16px;padding:16px 18px;margin-bottom:12px;text-align:left;}
 .scan-done-title{font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
 .scan-done-title .material-icons-round{color:#4ADE80;font-size:20px;}
@@ -529,7 +553,7 @@ html.pwa-standalone .frame{
 .session-end-banner .sub{font-size:13px;opacity:.75;margin-top:6px;line-height:1.4;}
 
 /* ── YARD LOADING MAP ─────────────────── */
-.map-inline-tip{position:absolute;top:36px;left:8px;right:8px;z-index:5;max-height:42%;overflow-y:auto;padding:8px 10px;background:rgba(5,8,12,.82);border:1px solid rgba(232,98,10,.45);border-radius:12px;font-size:11px;line-height:1.4;color:rgba(255,255,255,.93);box-shadow:0 4px 16px rgba(0,0,0,.4);-webkit-overflow-scrolling:touch;}
+.map-inline-tip{position:absolute;top:52px;left:8px;right:8px;z-index:5;max-height:40%;overflow-y:auto;padding:8px 10px;background:rgba(5,8,12,.82);border:1px solid rgba(232,98,10,.45);border-radius:12px;font-size:11px;line-height:1.4;color:rgba(255,255,255,.93);box-shadow:0 4px 16px rgba(0,0,0,.4);-webkit-overflow-scrolling:touch;}
 .map-inline-tip .mit-k{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.12em;color:#ffc49c;text-transform:uppercase;margin-bottom:3px;}
 .map-inline-tip ul{margin:4px 0 0 16px;padding:0;color:rgba(255,255,255,.78);font-size:10px;line-height:1.35;}
 .map-inline-tip li{margin:1px 0;}
@@ -544,8 +568,15 @@ html.pwa-standalone .frame{
 .sq-chip.loaded{opacity:.55;border-color:var(--success)!important;background:rgba(183,240,207,.4)!important;}
 .sq-chip.loaded .sqn{color:var(--success)!important;}
 .map-load-cta{padding:12px 16px 0;}
-.btn-load-next{width:100%;justify-content:center;height:46px;border-radius:12px;font-size:15px;}
+.btn-load-next{width:100%;justify-content:center;min-height:52px;border-radius:12px;font-size:15px;flex-direction:column;align-items:center;gap:4px;padding:12px 14px;height:auto;}
+.btn-yard-sub{display:block;font-size:12px;font-weight:500;opacity:.88;line-height:1.3;max-width:280px;}
 .ns-walk{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.85);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;}
+.yard-leg-meta{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.55);margin-top:6px;line-height:1.35;}
+.yard-up-next{margin:0 16px 12px;padding:12px 14px;background:var(--surface-container);border-radius:12px;border:1px solid var(--outline-var);}
+.yun-lbl{font-size:9px;font-weight:700;color:var(--on-surface-var);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.yun-name{font-size:14px;font-weight:600;color:var(--on-surface);line-height:1.25;}
+.yun-hint{font-size:11px;color:var(--primary);margin-top:4px;line-height:1.35;}
+.yun-empty{font-size:12px;color:var(--on-surface-var);line-height:1.4;}
 </style>
 </head>
 <body>
@@ -657,7 +688,7 @@ html.pwa-standalone .frame{
 
     <div class="scan-action" onclick="goTo('s-scan')">
       <div class="scan-icon"><span class="material-icons-round">document_scanner</span></div>
-      <div class="scan-text"><div class="t">Capture load sheet</div><div class="s">Camera scan (demo) · Cottrell CX-09LS</div></div>
+      <div class="scan-text"><div class="t">Capture load sheet</div><div class="s">Camera or upload · Cottrell CX-09LS</div></div>
       <span class="material-icons-round" style="color:#fff;font-size:20px;">arrow_forward</span>
     </div>
 
@@ -699,6 +730,7 @@ html.pwa-standalone .frame{
     <span class="scan-title">Capture BOL</span>
   </div>
   <div class="viewfinder" id="scanViewfinder">
+    <img class="scan-sheet-preview" id="scanSheetPreview" alt="Selected load sheet preview" />
     <div class="bol-mock">
       <div class="bh">MASTER UNIFORM STRAIGHT BILL OF LADING — UNITED ROAD</div>
       <div class="bm">CARRIER: United Road · ORIGIN: BNSF ORILLIA – RENTON WA · LOAD: 041625-09</div>
@@ -719,22 +751,36 @@ html.pwa-standalone .frame{
       <div class="scan-line"></div>
     </div>
   </div>
+  <input type="file" id="inputScanCamera" class="sr-only" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true" />
+  <input type="file" id="inputScanUpload" class="sr-only" accept="image/*" tabindex="-1" aria-hidden="true" />
   <div class="scan-bottom" id="scanBottom">
-    <div class="scan-phase-scan" id="scanPhaseScan">
-      <div class="scan-status" id="scanStatusLine">Detecting VINs...</div>
-      <div class="scan-sub">Demo: camera scan only — photo upload can ship later</div>
-      <div class="vin-chip"><span class="material-icons-round">check_circle</span>4T1G11AK8PU123481</div>
-      <div class="vin-chip" style="animation-delay:.15s"><span class="material-icons-round">check_circle</span>2T3P1RFV8PW847263</div>
-      <div class="vin-chip" style="animation-delay:.3s"><span class="material-icons-round">check_circle</span>3TMLB5JN3SM178449</div>
-      <div class="vin-chip" style="animation-delay:.45s"><span class="material-icons-round">check_circle</span>5TDHZRBH9MS523875</div>
-      <div class="vin-chip" style="animation-delay:.6s"><span class="material-icons-round">check_circle</span>4T1DAACK6SU566558</div>
+    <div class="scan-phase-pick" id="scanPhasePick">
+      <div class="scan-pick-hint">Add your load sheet</div>
+      <div class="scan-pick-sub">Use the camera or a saved photo. For this pilot, processing runs locally — the decoded list below is a fixed demo.</div>
+      <div class="scan-actions-row">
+        <button type="button" class="btn-scan-primary" id="btnTakePhoto">
+          <span class="material-icons-round">photo_camera</span>
+          Take Photo
+        </button>
+        <button type="button" class="btn-scan-secondary" id="btnUploadImage">
+          <span class="material-icons-round">upload_file</span>
+          Upload Image
+        </button>
+      </div>
     </div>
     <div class="scan-phase-done" id="scanPhaseDone">
       <div class="scan-done-card">
-        <div class="scan-done-title"><span class="material-icons-round">verified</span>BOL captured (camera)</div>
-        <div class="scan-done-body">Visible VINs were read from the sheet. Review on the next screen, or re-scan if anything looks wrong.</div>
+        <div class="scan-done-title"><span class="material-icons-round">verified</span>Load sheet ready</div>
+        <div class="scan-done-body">VINs and lane tags are staged for review. Next screen matches our pilot dataset — swap in live OCR when you wire the backend.</div>
       </div>
       <button type="button" class="btn-fill btn-scan-accept" id="btnScanAccept"><span class="material-icons-round">arrow_forward</span>Accept &amp; review vehicles</button>
+    </div>
+  </div>
+  <div class="scan-analyzing-overlay" id="scanAnalyzingOverlay" aria-live="polite">
+    <div class="scan-analyze-card">
+      <div class="scan-analyze-ring" role="status"></div>
+      <p class="scan-analyze-title">Analyzing load sheet…</p>
+      <p class="scan-analyze-sub">Matching VIN rows and yard tags · demo extraction (fixed sample output)</p>
     </div>
   </div>
 </div>
@@ -756,7 +802,7 @@ html.pwa-standalone .frame{
       <div>
         <div class="dt">Vehicles detected</div>
         <div class="ds">BNSF Orillia · Load 041625-09</div>
-        <div style="margin-top:6px;"><span class="badge badge-ok"><span class="material-icons-round" style="font-size:12px;">document_scanner</span>Scan complete — verify each VIN</span></div>
+        <div style="margin-top:6px;"><span class="badge badge-ok"><span class="material-icons-round" style="font-size:12px;">document_scanner</span>Sheet processed — verify each VIN</span></div>
       </div>
     </div>
     <div class="decode-hint">Accept each VIN if it matches the metal, or edit before optimizing. MONTAR will only build a load plan from accepted rows.</div>
@@ -922,7 +968,7 @@ html.pwa-standalone .frame{
         <input type="radio" name="adjSlot1" value="highlander" />
         <span class="adj-opt-lbl">Move Highlander XLE into Slot 1 <small>Requires review — conflicts with deck height</small></span>
       </label>
-      <textarea class="adj-note" id="adjDriverNote" placeholder="Driver note (optional): e.g. dealer staging request, chain placement…"></textarea>
+      <textarea class="adj-note" id="adjDriverNote" placeholder="Driver note (optional): e.g. dealer staging, strap / crossbar preference…"></textarea>
       <div class="adj-actions">
         <button type="button" class="btn-outline btn-adj-check" id="btnAdjCheck"><span class="material-icons-round" style="font-size:18px;">fact_check</span>Apply &amp; recheck feasibility</button>
       </div>
@@ -954,13 +1000,14 @@ html.pwa-standalone .frame{
   <div class="map-cont map-cont-tesla">
     <div class="map-tesla-vignette"></div>
     <div class="map-hud-top">BNSF ORILLIA · RENTON WA · YARD PULL MAP</div>
+    <div class="map-hud-sub" id="yardHudSub">Optimized pull order · 2 rows · minimal backtrack</div>
     <div class="map-inline-tip" aria-hidden="true">
       <div class="mit-k">How to read this</div>
-      <strong style="color:#fff;font-weight:600;font-size:12px;">You &rarr; next stall</strong>
+      <strong style="color:#fff;font-weight:600;font-size:12px;">Rig &rarr; bay · this leg only</strong>
       <ul>
-        <li><strong style="color:#FF9A5C;">Orange path</strong> — walk/drive path to the next pick (follow in order).</li>
-        <li><strong style="color:#ffb38a;">Orange stalls</strong> — vehicles on this load. Dim stalls are empty/other.</li>
-        <li><strong style="color:#9bb0cc;">Car icons</strong> — units still in the bay. Dot at bottom = your rig.</li>
+        <li><strong style="color:#FF9A5C;">Orange path</strong> — shortest aisle route from your rig to the <em>current</em> stall (sequence minimizes zig-zags).</li>
+        <li><strong style="color:#ffb38a;">Orange stalls</strong> — this load. Order is Row T-A west&rarr;east, then Row T-C — fewer steps than row-hopping.</li>
+        <li><strong style="color:#9bb0cc;">Car icons</strong> — units still in the bay. Bottom dot = your rig position.</li>
       </ul>
     </div>
     <svg class="map-tesla-svg" viewBox="0 0 393 330" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-label="Yard map">
@@ -1000,13 +1047,17 @@ html.pwa-standalone .frame{
       <!-- Cars in stalls (top-down) -->
       <g transform="translate(76,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
       <g transform="translate(108,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(140,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(172,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
       <g transform="translate(280,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
       <g transform="translate(312,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
       <text x="78" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T042</text>
       <text x="110" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T043</text>
+      <text x="142" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T044</text>
+      <text x="174" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T045</text>
       <text x="282" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T048</text>
       <text x="314" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T049</text>
-      <g>
+      <g id="yardNextPullGroup" transform="translate(0,0)">
         <text x="86" y="19" text-anchor="middle" fill="#ffc49c" font-family="Roboto Mono,monospace" font-size="7" font-weight="700">NEXT PULL</text>
         <rect x="69" y="23" width="34" height="24" rx="5" class="next-pull-ring"/>
       </g>
@@ -1025,20 +1076,17 @@ html.pwa-standalone .frame{
       <text x="218" y="196" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T073</text>
       <!-- Row D -->
       <rect x="8" y="284" width="28" height="18" rx="3" class="stall-base"/><rect x="40" y="284" width="28" height="18" rx="3" class="stall-base"/>
-      <!-- Route glow + line -->
-      <path class="route-glow" d="M30,318 L30,165 L196,165 L196,78 L83,78 L83,52" filter="url(#routeGlow)"/>
-      <path class="route-line" d="M30,318 L30,165 L196,165 L196,78 L83,78 L83,52" marker-end="url(#arrT)"/>
-      <path class="route-glow" d="M83,52 L113,52 L143,52 L173,52 L196,52 L196,78 L283,78 L283,52 L313,52" filter="url(#routeGlow)"/>
-      <path class="route-line" d="M83,52 L113,52 L143,52 L173,52 L196,52 L196,78 L283,78 L283,52 L313,52"/>
-      <path class="route-glow" d="M313,52 L313,78 L196,78 L196,165 L83,165 L83,182" filter="url(#routeGlow)"/>
-      <path class="route-line" d="M313,52 L313,78 L196,78 L196,165 L83,165 L83,182" marker-end="url(#arrT)"/>
-      <path class="route-line" d="M83,182 L113,182 M113,182 L196,182 L196,165 L223,165 L223,182" marker-end="url(#arrT)"/>
+      <!-- Active leg: rig → current bay (updated per stop; sequenced to reduce backtrack) -->
+      <g id="yardRoutePaths">
+        <path id="yardRouteGlow" class="route-glow" filter="url(#routeGlow)" d="" />
+        <path id="yardRouteLine" class="route-line" marker-end="url(#arrT)" d="" />
+      </g>
       <!-- Rig + heading -->
       <circle cx="30" cy="318" r="7" class="rig-marker"/>
       <text x="42" y="314" fill="#ffb38a" font-family="Roboto Mono,monospace" font-size="9" font-weight="700">YOUR RIG</text>
       <text x="42" y="325" fill="rgba(255,255,255,.45)" font-family="Roboto Mono,monospace" font-size="7">Entry lane · face north</text>
     </svg>
-    <div class="map-legend-bar"><span style="color:#5eead4;">● Glow</span><span style="color:#FF9A5C;">━ Path to next</span><span style="color:#E8620A;">■ This load</span><span style="color:#9bb0cc;">▭ Unit</span></div>
+    <div class="map-legend-bar"><span style="color:#5eead4;">● Glow</span><span style="color:#FF9A5C;">━ This leg only</span><span style="color:#E8620A;">■ This load</span><span style="color:#9bb0cc;">▭ Unit</span></div>
   </div>
 
   <!-- bottom sheet -->
@@ -1047,31 +1095,40 @@ html.pwa-standalone .frame{
     <div class="next-stop" id="yardNextCard">
       <div class="ns-num" id="yardNextNum">1</div>
       <div class="ns-info">
-        <div class="ns-lbl">Next vehicle to pull</div>
+        <div class="ns-lbl">Current pull — route from your rig</div>
         <div class="ns-name" id="yardNextName">Bay T042 — Camry XSE V6</div>
-        <div class="ns-dist" id="yardNextDist">~220 ft ahead · Row T-A · Toyota row</div>
-        <div class="ns-walk" id="yardNextWalk"><span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">directions_walk</span>~1.5 min walk · Staging lane</div>
+        <div class="ns-dist" id="yardNextDist">~220 ft · Row T-A · north staging</div>
+        <div class="ns-walk" id="yardNextWalk"><span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">directions_walk</span>~1.5 min walk · paved lane</div>
+        <div class="yard-leg-meta" id="yardLegMeta">Leg 1 of 9 · Full leg from rig</div>
       </div>
       <span class="material-icons-round" style="color:#fff;font-size:22px;">pin_drop</span>
+    </div>
+    <div class="yard-up-next" id="yardUpNextWrap">
+      <div class="yun-lbl" id="yardUpNextLbl">Next car (plan ahead)</div>
+      <div class="yun-name" id="yardUpNextName">Bay T043 — RAV4 XLE Premium</div>
+      <div class="yun-hint" id="yardUpNextHint">Same row — short walk east after you strap</div>
     </div>
     <div class="stop-q" id="yardStopQ">
       <div class="sq-chip" data-yi="0"><div class="sqn">1</div><div class="sql">T042</div><div class="sqv">Camry XSE</div></div>
       <div class="sq-chip" data-yi="1"><div class="sqn">2</div><div class="sql">T043</div><div class="sqv">RAV4 XLE</div></div>
-      <div class="sq-chip" data-yi="2"><div class="sqn">3</div><div class="sql">T071</div><div class="sqv">Tacoma TRD</div></div>
-      <div class="sq-chip" data-yi="3"><div class="sqn">4</div><div class="sql">T072</div><div class="sqv">Highlander</div></div>
+      <div class="sq-chip" data-yi="2"><div class="sqn">3</div><div class="sql">T044</div><div class="sqv">Camry Hybrid</div></div>
+      <div class="sq-chip" data-yi="3"><div class="sqn">4</div><div class="sql">T045</div><div class="sqv">Camry XSE</div></div>
       <div class="sq-chip" data-yi="4"><div class="sqn">5</div><div class="sql">T048</div><div class="sqv">Corolla</div></div>
       <div class="sq-chip" data-yi="5"><div class="sqn">6</div><div class="sql">T049</div><div class="sqv">RAV4 Adv</div></div>
-      <div class="sq-chip" data-yi="6"><div class="sqn">7</div><div class="sql">T044</div><div class="sqv">Camry H</div></div>
-      <div class="sq-chip" data-yi="7"><div class="sqn">8</div><div class="sql">T045</div><div class="sqv">Camry XSE</div></div>
+      <div class="sq-chip" data-yi="6"><div class="sqn">7</div><div class="sql">T071</div><div class="sqv">Tacoma TRD</div></div>
+      <div class="sq-chip" data-yi="7"><div class="sqn">8</div><div class="sql">T072</div><div class="sqv">Highlander</div></div>
       <div class="sq-chip" data-yi="8"><div class="sqn">9</div><div class="sql">T073</div><div class="sqv">Highlander</div></div>
     </div>
     <div class="map-load-cta">
       <button type="button" class="btn-fill btn-load-next" id="btnYardMarkLoaded">
-        <span class="material-icons-round">local_shipping</span>
-        <span id="btnYardMarkLabel">Pull this vehicle, then tap — loaded on trailer</span>
+        <span class="material-icons-round">verified</span>
+        <span style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+          <span id="btnYardMarkTitle">Strapped &amp; loaded — confirm</span>
+          <span class="btn-yard-sub" id="btnYardMarkSub">Vehicle 1 of 9 · wheel straps tensioned, then continue</span>
+        </span>
       </button>
     </div>
-    <div style="padding:8px 16px 0;text-align:center;font-size:11px;color:var(--on-surface-var);line-height:1.35;">Tap a chip to preview that stop. Only the highlighted stop advances the route.</div>
+    <div style="padding:8px 16px 0;text-align:center;font-size:11px;color:var(--on-surface-var);line-height:1.35;">Highlighted stall = active pull. Queue follows load order + shortest yard path — tap chips to scan the sequence.</div>
     <div style="padding:12px 16px 0;">
       <button type="button" class="btn-outline" id="btnYardAllDone" style="width:100%;justify-content:center;height:42px;border-radius:12px;font-size:14px;display:none;">
         <span class="material-icons-round">flag</span>Finish yard loading — all 9 staged
@@ -1268,23 +1325,59 @@ html.pwa-standalone .frame{
 let audioCtx;
 function audioReady() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
+/** iOS Safari / PWA: AudioContext stays suspended until a real user gesture. Splash auto-advances without one, and scroll does not unlock audio — first touch must call resume(). */
+function unlockAudioFromUserGesture() {
+  try {
+    const ctx = audioReady();
+    const warm = () => {
+      try {
+        const buf = ctx.createBuffer(1, 1, ctx.sampleRate);
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(ctx.destination);
+        src.start(0);
+      } catch (e) {}
+    };
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(warm).catch(warm);
+    } else {
+      warm();
+    }
+  } catch (e) {}
+}
+(function bindAudioGestureUnlock() {
+  let done = false;
+  const opts = { capture: true, passive: true };
+  function onFirstPointer() {
+    if (done) return;
+    done = true;
+    document.removeEventListener('touchstart', onFirstPointer, opts);
+    document.removeEventListener('pointerdown', onFirstPointer, opts);
+    unlockAudioFromUserGesture();
+  }
+  document.addEventListener('touchstart', onFirstPointer, opts);
+  document.addEventListener('pointerdown', onFirstPointer, opts);
+})();
 function beep(freq, dur, vol = 0.07) {
   try {
     const ctx = audioReady();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'sine';
-    o.frequency.value = freq;
-    g.gain.value = vol;
-    o.connect(g);
-    g.connect(ctx.destination);
-    const t = ctx.currentTime;
-    o.start(t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    o.stop(t + dur);
+    const run = () => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      g.gain.value = vol;
+      o.connect(g);
+      g.connect(ctx.destination);
+      const t = ctx.currentTime;
+      o.start(t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.stop(t + dur);
+    };
+    if (ctx.state === 'running') run();
+    else ctx.resume().then(run).catch(() => {});
   } catch (e) {}
 }
 function playSound(kind) {
@@ -1358,7 +1451,7 @@ function onScreenEnter(id, from) {
   const bar = document.getElementById('statusBar');
   if (bar) bar.classList.toggle('light', lightScreens.includes(id));
 
-  if (id === 's-scan') startScanCapture();
+  if (id === 's-scan') resetScanScreen();
   if (id === 's-decode' && from === 's-scan') resetDecodeScreen();
   if (id === 's-slots' && from === 's-decode') resetPlanScreen();
   if (id === 's-map') initYardScreen();
@@ -1418,22 +1511,85 @@ function goBack(id) {
   }, 300);
 }
 
-// ── SCAN: simulated capture + accept ────
-let scanTimer;
-function startScanCapture() {
+// ── SCAN: camera / upload → analyze → accept ─
+let scanAnalyzeTimer;
+let scanPreviewUrl = null;
+
+function resetScanScreen() {
   const root = document.getElementById('s-scan');
   if (!root) return;
-  root.classList.remove('sheet-ready');
-  clearTimeout(scanTimer);
-  const line = document.getElementById('scanStatusLine');
-  if (line) line.textContent = 'Detecting VINs...';
-  scanTimer = setTimeout(() => {
+  clearTimeout(scanAnalyzeTimer);
+  root.classList.remove('sheet-ready', 'scan-state-analyzing', 'has-preview');
+  const prev = document.getElementById('scanSheetPreview');
+  if (prev) {
+    prev.style.display = 'none';
+    if (scanPreviewUrl) {
+      try {
+        URL.revokeObjectURL(scanPreviewUrl);
+      } catch (e) {}
+      scanPreviewUrl = null;
+    }
+    prev.removeAttribute('src');
+  }
+  const cam = document.getElementById('inputScanCamera');
+  const up = document.getElementById('inputScanUpload');
+  if (cam) cam.value = '';
+  if (up) up.value = '';
+}
+
+function handleScanFileInput(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const root = document.getElementById('s-scan');
+  const img = document.getElementById('scanSheetPreview');
+  if (!root || !img) return;
+  if (scanPreviewUrl) {
+    try {
+      URL.revokeObjectURL(scanPreviewUrl);
+    } catch (e) {}
+  }
+  scanPreviewUrl = URL.createObjectURL(file);
+  img.src = scanPreviewUrl;
+  img.style.display = 'block';
+  root.classList.add('has-preview');
+  beginScanAnalyzing();
+}
+
+function beginScanAnalyzing() {
+  const root = document.getElementById('s-scan');
+  if (!root) return;
+  clearTimeout(scanAnalyzeTimer);
+  root.classList.add('scan-state-analyzing');
+  playSound('confirm');
+  haptic(10);
+  scanAnalyzeTimer = setTimeout(() => {
+    root.classList.remove('scan-state-analyzing');
+    root.classList.add('sheet-ready');
     playSound('scan');
     haptic([18, 55, 22]);
-    if (line) line.textContent = 'VIN capture complete';
-    root.classList.add('sheet-ready');
-  }, 2400);
+  }, 2300);
 }
+
+document.getElementById('btnTakePhoto').addEventListener('click', () => {
+  playSound('tap');
+  haptic(8);
+  document.getElementById('inputScanCamera').click();
+});
+
+document.getElementById('btnUploadImage').addEventListener('click', () => {
+  playSound('tap');
+  haptic(8);
+  document.getElementById('inputScanUpload').click();
+});
+
+document.getElementById('inputScanCamera').addEventListener('change', function () {
+  const f = this.files && this.files[0];
+  if (f) handleScanFileInput(f);
+});
+
+document.getElementById('inputScanUpload').addEventListener('change', function () {
+  const f = this.files && this.files[0];
+  if (f) handleScanFileInput(f);
+});
 
 document.getElementById('btnScanAccept').addEventListener('click', () => {
   playSound('success');
@@ -1598,18 +1754,50 @@ document.getElementById('btnPlanInfo').addEventListener('click', () => {
 });
 
 // ── YARD LOADING MAP ────────────────────
+// Path templates: rig → stall (orange leg on map). Pull order = Row T-A west→east, then Row T-C west→east to cut cross-yard backtracking.
+function yardPathRowA(sx) {
+  return 'M30,318 L30,165 L196,165 L196,78 L' + sx + ',78 L' + sx + ',52';
+}
+function yardPathRowC(sx) {
+  return 'M30,318 L30,165 L196,165 L196,198 L' + sx + ',198 L' + sx + ',208';
+}
 const YARD_STOPS = [
-  { title: 'Bay T042 — Camry XSE V6', dist: '~220 ft · Row T-A · North staging', walk: '~1.5 min walk · Paved lane' },
-  { title: 'Bay T043 — RAV4 XLE Premium', dist: '~190 ft · Row T-A', walk: '~1.3 min walk' },
-  { title: 'Bay T071 — Tacoma TRD 4x4', dist: '~280 ft · Row T-C · SUV row', walk: '~2.1 min walk · Cross main lane' },
-  { title: 'Bay T072 — Highlander XLE', dist: '~310 ft · Row T-C', walk: '~2.3 min walk' },
-  { title: 'Bay T048 — Corolla SE CVT', dist: '~240 ft · Row T-A · Right section', walk: '~1.7 min walk' },
-  { title: 'Bay T049 — RAV4 Adventure', dist: '~260 ft · Row T-A · Right section', walk: '~1.8 min walk' },
-  { title: 'Bay T044 — Camry LE Hybrid', dist: '~200 ft · Row T-A', walk: '~1.4 min walk' },
-  { title: 'Bay T045 — Camry XSE AWD', dist: '~230 ft · Row T-A', walk: '~1.6 min walk' },
-  { title: 'Bay T073 — Highlander XSE', dist: '~340 ft · Row T-C · East end', walk: '~2.5 min walk · Longest leg' },
+  { title: 'Bay T042 — Camry XSE V6', dist: '~210 ft · Row T-A · from rig', walk: '~1.5 min walk · staging lane', routeD: yardPathRowA(86), nextPull: 'translate(0,0)', legMeta: 'Leg 1 of 9 · Full leg from rig · Row T-A sweep', upNextHint: 'Same row — short walk east after you strap' },
+  { title: 'Bay T043 — RAV4 XLE Premium', dist: '~45 ft · Row T-A · next stall east', walk: '~25 sec walk · no row change', routeD: yardPathRowA(118), nextPull: 'translate(32,0)', legMeta: 'Leg 2 of 9 · Stay on T-A — minimal steps', upNextHint: 'Still T-A — continue east two stalls' },
+  { title: 'Bay T044 — Camry LE Hybrid', dist: '~38 ft · Row T-A', walk: '~20 sec walk', routeD: yardPathRowA(152), nextPull: 'translate(64,0)', legMeta: 'Leg 3 of 9 · Same aisle · no backtrack', upNextHint: 'Next stall east — prep deck height for sedan' },
+  { title: 'Bay T045 — Camry XSE AWD', dist: '~35 ft · Row T-A', walk: '~20 sec walk', routeD: yardPathRowA(182), nextPull: 'translate(96,0)', legMeta: 'Leg 4 of 9 · Finish left block before crossing', upNextHint: 'Jump to east T-A — then SUV row last on this deck' },
+  { title: 'Bay T048 — Corolla SE CVT', dist: '~95 ft · Row T-A · east section', walk: '~50 sec walk · skip empty stalls', routeD: yardPathRowA(292), nextPull: 'translate(206,0)', legMeta: 'Leg 5 of 9 · East T-A — straight shot', upNextHint: 'Adjacent stall — RAV4 after Corolla' },
+  { title: 'Bay T049 — RAV4 Adventure', dist: '~38 ft · Row T-A · east end', walk: '~22 sec walk', routeD: yardPathRowA(324), nextPull: 'translate(228,0)', legMeta: 'Leg 6 of 9 · Last T-A pull — then drop to T-C', upNextHint: 'Switch to Row T-C — SUVs (longest walk of run)' },
+  { title: 'Bay T071 — Tacoma TRD 4x4', dist: '~175 ft · Row T-C · via main aisle', walk: '~1.9 min walk · one row change', routeD: yardPathRowC(86), nextPull: 'translate(0,177)', legMeta: 'Leg 7 of 9 · Row T-C west — SUVs', upNextHint: 'Next stall east — Highlander same row' },
+  { title: 'Bay T072 — Highlander XLE', dist: '~38 ft · Row T-C', walk: '~22 sec walk', routeD: yardPathRowC(118), nextPull: 'translate(32,177)', legMeta: 'Leg 8 of 9 · Stay on T-C', upNextHint: 'Final pull — east end of T-C' },
+  { title: 'Bay T073 — Highlander XSE', dist: '~110 ft · Row T-C · east end', walk: '~1.1 min walk', routeD: yardPathRowC(224), nextPull: 'translate(136,177)', legMeta: 'Leg 9 of 9 · Last unit — then secure & exit', upNextHint: '' },
 ];
 let yardIdx = 0;
+
+function setYardRoutePaths(idx) {
+  const glow = document.getElementById('yardRouteGlow');
+  const line = document.getElementById('yardRouteLine');
+  const paths = document.getElementById('yardRoutePaths');
+  const pull = document.getElementById('yardNextPullGroup');
+  const hud = document.getElementById('yardHudSub');
+  if (idx >= YARD_STOPS.length) {
+    if (glow) glow.setAttribute('d', '');
+    if (line) line.setAttribute('d', '');
+    if (paths) paths.style.display = 'none';
+    if (pull) pull.style.display = 'none';
+    if (hud) hud.textContent = 'All units staged · final strap / equipment check';
+    return;
+  }
+  const s = YARD_STOPS[idx];
+  if (glow) glow.setAttribute('d', s.routeD);
+  if (line) line.setAttribute('d', s.routeD);
+  if (paths) paths.style.display = 'block';
+  if (pull) {
+    pull.style.display = 'block';
+    pull.setAttribute('transform', s.nextPull);
+  }
+  if (hud) hud.textContent = 'Active leg · map matches pull ' + (idx + 1) + ' of 9';
+}
 
 function initYardScreen() {
   yardIdx = 0;
@@ -1618,8 +1806,10 @@ function initYardScreen() {
   });
   const fin = document.getElementById('btnYardAllDone');
   const main = document.getElementById('btnYardMarkLoaded');
+  const upWrap = document.getElementById('yardUpNextWrap');
   if (fin) fin.style.display = 'none';
   if (main) main.style.display = 'inline-flex';
+  if (upWrap) upWrap.style.display = 'block';
   renderYard();
 }
 
@@ -1628,13 +1818,32 @@ function renderYard() {
   const dist = document.getElementById('yardNextDist');
   const walk = document.getElementById('yardNextWalk');
   const num = document.getElementById('yardNextNum');
-  const lbl = document.getElementById('btnYardMarkLabel');
+  const legMeta = document.getElementById('yardLegMeta');
+  const titleEl = document.getElementById('btnYardMarkTitle');
+  const subEl = document.getElementById('btnYardMarkSub');
+  const upName = document.getElementById('yardUpNextName');
+  const upHint = document.getElementById('yardUpNextHint');
+  const upLbl = document.getElementById('yardUpNextLbl');
+  const upWrap = document.getElementById('yardUpNextWrap');
   if (yardIdx >= YARD_STOPS.length) {
     if (name) name.textContent = 'All vehicles staged on trailer';
-    if (dist) dist.textContent = 'Ready to secure load & exit yard';
-    if (walk) walk.innerHTML = '<span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">check_circle</span>Walking route complete';
+    if (dist) dist.textContent = 'Straps checked · ready to roll to dealer';
+    if (walk) walk.innerHTML = '<span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">check_circle</span>Yard path complete';
     if (num) num.textContent = '✓';
-    if (lbl) lbl.textContent = 'Use the button below to close out yard loading';
+    if (legMeta) legMeta.textContent = 'Queue finished — optimized row order (demo)';
+    if (titleEl) titleEl.textContent = 'Yard loading complete';
+    if (subEl) subEl.textContent = 'Use the button below to continue';
+    if (upLbl) upLbl.textContent = 'All set';
+    if (upName) {
+      upName.classList.remove('yun-empty');
+      upName.textContent = 'No more pulls in this queue';
+    }
+    if (upHint) {
+      upHint.textContent = 'Double-check strap tension, crossbars, and clearance before departure.';
+      upHint.style.display = 'block';
+    }
+    if (upWrap) upWrap.style.display = 'block';
+    setYardRoutePaths(yardIdx);
     return;
   }
   const s = YARD_STOPS[yardIdx];
@@ -1642,7 +1851,24 @@ function renderYard() {
   if (name) name.textContent = s.title;
   if (dist) dist.textContent = s.dist;
   if (walk) walk.innerHTML = '<span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">directions_walk</span>' + s.walk;
-  if (lbl) lbl.textContent = 'Vehicle ' + (yardIdx + 1) + ' of 9 — tap when it\'s chained on the trailer';
+  if (legMeta) legMeta.textContent = s.legMeta;
+  if (titleEl) titleEl.textContent = 'Strapped & loaded — confirm';
+  if (subEl) subEl.textContent = 'Vehicle ' + (yardIdx + 1) + ' of 9 · straps tensioned, then load next';
+  const next = YARD_STOPS[yardIdx + 1];
+  if (next && upName && upHint && upLbl) {
+    upLbl.textContent = 'Next car (plan ahead)';
+    upName.textContent = next.title;
+    upHint.textContent = next.upNextHint || 'Review deck placement before you roll';
+    upHint.style.display = next.upNextHint ? 'block' : 'none';
+    if (upWrap) upWrap.style.display = 'block';
+  } else if (upWrap && upName && upHint && upLbl) {
+    upLbl.textContent = 'Last vehicle';
+    upName.textContent = 'After this, secure & exit the yard';
+    upHint.textContent = 'Final check: tie-downs, crossbars, deck clearance';
+    upHint.style.display = 'block';
+    upWrap.style.display = 'block';
+  }
+  setYardRoutePaths(yardIdx);
 
   document.querySelectorAll('#yardStopQ .sq-chip').forEach((chip) => {
     const i = +chip.getAttribute('data-yi');
