@@ -39,7 +39,7 @@ html,body{min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;ba
 body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 
 /* PHONE FRAME — full viewport on device; framed preview on large desktop */
-.frame{width:100%;max-width:100%;height:100%;min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;background:#000;position:relative;overflow:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;}
+.frame{width:100%;max-width:100%;height:100%;min-height:100%;min-height:100dvh;min-height:100svh;min-height:-webkit-fill-available;background:#000;position:relative;overflow:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);box-sizing:border-box;}
 .frame::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:0 0 20px 20px;z-index:200;display:none;}
 @media (min-width:520px) and (min-height:720px) and (pointer:fine){
   html,body{align-items:center;padding:12px;}
@@ -52,8 +52,33 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
   :root{--app-bar-pad:calc(env(safe-area-inset-top,0px) + 10px);}
   .frame::before,.home-ind{display:none!important;}
   #statusBar{display:none!important;}
-  html,body{align-items:stretch;justify-content:flex-start;height:100%;min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;}
-  .frame{flex:1 0 auto;align-self:stretch;width:100%;max-width:100%;height:auto;min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;}
+  html,body{
+    align-items:stretch;
+    justify-content:flex-start;
+    width:100%;
+    height:100%;
+    min-height:100%;
+    min-height:100dvh;
+    min-height:100svh;
+    min-height:-webkit-fill-available;
+  }
+  /* Fixed shell = fills iOS / PWA visual viewport (avoids gap above home indicator) */
+  .frame{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    flex:none;
+    width:100%;
+    max-width:100%;
+    height:100%;
+    min-height:100%;
+    min-height:var(--app-viewport-h, 100dvh);
+    min-height:var(--app-viewport-h, 100svh);
+    height:var(--app-viewport-h, 100dvh);
+    max-height:none;
+  }
 }
 .status-bar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;z-index:190;pointer-events:none;}
 .status-bar.light .st,.status-bar.light .si{color:#fff;}
@@ -1825,6 +1850,26 @@ setTimeout(() => {
 }, 2200);
 
 // ── iOS PWA FIXES ───────────────────────
+function syncAppViewportHeight() {
+  try {
+    const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    if (h && h > 200) {
+      document.documentElement.style.setProperty('--app-viewport-h', h + 'px');
+    }
+  } catch (e) {}
+}
+syncAppViewportHeight();
+window.addEventListener('resize', syncAppViewportHeight);
+window.addEventListener('orientationchange', function() {
+  setTimeout(syncAppViewportHeight, 350);
+});
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', syncAppViewportHeight);
+}
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) syncAppViewportHeight();
+});
+
 document.addEventListener('touchend', function(e) {
   const now = Date.now();
   if (now - (this._lt || 0) < 300) e.preventDefault();
