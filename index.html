@@ -34,12 +34,12 @@ img{max-width:100%;height:auto;display:block;}
   --e3:0 4px 8px 3px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.1);
   --app-bar-pad:54px;
 }
-html{width:100%;height:100%;-webkit-text-size-adjust:100%;}
-html,body{min-height:100%;min-height:100dvh;background:#1A1A2E;display:flex;align-items:stretch;justify-content:center;font-family:var(--font);overflow:hidden;}
+html{width:100%;height:100%;height:-webkit-fill-available;-webkit-text-size-adjust:100%;}
+html,body{min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;background:#1A1A2E;display:flex;align-items:stretch;justify-content:center;font-family:var(--font);overflow:hidden;}
 body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 
 /* PHONE FRAME — full viewport on device; framed preview on large desktop */
-.frame{width:100%;max-width:100%;height:100%;min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;background:#000;position:relative;overflow:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);box-sizing:border-box;}
+.frame{width:100%;max-width:100%;height:100%;min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;background:#000;position:relative;overflow:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;}
 .frame::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:0 0 20px 20px;z-index:200;display:none;}
 @media (min-width:520px) and (min-height:720px) and (pointer:fine){
   html,body{align-items:center;padding:12px;}
@@ -52,6 +52,8 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
   :root{--app-bar-pad:calc(env(safe-area-inset-top,0px) + 10px);}
   .frame::before,.home-ind{display:none!important;}
   #statusBar{display:none!important;}
+  html,body{align-items:stretch;justify-content:flex-start;height:100%;min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;}
+  .frame{flex:1 0 auto;align-self:stretch;width:100%;max-width:100%;height:auto;min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;}
 }
 .status-bar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;z-index:190;pointer-events:none;}
 .status-bar.light .st,.status-bar.light .si{color:#fff;}
@@ -225,7 +227,8 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 .slot .sv{font-size:7px;font-weight:500;color:var(--on-primary-container);text-align:center;padding:0 1px;line-height:1.2;}
 .slot.filled .sn{color:var(--primary);}
 .slot.rev .sn{color:#7B5800;}
-.slot-list-item{display:flex;align-items:center;padding:11px 16px;gap:13px;border-bottom:1px solid var(--outline-var);cursor:pointer;}
+.slot-list-item{display:flex;flex-wrap:wrap;align-items:flex-start;padding:11px 16px;gap:8px 13px;border-bottom:1px solid var(--outline-var);cursor:default;}
+.slot-list-item .sl-ack-row{flex:1 0 100%;padding-left:47px;}
 .slot-list-item:last-child{border-bottom:none;}
 .sl-num{width:34px;height:34px;border-radius:9px;background:var(--primary-container);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;color:var(--primary);flex-shrink:0;}
 .sl-info{flex:1;}
@@ -256,10 +259,30 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 .btn-err{height:40px;padding:0 24px;border-radius:20px;background:var(--error-container);border:none;font-family:var(--font);font-size:14px;font-weight:500;color:var(--error);cursor:pointer;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-bottom:8px;}
 .btn-err .material-icons-round{font-size:18px;}
 
-/* ══ SCREEN 7: YARD MAP ══════════════════ */
-.map-cont{flex:1;position:relative;background:#DDD5C8;overflow:hidden;min-height:300px;}
-/* asphalt base */
-.asphalt{position:absolute;inset:0;background:#C8C0B4;}
+/* ══ SCREEN 7: YARD MAP (Tesla-style) ═══ */
+.map-cont{position:relative;background:#12151a;overflow:hidden;}
+.map-cont-tesla{background:radial-gradient(ellipse 120% 80% at 50% 30%,#1e2633 0%,#0d0f14 55%,#080a0c 100%);}
+/* Yard: scroll map + sheet together; map was flex:1 and hid the bottom sheet */
+#s-map .yard-scroll{flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding-bottom:max(4px,env(safe-area-inset-bottom));}
+#s-map .map-cont{flex-shrink:0;height:clamp(228px,44vh,380px);min-height:210px;max-height:52vh;}
+#s-map .map-tesla-svg{pointer-events:none;}
+#s-map .map-sheet{flex-shrink:0;}
+.map-tesla-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 80px rgba(0,0,0,.5);z-index:3;}
+.map-hud-top{position:absolute;top:0;left:0;right:0;z-index:4;padding:9px 12px 10px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.72);text-align:center;background:linear-gradient(to bottom,rgba(0,0,0,.72),rgba(0,0,0,.15));}
+.map-tesla-svg{position:absolute;inset:0;width:100%;height:100%;z-index:1;}
+.map-car-icon{fill:#3d4a5c;stroke:#5c6b82;stroke-width:0.6;}
+.map-car-glass{fill:#8fa3bc;opacity:.85;}
+.stall-base{fill:rgba(30,38,50,.9);stroke:rgba(90,104,128,.5);stroke-width:1;}
+.stall-hot{fill:rgba(232,98,10,.12);stroke:rgba(232,98,10,.85);stroke-width:1.2;filter:drop-shadow(0 0 6px rgba(232,98,10,.35));}
+.stall-done{fill:rgba(29,158,117,.15);stroke:rgba(74,222,128,.5);stroke-width:1;}
+.road-surface{fill:#252d3a;stroke:#3a4558;stroke-width:1;}
+.route-glow{stroke:#5eead4;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;opacity:.22;fill:none;filter:blur(1px);}
+.route-line{stroke:#FF9A5C;stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:1;filter:drop-shadow(0 0 4px rgba(232,98,10,.55));}
+.next-pull-ring{fill:none;stroke:#ffb38a;stroke-width:2.2;animation:npulse 2.2s ease-in-out infinite;}
+@keyframes npulse{0%,100%{stroke-opacity:.55;opacity:.9}50%{stroke-opacity:1;opacity:1}}
+.rig-marker{fill:#E8620A;filter:drop-shadow(0 0 8px rgba(232,98,10,.8));}
+/* legacy asphalt (unused if Tesla SVG present) */
+.asphalt{position:absolute;inset:0;background:transparent;pointer-events:none;}
 /* painted rows */
 .row-section{position:absolute;}
 .row-section .row-label{position:absolute;font-family:var(--mono);font-size:8px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.05em;}
@@ -366,6 +389,99 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 .ac-num{width:22px;height:22px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;}
 .ac-text{font-size:12px;color:rgba(255,255,255,.65);line-height:1.5;padding-top:2px;}
 .ac-text strong{color:#fff;font-weight:500;}
+
+/* ── SCAN: capture confirmation ───────── */
+#s-scan .viewfinder{cursor:default;}
+.scan-phase-done{display:none;}
+#s-scan.sheet-ready .scan-phase-scan{display:none;}
+#s-scan.sheet-ready .scan-phase-done{display:block;}
+.scan-done-card{background:rgba(29,107,62,.25);border:1px solid rgba(74,222,128,.45);border-radius:16px;padding:16px 18px;margin-bottom:12px;text-align:left;}
+.scan-done-title{font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.scan-done-title .material-icons-round{color:#4ADE80;font-size:20px;}
+.scan-done-body{font-size:13px;color:rgba(255,255,255,.65);line-height:1.45;}
+.btn-scan-accept{width:100%;justify-content:center;height:48px;border-radius:14px;font-size:15px;margin-top:4px;}
+
+/* ── DECODE: per-VIN actions ──────────── */
+.veh-card-decode{flex-wrap:wrap;align-items:flex-start;cursor:default;}
+.veh-card-decode .veh-rank{margin-top:2px;}
+.veh-card-decode .veh-meta{flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px;}
+.veh-actions{display:flex;gap:6px;margin-left:auto;flex-shrink:0;}
+.btn-mini{min-width:40px;height:36px;padding:0 10px;border-radius:10px;border:1px solid var(--outline-var);background:var(--surface-low);font-family:var(--font);font-size:12px;font-weight:600;color:var(--on-surface);display:inline-flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;}
+.btn-mini .material-icons-round{font-size:18px;}
+.btn-mini.primary{background:var(--primary-container);border-color:var(--primary);color:var(--on-primary-container);}
+.btn-mini.success{background:var(--success-container);border-color:var(--success);color:var(--success);}
+.veh-card-decode.vin-accepted{background:rgba(183,240,207,.35);border:2px solid var(--success);}
+.veh-card-decode.vin-accepted .veh-vin{color:var(--success);}
+.decode-hint{font-size:12px;color:var(--on-surface-var);line-height:1.45;padding:0 16px 8px;}
+
+/* ── LOAD PLAN: confirmations ─────────── */
+.plan-intro{margin:8px 16px 0;background:var(--surface-container);border-radius:14px;padding:14px 16px;border-left:4px solid var(--primary);}
+.plan-intro-title{font-size:13px;font-weight:600;color:var(--on-surface);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.plan-intro-body{font-size:12px;color:var(--on-surface-var);line-height:1.45;}
+.plan-progress{font-size:12px;font-weight:600;color:var(--primary);padding:6px 16px 0;}
+.slot.confirmed{background:rgba(183,240,207,.5)!important;border-color:var(--success)!important;}
+.slot.confirmed .sn{color:var(--success)!important;}
+.slot.confirmed .sv{color:var(--success)!important;}
+.slot-list-item{position:relative;}
+.slot-list-item.is-confirmed{background:rgba(183,240,207,.25);}
+.slot-list-item.is-confirmed .sl-reason{color:var(--success);}
+.sl-ack-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;padding-top:8px;border-top:1px solid var(--outline-var);flex:1 0 100%;}
+.btn-why-montar{background:transparent;border:none;color:var(--primary);font-family:var(--font);font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:6px 0;text-decoration:underline;text-underline-offset:3px;}
+.btn-why-montar .material-icons-round{font-size:16px;text-decoration:none;}
+.sl-montar-detail{display:none;font-size:12px;color:var(--on-surface-var);line-height:1.45;padding:10px 12px;background:var(--surface-container);border-radius:10px;margin-top:8px;border:1px solid var(--outline-var);}
+.slot-list-item.show-reason .sl-montar-detail{display:block;}
+.btn-ack-slot{flex-shrink:0;height:38px;padding:0 16px;border-radius:12px;border:none;background:var(--primary);color:#fff;font-family:var(--font);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer;}
+.btn-ack-slot.done{background:var(--success);pointer-events:none;}
+.plan-actions{flex-direction:column;gap:10px;}
+.plan-actions .btn-outline{width:100%;justify-content:center;min-height:44px;border-radius:12px;}
+.plan-actions .plan-foot{font-size:11px;color:var(--on-surface-var);text-align:center;line-height:1.35;}
+.plan-actions .plan-foot-short{font-size:11px;color:var(--on-surface-var);text-align:center;line-height:1.35;margin:0;}
+.btn-yContinue{width:100%;justify-content:center;min-height:56px;border-radius:16px;font-size:17px;font-weight:600;padding:16px 20px;box-shadow:var(--e2);}
+.btn-accept-montar-outline{border-style:dashed;border-width:2px;}
+.adj-quick-cta{margin:8px 16px 0;padding:12px 14px;background:var(--surface-container);border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--outline-var);}
+.adj-quick-copy{font-size:12px;color:var(--on-surface-var);line-height:1.35;flex:1;}
+.adj-quick-cta .btn-fill{flex-shrink:0;min-height:40px;padding:0 16px;border-radius:12px;font-size:13px;}
+.adj-panel{margin:8px 16px 0;background:var(--surface);border-radius:14px;box-shadow:var(--e1);padding:14px 16px 16px;}
+.adj-panel-h{font-size:14px;font-weight:600;color:var(--on-surface);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.adj-panel-h .material-icons-round{font-size:20px;color:var(--primary);}
+.adj-opt{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--outline-var);cursor:pointer;}
+.adj-opt:last-of-type{border-bottom:none;}
+.adj-opt input{margin-top:3px;accent-color:var(--primary);}
+.adj-opt-lbl{flex:1;font-size:13px;line-height:1.45;color:var(--on-surface);}
+.adj-opt-lbl small{display:block;font-size:11px;color:var(--on-surface-var);margin-top:4px;}
+.adj-note{width:100%;min-height:56px;margin-top:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--outline-var);font-family:var(--font);font-size:13px;resize:vertical;}
+.adj-actions{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+.btn-adj-check{width:100%;justify-content:center;height:42px;border-radius:12px;font-size:14px;}
+.adj-outcome{display:none;margin-top:12px;padding:12px;border-radius:10px;font-size:13px;line-height:1.45;}
+.adj-outcome.ok{display:block;background:var(--success-container);color:var(--success);border:1px solid rgba(29,107,62,.35);}
+.adj-outcome.bad{display:block;background:var(--error-container);color:var(--error);border:1px solid rgba(186,26,26,.25);}
+.adj-ack-row{display:none;align-items:flex-start;gap:10px;margin-top:12px;font-size:12px;color:var(--on-surface-var);}
+.adj-ack-row.show{display:flex;}
+.adj-ack-row input{margin-top:2px;}
+.delivery-disclaimer{margin:8px 16px 0;padding:12px 14px;background:var(--surface-container);border-radius:12px;font-size:12px;line-height:1.45;color:var(--on-surface-var);border-left:3px solid var(--primary);}
+.delivery-disclaimer strong{color:var(--on-surface);}
+.session-end-banner{margin:8px 16px 0;padding:14px;background:linear-gradient(135deg,var(--navy) 0%,#1a3040 100%);border-radius:14px;color:#fff;text-align:center;}
+.session-end-banner .big{font-family:var(--display);font-size:28px;font-weight:500;color:#4ADE80;}
+.session-end-banner .sub{font-size:13px;opacity:.75;margin-top:6px;line-height:1.4;}
+
+/* ── YARD LOADING MAP ─────────────────── */
+.map-inline-tip{position:absolute;top:36px;left:8px;right:8px;z-index:5;max-height:42%;overflow-y:auto;padding:8px 10px;background:rgba(5,8,12,.82);border:1px solid rgba(232,98,10,.45);border-radius:12px;font-size:11px;line-height:1.4;color:rgba(255,255,255,.93);box-shadow:0 4px 16px rgba(0,0,0,.4);-webkit-overflow-scrolling:touch;}
+.map-inline-tip .mit-k{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.12em;color:#ffc49c;text-transform:uppercase;margin-bottom:3px;}
+.map-inline-tip ul{margin:4px 0 0 16px;padding:0;color:rgba(255,255,255,.78);font-size:10px;line-height:1.35;}
+.map-inline-tip li{margin:1px 0;}
+.map-legend-bar{position:absolute;bottom:10px;left:10px;right:10px;display:flex;justify-content:center;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:8px 12px;z-index:6;pointer-events:none;background:rgba(6,8,12,.82);backdrop-filter:blur(8px);border-radius:10px;border:1px solid rgba(255,255,255,.08);}
+.map-legend-bar span{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.04em;}
+.map-rig-tag{position:absolute;z-index:26;transform:translate(-50%,-100%);background:var(--navy);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;padding:4px 8px;border-radius:6px;box-shadow:var(--e2);white-space:nowrap;}
+.map-rig-tag::after{content:'';position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);}
+.spot{box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);}
+.walk-split{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.sq-chip{cursor:pointer;transition:transform .12s,opacity .12s;}
+.sq-chip:active{transform:scale(.97);}
+.sq-chip.loaded{opacity:.55;border-color:var(--success)!important;background:rgba(183,240,207,.4)!important;}
+.sq-chip.loaded .sqn{color:var(--success)!important;}
+.map-load-cta{padding:12px 16px 0;}
+.btn-load-next{width:100%;justify-content:center;height:46px;border-radius:12px;font-size:15px;}
+.ns-walk{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.85);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;}
 </style>
 </head>
 <body>
@@ -446,7 +562,7 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
   </div>
 
   <div class="rig-cta">
-    <button class="btn-fill" onclick="goTo('s-home')">
+    <button type="button" class="btn-fill" id="btnConfirmRig">
       <span class="material-icons-round">check</span>
       Confirm Rig — Start Loading
     </button>
@@ -477,29 +593,13 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 
     <div class="scan-action" onclick="goTo('s-scan')">
       <div class="scan-icon"><span class="material-icons-round">document_scanner</span></div>
-      <div class="scan-text"><div class="t">Scan Load Sheet</div><div class="s">Start a new load · Cottrell CX-09LS</div></div>
+      <div class="scan-text"><div class="t">Capture load sheet</div><div class="s">Camera scan (demo) · Cottrell CX-09LS</div></div>
       <span class="material-icons-round" style="color:#fff;font-size:20px;">arrow_forward</span>
     </div>
 
-    <div class="section-lbl">Recent Loads</div>
-    <div class="card-el" style="margin-bottom:0;">
-      <div class="list-item">
-        <div class="li-lead"><span class="material-icons-round">local_shipping</span></div>
-        <div class="li-content"><div class="li-headline">BNSF Orillia → Renton Toyota</div><div class="li-support">9 vehicles · 41,200 lbs · Yesterday</div></div>
-        <span class="badge badge-ok" style="margin-left:8px;"><span class="material-icons-round" style="font-size:12px;">check</span>Done</span>
-      </div>
-      <div class="divider"></div>
-      <div class="list-item">
-        <div class="li-lead"><span class="material-icons-round">local_shipping</span></div>
-        <div class="li-content"><div class="li-headline">Port of Long Beach → Chino</div><div class="li-support">8 vehicles · 38,800 lbs · Mon</div></div>
-        <span class="badge badge-ok" style="margin-left:8px;"><span class="material-icons-round" style="font-size:12px;">check</span>Done</span>
-      </div>
-      <div class="divider"></div>
-      <div class="list-item">
-        <div class="li-lead"><span class="material-icons-round">local_shipping</span></div>
-        <div class="li-content"><div class="li-headline">BNSF Miraloma → Fontana</div><div class="li-support">9 vehicles · 43,600 lbs · Sun</div></div>
-        <span class="badge badge-ok" style="margin-left:8px;"><span class="material-icons-round" style="font-size:12px;">check</span>Done</span>
-      </div>
+    <div class="section-lbl">Previous loads</div>
+    <div class="card-el" style="margin-bottom:0;" id="recentLoadsCard">
+      <div id="recentLoadsMount"></div>
     </div>
 
     <div class="section-lbl">Active Rig</div>
@@ -532,9 +632,9 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 <div class="screen" id="s-scan" style="background:#000;">
   <div class="scan-toolbar">
     <button class="icon-btn" onclick="goBack('s-home')" style="color:#fff;"><span class="material-icons-round">arrow_back</span></button>
-    <span class="scan-title">Scan Load Sheet</span>
+    <span class="scan-title">Capture BOL</span>
   </div>
-  <div class="viewfinder" onclick="goTo('s-decode')" style="cursor:pointer;">
+  <div class="viewfinder" id="scanViewfinder">
     <div class="bol-mock">
       <div class="bh">MASTER UNIFORM STRAIGHT BILL OF LADING — UNITED ROAD</div>
       <div class="bm">CARRIER: United Road · ORIGIN: BNSF ORILLIA – RENTON WA · LOAD: 041625-09</div>
@@ -555,14 +655,23 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
       <div class="scan-line"></div>
     </div>
   </div>
-  <div class="scan-bottom">
-    <div class="scan-status">Detecting VINs...</div>
-    <div class="scan-sub">Hold steady over the load sheet</div>
-    <div class="vin-chip"><span class="material-icons-round">check_circle</span>4T1G11AK8PU123481</div>
-    <div class="vin-chip" style="animation-delay:.15s"><span class="material-icons-round">check_circle</span>2T3P1RFV8PW847263</div>
-    <div class="vin-chip" style="animation-delay:.3s"><span class="material-icons-round">check_circle</span>3TMLB5JN3SM178449</div>
-    <div class="vin-chip" style="animation-delay:.45s"><span class="material-icons-round">check_circle</span>5TDHZRBH9MS523875</div>
-    <div class="vin-chip" style="animation-delay:.6s"><span class="material-icons-round">check_circle</span>4T1DAACK6SU566558</div>
+  <div class="scan-bottom" id="scanBottom">
+    <div class="scan-phase-scan" id="scanPhaseScan">
+      <div class="scan-status" id="scanStatusLine">Detecting VINs...</div>
+      <div class="scan-sub">Demo: camera scan only — photo upload can ship later</div>
+      <div class="vin-chip"><span class="material-icons-round">check_circle</span>4T1G11AK8PU123481</div>
+      <div class="vin-chip" style="animation-delay:.15s"><span class="material-icons-round">check_circle</span>2T3P1RFV8PW847263</div>
+      <div class="vin-chip" style="animation-delay:.3s"><span class="material-icons-round">check_circle</span>3TMLB5JN3SM178449</div>
+      <div class="vin-chip" style="animation-delay:.45s"><span class="material-icons-round">check_circle</span>5TDHZRBH9MS523875</div>
+      <div class="vin-chip" style="animation-delay:.6s"><span class="material-icons-round">check_circle</span>4T1DAACK6SU566558</div>
+    </div>
+    <div class="scan-phase-done" id="scanPhaseDone">
+      <div class="scan-done-card">
+        <div class="scan-done-title"><span class="material-icons-round">verified</span>BOL captured (camera)</div>
+        <div class="scan-done-body">Visible VINs were read from the sheet. Review on the next screen, or re-scan if anything looks wrong.</div>
+      </div>
+      <button type="button" class="btn-fill btn-scan-accept" id="btnScanAccept"><span class="material-icons-round">arrow_forward</span>Accept &amp; review vehicles</button>
+    </div>
   </div>
 </div>
 
@@ -583,23 +692,24 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
       <div>
         <div class="dt">Vehicles detected</div>
         <div class="ds">BNSF Orillia · Load 041625-09</div>
-        <div style="margin-top:6px;"><span class="badge badge-ok"><span class="material-icons-round" style="font-size:12px;">check</span>All VINs verified</span></div>
+        <div style="margin-top:6px;"><span class="badge badge-ok"><span class="material-icons-round" style="font-size:12px;">document_scanner</span>Scan complete — verify each VIN</span></div>
       </div>
     </div>
+    <div class="decode-hint">Accept each VIN if it matches the metal, or edit before optimizing. MONTAR will only build a load plan from accepted rows.</div>
     <div class="section-lbl">Decoded Vehicles</div>
-    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">1</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry XSE V6</div><div class="veh-vin">4T1G11AK8PU123481</div></div><div class="veh-meta"><span class="badge badge-neu">3,572 lbs</span><span class="badge badge-pri" style="font-size:10px;">T042</span></div></div>
-    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">2</div><div class="veh-info"><div class="veh-name">2025 Toyota RAV4 XLE Premium</div><div class="veh-vin">2T3P1RFV8PW847263</div></div><div class="veh-meta"><span class="badge badge-neu">4,015 lbs</span><span class="badge badge-pri" style="font-size:10px;">T043</span></div></div>
-    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">3</div><div class="veh-info"><div class="veh-name">2025 Toyota Tacoma TRD 4x4</div><div class="veh-vin">3TMLB5JN3SM178449</div></div><div class="veh-meta"><span class="badge badge-warn">4,480 lbs</span><span class="badge badge-pri" style="font-size:10px;">T071</span></div></div>
-    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">4</div><div class="veh-info"><div class="veh-name">2025 Toyota Highlander XLE</div><div class="veh-vin">5TDHZRBH9MS523875</div></div><div class="veh-meta"><span class="badge badge-warn">4,705 lbs</span><span class="badge badge-pri" style="font-size:10px;">T072</span></div></div>
-    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">5</div><div class="veh-info"><div class="veh-name">2025 Toyota Corolla SE CVT</div><div class="veh-vin">4T1DAACK6SU566558</div></div><div class="veh-meta"><span class="badge badge-neu">3,097 lbs</span><span class="badge badge-pri" style="font-size:10px;">T048</span></div></div>
-    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">6</div><div class="veh-info"><div class="veh-name">2025 Toyota RAV4 Adventure</div><div class="veh-vin">2T3P1RFV2SC561402</div></div><div class="veh-meta"><span class="badge badge-neu">4,015 lbs</span><span class="badge badge-pri" style="font-size:10px;">T049</span></div></div>
-    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">7</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry LE Hybrid</div><div class="veh-vin">4T1DAACK1SU559372</div></div><div class="veh-meta"><span class="badge badge-neu">3,616 lbs</span><span class="badge badge-pri" style="font-size:10px;">T044</span></div></div>
-    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">8</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry XSE AWD</div><div class="veh-vin">4T1DAACK8SU046040</div></div><div class="veh-meta"><span class="badge badge-neu">3,682 lbs</span><span class="badge badge-pri" style="font-size:10px;">T045</span></div></div>
-    <div class="veh-card" onclick="goTo('s-slots')"><div class="veh-rank">9</div><div class="veh-info"><div class="veh-name">2025 Toyota Highlander XSE</div><div class="veh-vin">5TDHZRBH9MS500001</div></div><div class="veh-meta"><span class="badge badge-warn">4,705 lbs</span><span class="badge badge-pri" style="font-size:10px;">T073</span></div></div>
+    <div class="veh-card veh-card-decode" data-vix="0"><div class="veh-rank">1</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry XSE V6</div><div class="veh-vin vin-text">4T1G11AK8PU123481</div></div><div class="veh-meta"><span class="badge badge-neu">3,572 lbs</span><span class="badge badge-pri" style="font-size:10px;">T042</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" title="Accept VIN"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit" title="Edit VIN"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="1"><div class="veh-rank">2</div><div class="veh-info"><div class="veh-name">2025 Toyota RAV4 XLE Premium</div><div class="veh-vin vin-text">2T3P1RFV8PW847263</div></div><div class="veh-meta"><span class="badge badge-neu">4,015 lbs</span><span class="badge badge-pri" style="font-size:10px;">T043</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="2"><div class="veh-rank">3</div><div class="veh-info"><div class="veh-name">2025 Toyota Tacoma TRD 4x4</div><div class="veh-vin vin-text">3TMLB5JN3SM178449</div></div><div class="veh-meta"><span class="badge badge-warn">4,480 lbs</span><span class="badge badge-pri" style="font-size:10px;">T071</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="3"><div class="veh-rank">4</div><div class="veh-info"><div class="veh-name">2025 Toyota Highlander XLE</div><div class="veh-vin vin-text">5TDHZRBH9MS523875</div></div><div class="veh-meta"><span class="badge badge-warn">4,705 lbs</span><span class="badge badge-pri" style="font-size:10px;">T072</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="4"><div class="veh-rank">5</div><div class="veh-info"><div class="veh-name">2025 Toyota Corolla SE CVT</div><div class="veh-vin vin-text">4T1DAACK6SU566558</div></div><div class="veh-meta"><span class="badge badge-neu">3,097 lbs</span><span class="badge badge-pri" style="font-size:10px;">T048</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="5"><div class="veh-rank">6</div><div class="veh-info"><div class="veh-name">2025 Toyota RAV4 Adventure</div><div class="veh-vin vin-text">2T3P1RFV2SC561402</div></div><div class="veh-meta"><span class="badge badge-neu">4,015 lbs</span><span class="badge badge-pri" style="font-size:10px;">T049</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="6"><div class="veh-rank">7</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry LE Hybrid</div><div class="veh-vin vin-text">4T1DAACK1SU559372</div></div><div class="veh-meta"><span class="badge badge-neu">3,616 lbs</span><span class="badge badge-pri" style="font-size:10px;">T044</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="7"><div class="veh-rank">8</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry XSE AWD</div><div class="veh-vin vin-text">4T1DAACK8SU046040</div></div><div class="veh-meta"><span class="badge badge-neu">3,682 lbs</span><span class="badge badge-pri" style="font-size:10px;">T045</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="8"><div class="veh-rank">9</div><div class="veh-info"><div class="veh-name">2025 Toyota Highlander XSE</div><div class="veh-vin vin-text">5TDHZRBH9MS500001</div></div><div class="veh-meta"><span class="badge badge-warn">4,705 lbs</span><span class="badge badge-pri" style="font-size:10px;">T073</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
   </div>
   <div class="confirm-bar">
-    <button class="btn-outline" onclick="goBack('s-scan')">Re-scan</button>
-    <button class="btn-fill" onclick="goTo('s-slots')"><span class="material-icons-round">auto_awesome</span>Optimize Load</button>
+    <button type="button" class="btn-outline" id="btnRescan">Re-scan</button>
+    <button type="button" class="btn-fill" id="btnOptimizeLoad" disabled><span class="material-icons-round">auto_awesome</span>Optimize load</button>
   </div>
 </div>
 
@@ -609,12 +719,17 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 <div class="screen" id="s-slots">
   <div class="app-bar">
     <div class="app-bar-inner">
-      <button class="icon-btn" onclick="goBack('s-decode')"><span class="material-icons-round">arrow_back</span></button>
+      <button type="button" class="icon-btn" onclick="goBack('s-decode')"><span class="material-icons-round">arrow_back</span></button>
       <div class="app-bar-title">Load Plan</div>
-      <button class="icon-btn"><span class="material-icons-round">info_outline</span></button>
+      <button type="button" class="icon-btn" id="btnPlanInfo" title="About this plan"><span class="material-icons-round">info_outline</span></button>
     </div>
   </div>
   <div class="scroll">
+    <div class="plan-intro">
+      <div class="plan-intro-title"><span class="material-icons-round" style="font-size:18px;color:var(--primary);">touch_app</span>You're in the loop</div>
+      <div class="plan-intro-body">Confirm each slot when you’re satisfied. Optional: open <strong>Why this slot?</strong> for MONTAR’s reasoning. Adjustments stay available with guardrails.</div>
+    </div>
+    <div class="plan-progress" id="planProgress">0 of 9 vehicles confirmed</div>
     <div class="wt-card">
       <div class="wt-header">
         <div><div class="wt-lbl">Total Load Weight</div><div class="wt-val">37,887 lbs</div><div class="wt-limit">Limit: 47,000 lbs available cargo</div></div>
@@ -624,43 +739,81 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
       <div class="wt-labels"><span>0</span><span>37,887 / 47,000 lbs (80.6%)</span><span>47K</span></div>
     </div>
     <div class="rig-vis">
-      <div class="rv-lbl">Cottrell CX-09LS — Slot Plan</div>
+      <div class="rv-lbl">Deck diagram — confirms turn green as you verify</div>
       <div class="deck-row">
         <div class="deck-lbl">Top</div>
-        <div class="slot rev"><div class="sn">1</div><div class="sv" style="color:#7B5800;">Camry↺</div></div>
-        <div class="slot filled" onclick="goTo('s-warning')"><div class="sn">2</div><div class="sv">RAV4</div></div>
-        <div class="slot filled"><div class="sn">3</div><div class="sv">Tacoma</div></div>
-        <div class="slot filled"><div class="sn">4</div><div class="sv">Corolla</div></div>
-        <div class="slot filled"><div class="sn">5</div><div class="sv">RAV4 Adv</div></div>
+        <div class="slot rev" data-slot="1"><div class="sn">1</div><div class="sv" style="color:#7B5800;">Camry↺</div></div>
+        <div class="slot filled" data-slot="2"><div class="sn">2</div><div class="sv">RAV4</div></div>
+        <div class="slot filled" data-slot="3"><div class="sn">3</div><div class="sv">Tacoma</div></div>
+        <div class="slot filled" data-slot="4"><div class="sn">4</div><div class="sv">Corolla</div></div>
+        <div class="slot filled" data-slot="5"><div class="sn">5</div><div class="sv">RAV4 Adv</div></div>
       </div>
       <div class="deck-row">
         <div class="deck-lbl">Bot</div>
-        <div class="slot filled"><div class="sn">6</div><div class="sv">Highlander</div></div>
-        <div class="slot filled"><div class="sn">7</div><div class="sv">Camry H</div></div>
-        <div class="slot filled"><div class="sn">8</div><div class="sv">Camry XSE</div></div>
-        <div class="slot filled"><div class="sn">9</div><div class="sv">Highlander</div></div>
+        <div class="slot filled" data-slot="6"><div class="sn">6</div><div class="sv">Highlander</div></div>
+        <div class="slot filled" data-slot="7"><div class="sn">7</div><div class="sv">Camry H</div></div>
+        <div class="slot filled" data-slot="8"><div class="sn">8</div><div class="sv">Camry XSE</div></div>
+        <div class="slot filled" data-slot="9"><div class="sn">9</div><div class="sv">Highlander</div></div>
       </div>
       <div style="margin-top:8px;font-size:11px;color:var(--on-surface-var);display:flex;align-items:center;gap:4px;">
-        <span class="material-icons-round" style="font-size:14px;color:var(--warning);">info</span>
-        Slot 1 reversed · Tap slot 2 to see adjustment panel
+        <span class="material-icons-round" style="font-size:14px;color:var(--warning);">shield</span>
+        Slot 1 loads reversed (cab-over). Swaps that break clearance are flagged in Adjustments.
       </div>
     </div>
-    <div class="section-lbl">Slot Assignments</div>
-    <div class="card-el" style="margin-top:0;">
-      <div class="slot-list-item" onclick="goTo('s-warning')"><div class="sl-num">1</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry XSE V6</div><div class="sl-vin">4T1G11AK8PU123481</div></div><div class="sl-right"><div class="sl-wt">3,572 lbs</div><div class="sl-reason">Reversed · Cab-over</div></div></div>
-      <div class="slot-list-item" onclick="goTo('s-warning')"><div class="sl-num">2</div><div class="sl-info"><div class="sl-name">2025 Toyota RAV4 XLE Premium</div><div class="sl-vin">2T3P1RFV8PW847263</div></div><div class="sl-right"><div class="sl-wt">4,015 lbs</div><div class="sl-reason">Height clearance ✓</div></div></div>
-      <div class="slot-list-item"><div class="sl-num">3</div><div class="sl-info"><div class="sl-name">2025 Toyota Tacoma TRD 4x4</div><div class="sl-vin">3TMLB5JN3SM178449</div></div><div class="sl-right"><div class="sl-wt">4,480 lbs</div><div class="sl-reason">Axle weight ✓</div></div></div>
-      <div class="slot-list-item"><div class="sl-num" style="background:var(--surface-container);color:var(--on-surface-var);">4</div><div class="sl-info"><div class="sl-name">2025 Toyota Corolla SE CVT</div><div class="sl-vin">4T1DAACK6SU566558</div></div><div class="sl-right"><div class="sl-wt">3,097 lbs</div><div class="sl-reason">Lightest top deck</div></div></div>
-      <div class="slot-list-item"><div class="sl-num">5</div><div class="sl-info"><div class="sl-name">2025 Toyota RAV4 Adventure</div><div class="sl-vin">2T3P1RFV2SC561402</div></div><div class="sl-right"><div class="sl-wt">4,015 lbs</div><div class="sl-reason">Height clearance ✓</div></div></div>
-      <div class="slot-list-item"><div class="sl-num">6</div><div class="sl-info"><div class="sl-name">2025 Toyota Highlander XLE</div><div class="sl-vin">5TDHZRBH9MS523875</div></div><div class="sl-right"><div class="sl-wt">4,705 lbs</div><div class="sl-reason">Bottom deck ✓</div></div></div>
-      <div class="slot-list-item"><div class="sl-num">7</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry LE Hybrid</div><div class="sl-vin">4T1DAACK1SU559372</div></div><div class="sl-right"><div class="sl-wt">3,616 lbs</div><div class="sl-reason">Weight balance ✓</div></div></div>
-      <div class="slot-list-item"><div class="sl-num">8</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry XSE AWD</div><div class="sl-vin">4T1DAACK8SU046040</div></div><div class="sl-right"><div class="sl-wt">3,682 lbs</div><div class="sl-reason">Rear axle ✓</div></div></div>
-      <div class="slot-list-item"><div class="sl-num">9</div><div class="sl-info"><div class="sl-name">2025 Toyota Highlander XSE</div><div class="sl-vin">5TDHZRBH9MS500001</div></div><div class="sl-right"><div class="sl-wt">4,705 lbs</div><div class="sl-reason">Bottom deck ✓</div></div></div>
+    <div class="section-lbl">Verify each placement</div>
+    <div class="card-el" style="margin-top:0;" id="planCardList">
+      <div class="slot-list-item" data-slot="1">
+        <div class="sl-num">1</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry XSE V6</div><div class="sl-vin">4T1G11AK8PU123481</div></div><div class="sl-right"><div class="sl-wt">3,572 lbs</div><div class="sl-reason">Reversed · Cab-over</div></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="1">Confirm</button></div>
+        <div class="sl-montar-detail">Lowest roof on the top deck clears the rail. Reversed for cab-over load sequence and tie-down geometry on your Cottrell.</div>
+      </div>
+      <div class="slot-list-item" data-slot="2">
+        <div class="sl-num">2</div><div class="sl-info"><div class="sl-name">2025 Toyota RAV4 XLE Premium</div><div class="sl-vin">2T3P1RFV8PW847263</div></div><div class="sl-right"><div class="sl-wt">4,015 lbs</div><div class="sl-reason">Height clearance ✓</div></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="2">Confirm</button></div>
+        <div class="sl-montar-detail">SUV height fits the remaining top-deck envelope after Slot 1, with margin for rail and strap angles.</div>
+      </div>
+      <div class="slot-list-item" data-slot="3">
+        <div class="sl-num">3</div><div class="sl-info"><div class="sl-name">2025 Toyota Tacoma TRD 4x4</div><div class="sl-vin">3TMLB5JN3SM178449</div></div><div class="sl-right"><div class="sl-wt">4,480 lbs</div><div class="sl-reason">Axle weight ✓</div></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="3">Confirm</button></div>
+        <div class="sl-montar-detail">Pickup weight split keeps the steer axle under limit with your fifth-wheel and stinger configuration.</div>
+      </div>
+      <div class="slot-list-item" data-slot="4">
+        <div class="sl-num" style="background:var(--surface-container);color:var(--on-surface-var);">4</div><div class="sl-info"><div class="sl-name">2025 Toyota Corolla SE CVT</div><div class="sl-vin">4T1DAACK6SU566558</div></div><div class="sl-right"><div class="sl-wt">3,097 lbs</div><div class="sl-reason">Lightest top deck</div></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="4">Confirm</button></div>
+        <div class="sl-montar-detail">Lightest unit forward on the top deck for tongue-weight balance and progressive loading.</div>
+      </div>
+      <div class="slot-list-item" data-slot="5">
+        <div class="sl-num">5</div><div class="sl-info"><div class="sl-name">2025 Toyota RAV4 Adventure</div><div class="sl-vin">2T3P1RFV2SC561402</div></div><div class="sl-right"><div class="sl-wt">4,015 lbs</div><div class="sl-reason">Height clearance ✓</div></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="5">Confirm</button></div>
+        <div class="sl-montar-detail">Mirrors Slot 2’s height envelope; sequenced for yard pull order toward T049.</div>
+      </div>
+      <div class="slot-list-item" data-slot="6">
+        <div class="sl-num">6</div><div class="sl-info"><div class="sl-name">2025 Toyota Highlander XLE</div><div class="sl-vin">5TDHZRBH9MS523875</div></div><div class="sl-right"><div class="sl-wt">4,705 lbs</div><div class="sl-reason">Bottom deck ✓</div></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="6">Confirm</button></div>
+        <div class="sl-montar-detail">Heavy SUV kept low on the bottom deck for stability, clearance, and tie-down leverage.</div>
+      </div>
+      <div class="slot-list-item" data-slot="7">
+        <div class="sl-num">7</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry LE Hybrid</div><div class="sl-vin">4T1DAACK1SU559372</div></div><div class="sl-right"><div class="sl-wt">3,616 lbs</div><div class="sl-reason">Weight balance ✓</div></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="7">Confirm</button></div>
+        <div class="sl-montar-detail">Hybrid battery mass is included in cross-weight so left–right balance stays in target.</div>
+      </div>
+      <div class="slot-list-item" data-slot="8">
+        <div class="sl-num">8</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry XSE AWD</div><div class="sl-vin">4T1DAACK8SU046040</div></div><div class="sl-right"><div class="sl-wt">3,682 lbs</div><div class="sl-reason">Rear axle ✓</div></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="8">Confirm</button></div>
+        <div class="sl-montar-detail">AWD bias lines up with bottom-deck tie-downs and drive-axle loading for this deck.</div>
+      </div>
+      <div class="slot-list-item" data-slot="9">
+        <div class="sl-num">9</div><div class="sl-info"><div class="sl-name">2025 Toyota Highlander XSE</div><div class="sl-vin">5TDHZRBH9MS500001</div></div><div class="sl-right"><div class="sl-wt">4,705 lbs</div><div class="sl-reason">Bottom deck ✓</div></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="9">Confirm</button></div>
+        <div class="sl-montar-detail">Paired with Slot 6 for symmetric load; last stop at dealer aligns with unload T073.</div>
+      </div>
     </div>
   </div>
-  <div class="confirm-bar">
-    <button class="btn-outline" onclick="goBack('s-decode')">Edit</button>
-    <button class="btn-fill" onclick="goTo('s-warning')"><span class="material-icons-round">check</span>Confirm Plan</button>
+  <div class="confirm-bar plan-actions">
+    <p class="plan-foot-short">Trust the full plan, review adjustments, or confirm each row — your call.</p>
+    <button type="button" class="btn-outline btn-accept-montar-outline" id="btnAcceptMontarPlan"><span class="material-icons-round">verified</span>Accept MONTAR&rsquo;s plan</button>
+    <button type="button" class="btn-outline" id="btnPlanAdjust"><span class="material-icons-round">tune</span>Adjustments &amp; overrides</button>
+    <button type="button" class="btn-fill btn-yContinue" id="btnPlanContinue" disabled><span class="material-icons-round">arrow_forward</span>Continue to yard loading</button>
   </div>
 </div>
 
@@ -675,6 +828,10 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
     </div>
   </div>
   <div class="scroll">
+    <div class="adj-quick-cta">
+      <div class="adj-quick-copy">Prefer MONTAR&rsquo;s clearance-safe plan? You can still review details below.</div>
+      <button type="button" class="btn-fill" id="btnAcceptMontarInline"><span class="material-icons-round" style="font-size:18px;">check</span>Accept plan</button>
+    </div>
     <div class="warn-banner">
       <span class="material-icons-round">warning</span>
       <div><div class="warn-title">Clearance Warning</div><div class="warn-body">Moving the Highlander XLE to Slot 1 creates a height clearance issue. At 70.9" it exceeds the deck clearance of 60.5".</div></div>
@@ -690,10 +847,31 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
       <div style="font-size:13px;font-weight:600;color:var(--on-surface);margin-bottom:5px;">MONTAR's suggestion</div>
       <div style="font-size:13px;color:var(--on-surface-var);line-height:1.55;">Keep the Camry XSE in Slot 1. The Highlander XLE has adequate clearance and better weight distribution on the bottom deck in Slot 6.</div>
     </div>
+
+    <div class="adj-panel" id="adjPanel">
+      <div class="adj-panel-h"><span class="material-icons-round">tune</span>Try a change (driver choice)</div>
+      <label class="adj-opt">
+        <input type="radio" name="adjSlot1" value="keep" checked />
+        <span class="adj-opt-lbl">Keep MONTAR: Camry XSE V6 in Slot 1 <small>Recommended — clearance safe</small></span>
+      </label>
+      <label class="adj-opt">
+        <input type="radio" name="adjSlot1" value="highlander" />
+        <span class="adj-opt-lbl">Move Highlander XLE into Slot 1 <small>Requires review — conflicts with deck height</small></span>
+      </label>
+      <textarea class="adj-note" id="adjDriverNote" placeholder="Driver note (optional): e.g. dealer staging request, chain placement…"></textarea>
+      <div class="adj-actions">
+        <button type="button" class="btn-outline btn-adj-check" id="btnAdjCheck"><span class="material-icons-round" style="font-size:18px;">fact_check</span>Apply &amp; recheck feasibility</button>
+      </div>
+      <div id="adjOutcome" class="adj-outcome" style="display:none;"></div>
+      <label id="adjAckRow" class="adj-ack-row">
+        <input type="checkbox" id="adjAckRisk" />
+        <span>I understand this conflicts with deck clearance and accept responsibility if I proceed with an override.</span>
+      </label>
+    </div>
   </div>
   <div class="override-bar">
-    <button class="btn-err"><span class="material-icons-round">warning</span>Override — I'll take responsibility</button>
-    <button class="btn-fill" onclick="goTo('s-map')" style="width:100%;justify-content:center;height:40px;border-radius:20px;font-family:var(--font);font-size:14px;font-weight:500;"><span class="material-icons-round">check</span>Accept MONTAR's Plan</button>
+    <button type="button" class="btn-err" id="btnAdjOverride" disabled><span class="material-icons-round">warning</span>Override — I accept the risk</button>
+    <button type="button" class="btn-fill" id="btnAcceptMontar" style="width:100%;justify-content:center;height:40px;border-radius:20px;font-family:var(--font);font-size:14px;font-weight:500;"><span class="material-icons-round">check</span>Accept MONTAR's Plan</button>
   </div>
 </div>
 
@@ -703,150 +881,139 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 <div class="screen" id="s-map">
   <div class="app-bar">
     <div class="app-bar-inner">
-      <button class="icon-btn" onclick="goBack('s-warning')"><span class="material-icons-round">arrow_back</span></button>
-      <div class="app-bar-title">Yard Route</div>
-      <button class="icon-btn"><span class="material-icons-round">tune</span></button>
+      <button type="button" class="icon-btn" onclick="goBack('s-slots')"><span class="material-icons-round">arrow_back</span></button>
+      <div class="app-bar-title">Yard loading</div>
+      <button type="button" class="icon-btn"><span class="material-icons-round">layers</span></button>
     </div>
   </div>
-  <div class="map-cont">
-    <!-- asphalt -->
-    <div class="asphalt"></div>
-    <!-- section header banners -->
-    <div style="position:absolute;top:0;left:0;right:0;height:22px;background:rgba(0,0,0,.35);display:flex;align-items:center;padding:0 10px;">
-      <span style="font-family:var(--mono);font-size:8px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.12em;">BNSF ORILLIA AUTOMOTIVE FACILITY — RENTON WA</span>
+  <div class="yard-scroll">
+  <div class="map-cont map-cont-tesla">
+    <div class="map-tesla-vignette"></div>
+    <div class="map-hud-top">BNSF ORILLIA · RENTON WA · YARD PULL MAP</div>
+    <div class="map-inline-tip" aria-hidden="true">
+      <div class="mit-k">How to read this</div>
+      <strong style="color:#fff;font-weight:600;font-size:12px;">You &rarr; next stall</strong>
+      <ul>
+        <li><strong style="color:#FF9A5C;">Orange path</strong> — walk/drive path to the next pick (follow in order).</li>
+        <li><strong style="color:#ffb38a;">Orange stalls</strong> — vehicles on this load. Dim stalls are empty/other.</li>
+        <li><strong style="color:#9bb0cc;">Car icons</strong> — units still in the bay. Dot at bottom = your rig.</li>
+      </ul>
     </div>
-    <!-- drive lanes -->
-    <div class="drive-lane" style="left:0;right:0;top:52px;height:20px;"></div>
-    <div class="drive-lane" style="left:0;right:0;top:140px;height:20px;"></div>
-    <div class="drive-lane" style="left:0;right:0;top:228px;height:20px;"></div>
-    <div class="drive-lane" style="left:0;right:0;top:280px;height:20px;"></div>
-    <!-- center vertical drive lane -->
-    <div class="drive-lane" style="left:186px;width:20px;top:22px;bottom:0;"></div>
-
-    <!-- ROW T-A (top) -->
-    <div style="position:absolute;left:8px;top:26px;font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;">ROW T-A</div>
-    <!-- spots T040-T049 left of center -->
-    <div class="spot empty" style="left:10px;top:30px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:40px;top:30px;width:26px;height:18px;"></div>
-    <div class="spot target" style="left:70px;top:30px;width:26px;height:18px;"></div><!-- T042 -->
-    <div class="spot target" style="left:100px;top:30px;width:26px;height:18px;"></div><!-- T043 -->
-    <div class="spot target" style="left:130px;top:30px;width:26px;height:18px;"></div><!-- T044 -->
-    <div class="spot target" style="left:160px;top:30px;width:26px;height:18px;"></div><!-- T045 -->
-    <!-- spots right of center -->
-    <div class="spot empty" style="left:210px;top:30px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:240px;top:30px;width:26px;height:18px;"></div>
-    <div class="spot target" style="left:270px;top:30px;width:26px;height:18px;"></div><!-- T048 -->
-    <div class="spot target" style="left:300px;top:30px;width:26px;height:18px;"></div><!-- T049 -->
-    <div class="spot empty" style="left:330px;top:30px;width:26px;height:18px;"></div>
-    <!-- slot labels -->
-    <div class="slot-paint" style="left:70px;top:30px;width:26px;height:18px;line-height:18px;">T042</div>
-    <div class="slot-paint" style="left:100px;top:30px;width:26px;height:18px;line-height:18px;">T043</div>
-    <div class="slot-paint" style="left:130px;top:30px;width:26px;height:18px;line-height:18px;">T044</div>
-    <div class="slot-paint" style="left:160px;top:30px;width:26px;height:18px;line-height:18px;">T045</div>
-    <div class="slot-paint" style="left:270px;top:30px;width:26px;height:18px;line-height:18px;">T048</div>
-    <div class="slot-paint" style="left:300px;top:30px;width:26px;height:18px;line-height:18px;">T049</div>
-
-    <!-- ROW T-B -->
-    <div style="position:absolute;left:8px;top:76px;font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;">ROW T-B</div>
-    <div class="spot empty" style="left:10px;top:78px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:40px;top:78px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:70px;top:78px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:100px;top:78px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:130px;top:78px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:210px;top:78px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:240px;top:78px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:270px;top:78px;width:26px;height:18px;"></div>
-
-    <!-- ROW T-C -->
-    <div style="position:absolute;left:8px;top:164px;font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;">ROW T-C</div>
-    <div class="spot empty" style="left:10px;top:166px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:40px;top:166px;width:26px;height:18px;"></div>
-    <div class="spot target" style="left:70px;top:166px;width:26px;height:18px;"></div><!-- T071 -->
-    <div class="spot target" style="left:100px;top:166px;width:26px;height:18px;"></div><!-- T072 -->
-    <div class="spot empty" style="left:130px;top:166px;width:26px;height:18px;"></div>
-    <div class="spot target" style="left:210px;top:166px;width:26px;height:18px;"></div><!-- T073 -->
-    <div class="spot empty" style="left:240px;top:166px;width:26px;height:18px;"></div>
-    <div class="slot-paint" style="left:70px;top:166px;width:26px;height:18px;line-height:18px;">T071</div>
-    <div class="slot-paint" style="left:100px;top:166px;width:26px;height:18px;line-height:18px;">T072</div>
-    <div class="slot-paint" style="left:210px;top:166px;width:26px;height:18px;line-height:18px;">T073</div>
-
-    <!-- ROW T-D -->
-    <div style="position:absolute;left:8px;top:252px;font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;">ROW T-D</div>
-    <div class="spot empty" style="left:10px;top:254px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:40px;top:254px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:70px;top:254px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:100px;top:254px;width:26px;height:18px;"></div>
-    <div class="spot empty" style="left:210px;top:254px;width:26px;height:18px;"></div>
-
-    <!-- SVG route -->
-    <svg class="route-svg" viewBox="0 0 393 310" xmlns="http://www.w3.org/2000/svg">
+    <svg class="map-tesla-svg" viewBox="0 0 393 330" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-label="Yard map">
       <defs>
-        <marker id="arr" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto">
-          <path d="M0,0 L0,5 L7,2.5 z" fill="#E8620A" opacity=".85"/>
-        </marker>
+        <pattern id="teslaGrid" width="18" height="18" patternUnits="userSpaceOnUse">
+          <path d="M18 0H0V18" fill="none" stroke="#7a8aa8" stroke-opacity=".07"/>
+        </pattern>
+        <linearGradient id="mapGround" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1e2635"/><stop offset="1" stop-color="#0c0f14"/>
+        </linearGradient>
+        <filter id="routeGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <marker id="arrT" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#ffb38a"/></marker>
       </defs>
-      <!-- entry from bottom left → row A left -->
-      <path d="M30,305 L30,160 L196,160 L196,72 L83,72 L83,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".8" marker-end="url(#arr)"/>
-      <!-- T042 → T043 -->
-      <path d="M83,50 L113,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".8" marker-end="url(#arr)"/>
-      <!-- T043 → T044 -->
-      <path d="M113,50 L143,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".7" marker-end="url(#arr)"/>
-      <!-- T044 → T045 -->
-      <path d="M143,50 L173,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".7" marker-end="url(#arr)"/>
-      <!-- cross to right side → T048 -->
-      <path d="M173,50 L196,50 L196,72 L283,72 L283,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".6" marker-end="url(#arr)"/>
-      <!-- T048 → T049 -->
-      <path d="M283,50 L313,50" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".6" marker-end="url(#arr)"/>
-      <!-- T049 → row C → T071 -->
-      <path d="M313,50 L313,72 L196,72 L196,160 L83,160 L83,178" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".55" marker-end="url(#arr)"/>
-      <!-- T071 → T072 -->
-      <path d="M83,178 L113,178" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".55" marker-end="url(#arr)"/>
-      <!-- T072 → T073 right side -->
-      <path d="M113,178 L196,178 L196,160 L223,160 L223,178" stroke="#E8620A" stroke-width="2" fill="none" stroke-dasharray="5,3" opacity=".5" marker-end="url(#arr)"/>
+      <rect width="393" height="330" fill="url(#mapGround)"/>
+      <rect width="393" height="330" fill="url(#teslaGrid)"/>
+      <!-- Drive aisles -->
+      <rect x="0" y="48" width="393" height="24" class="road-surface" rx="3"/>
+      <rect x="0" y="134" width="393" height="22" class="road-surface" rx="3"/>
+      <rect x="0" y="220" width="393" height="22" class="road-surface" rx="3"/>
+      <rect x="184" y="24" width="26" height="306" class="road-surface" rx="3"/>
+      <line x1="0" y1="60" x2="393" y2="60" stroke="#1a2029" stroke-width="1" stroke-dasharray="4 6" opacity=".5"/>
+      <line x1="0" y1="145" x2="393" y2="145" stroke="#1a2029" stroke-width="1" stroke-dasharray="4 6" opacity=".5"/>
+      <!-- Row labels -->
+      <text x="12" y="42" fill="rgba(255,255,255,.35)" font-family="Roboto Mono,monospace" font-size="8" font-weight="700">ROW T-A</text>
+      <text x="12" y="128" fill="rgba(255,255,255,.35)" font-family="Roboto Mono,monospace" font-size="8" font-weight="700">ROW T-B</text>
+      <text x="12" y="214" fill="rgba(255,255,255,.35)" font-family="Roboto Mono,monospace" font-size="8" font-weight="700">ROW T-C</text>
+      <text x="12" y="298" fill="rgba(255,255,255,.35)" font-family="Roboto Mono,monospace" font-size="8" font-weight="700">ROW T-D</text>
+      <!-- Stalls row A -->
+      <rect x="8" y="26" width="28" height="18" rx="3" class="stall-base"/><rect x="40" y="26" width="28" height="18" rx="3" class="stall-base"/>
+      <rect x="72" y="26" width="28" height="18" rx="3" class="stall-hot"/><rect x="104" y="26" width="28" height="18" rx="3" class="stall-hot"/>
+      <rect x="136" y="26" width="28" height="18" rx="3" class="stall-hot"/><rect x="168" y="26" width="28" height="18" rx="3" class="stall-hot"/>
+      <rect x="212" y="26" width="28" height="18" rx="3" class="stall-base"/><rect x="244" y="26" width="28" height="18" rx="3" class="stall-base"/>
+      <rect x="276" y="26" width="28" height="18" rx="3" class="stall-hot"/><rect x="308" y="26" width="28" height="18" rx="3" class="stall-hot"/>
+      <rect x="340" y="26" width="28" height="18" rx="3" class="stall-base"/>
+      <!-- Cars in stalls (top-down) -->
+      <g transform="translate(76,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(108,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(280,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(312,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <text x="78" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T042</text>
+      <text x="110" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T043</text>
+      <text x="282" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T048</text>
+      <text x="314" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T049</text>
+      <g>
+        <text x="86" y="19" text-anchor="middle" fill="#ffc49c" font-family="Roboto Mono,monospace" font-size="7" font-weight="700">NEXT PULL</text>
+        <rect x="69" y="23" width="34" height="24" rx="5" class="next-pull-ring"/>
+      </g>
+      <!-- Row B empty stalls -->
+      <rect x="8" y="112" width="28" height="18" rx="3" class="stall-base"/><rect x="40" y="112" width="28" height="18" rx="3" class="stall-base"/>
+      <rect x="72" y="112" width="28" height="18" rx="3" class="stall-base"/><rect x="104" y="112" width="28" height="18" rx="3" class="stall-base"/>
+      <!-- Row C -->
+      <rect x="8" y="198" width="28" height="18" rx="3" class="stall-base"/><rect x="40" y="198" width="28" height="18" rx="3" class="stall-base"/>
+      <rect x="72" y="198" width="28" height="18" rx="3" class="stall-hot"/><rect x="104" y="198" width="28" height="18" rx="3" class="stall-hot"/>
+      <rect x="212" y="198" width="28" height="18" rx="3" class="stall-hot"/>
+      <g transform="translate(76,201)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(108,201)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(216,201)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <text x="78" y="196" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T071</text>
+      <text x="110" y="196" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T072</text>
+      <text x="218" y="196" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T073</text>
+      <!-- Row D -->
+      <rect x="8" y="284" width="28" height="18" rx="3" class="stall-base"/><rect x="40" y="284" width="28" height="18" rx="3" class="stall-base"/>
+      <!-- Route glow + line -->
+      <path class="route-glow" d="M30,318 L30,165 L196,165 L196,78 L83,78 L83,52" filter="url(#routeGlow)"/>
+      <path class="route-line" d="M30,318 L30,165 L196,165 L196,78 L83,78 L83,52" marker-end="url(#arrT)"/>
+      <path class="route-glow" d="M83,52 L113,52 L143,52 L173,52 L196,52 L196,78 L283,78 L283,52 L313,52" filter="url(#routeGlow)"/>
+      <path class="route-line" d="M83,52 L113,52 L143,52 L173,52 L196,52 L196,78 L283,78 L283,52 L313,52"/>
+      <path class="route-glow" d="M313,52 L313,78 L196,78 L196,165 L83,165 L83,182" filter="url(#routeGlow)"/>
+      <path class="route-line" d="M313,52 L313,78 L196,78 L196,165 L83,165 L83,182" marker-end="url(#arrT)"/>
+      <path class="route-line" d="M83,182 L113,182 M113,182 L196,182 L196,165 L223,165 L223,182" marker-end="url(#arrT)"/>
+      <!-- Rig + heading -->
+      <circle cx="30" cy="318" r="7" class="rig-marker"/>
+      <text x="42" y="314" fill="#ffb38a" font-family="Roboto Mono,monospace" font-size="9" font-weight="700">YOUR RIG</text>
+      <text x="42" y="325" fill="rgba(255,255,255,.45)" font-family="Roboto Mono,monospace" font-size="7">Entry lane · face north</text>
     </svg>
-
-    <!-- You are here -->
-    <div class="you-here" style="left:30px;top:305px;">
-      <div class="yh-ring"><div class="yh-dot"></div></div>
-    </div>
-
-    <!-- Map pins — first two done, rest todo, T071 is active/next -->
-    <div class="mpin" style="left:83px;top:47px;"><div class="pin-bub done">T042 ✓</div><div class="pin-dot done"></div></div>
-    <div class="mpin" style="left:113px;top:47px;"><div class="pin-bub done">T043 ✓</div><div class="pin-dot done"></div></div>
-    <div class="mpin" style="left:83px;top:163px;"><div class="pin-bub active">T071 · Next →</div><div class="pin-dot active"></div></div>
-    <div class="mpin" style="left:113px;top:163px;"><div class="pin-bub todo">T072</div><div class="pin-dot todo"></div></div>
-    <div class="mpin" style="left:223px;top:163px;"><div class="pin-bub todo">T073</div><div class="pin-dot todo"></div></div>
+    <div class="map-legend-bar"><span style="color:#5eead4;">● Glow</span><span style="color:#FF9A5C;">━ Path to next</span><span style="color:#E8620A;">■ This load</span><span style="color:#9bb0cc;">▭ Unit</span></div>
   </div>
 
   <!-- bottom sheet -->
   <div class="map-sheet">
     <div class="sheet-handle"></div>
-    <div class="next-stop">
-      <div class="ns-num">3</div>
+    <div class="next-stop" id="yardNextCard">
+      <div class="ns-num" id="yardNextNum">1</div>
       <div class="ns-info">
-        <div class="ns-lbl">Next stop</div>
-        <div class="ns-name">Bay T071 — Tacoma TRD 4x4</div>
-        <div class="ns-dist">~280 ft · Row T-C · Toyota section</div>
+        <div class="ns-lbl">Next vehicle to pull</div>
+        <div class="ns-name" id="yardNextName">Bay T042 — Camry XSE V6</div>
+        <div class="ns-dist" id="yardNextDist">~220 ft ahead · Row T-A · Toyota row</div>
+        <div class="ns-walk" id="yardNextWalk"><span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">directions_walk</span>~1.5 min walk · Staging lane</div>
       </div>
-      <span class="material-icons-round" style="color:#fff;font-size:22px;">navigation</span>
+      <span class="material-icons-round" style="color:#fff;font-size:22px;">pin_drop</span>
     </div>
-    <div class="stop-q">
-      <div class="sq-chip done"><div class="sqn">✓ 1</div><div class="sql">T042</div><div class="sqv">Camry XSE</div></div>
-      <div class="sq-chip done"><div class="sqn">✓ 2</div><div class="sql">T043</div><div class="sqv">RAV4 XLE</div></div>
-      <div class="sq-chip active"><div class="sqn">3</div><div class="sql">T071</div><div class="sqv">Tacoma TRD</div></div>
-      <div class="sq-chip"><div class="sqn">4</div><div class="sql">T072</div><div class="sqv">Highlander</div></div>
-      <div class="sq-chip"><div class="sqn">5</div><div class="sql">T048</div><div class="sqv">Corolla</div></div>
-      <div class="sq-chip"><div class="sqn">6</div><div class="sql">T049</div><div class="sqv">RAV4 Adv</div></div>
-      <div class="sq-chip"><div class="sqn">7</div><div class="sql">T044</div><div class="sqv">Camry H</div></div>
-      <div class="sq-chip"><div class="sqn">8</div><div class="sql">T045</div><div class="sqv">Camry XSE</div></div>
-      <div class="sq-chip"><div class="sqn">9</div><div class="sql">T073</div><div class="sqv">Highlander</div></div>
+    <div class="stop-q" id="yardStopQ">
+      <div class="sq-chip" data-yi="0"><div class="sqn">1</div><div class="sql">T042</div><div class="sqv">Camry XSE</div></div>
+      <div class="sq-chip" data-yi="1"><div class="sqn">2</div><div class="sql">T043</div><div class="sqv">RAV4 XLE</div></div>
+      <div class="sq-chip" data-yi="2"><div class="sqn">3</div><div class="sql">T071</div><div class="sqv">Tacoma TRD</div></div>
+      <div class="sq-chip" data-yi="3"><div class="sqn">4</div><div class="sql">T072</div><div class="sqv">Highlander</div></div>
+      <div class="sq-chip" data-yi="4"><div class="sqn">5</div><div class="sql">T048</div><div class="sqv">Corolla</div></div>
+      <div class="sq-chip" data-yi="5"><div class="sqn">6</div><div class="sql">T049</div><div class="sqv">RAV4 Adv</div></div>
+      <div class="sq-chip" data-yi="6"><div class="sqn">7</div><div class="sql">T044</div><div class="sqv">Camry H</div></div>
+      <div class="sq-chip" data-yi="7"><div class="sqn">8</div><div class="sql">T045</div><div class="sqv">Camry XSE</div></div>
+      <div class="sq-chip" data-yi="8"><div class="sqn">9</div><div class="sql">T073</div><div class="sqv">Highlander</div></div>
     </div>
-    <div style="padding:12px 16px 0;">
-      <button class="btn-fill" onclick="goTo('s-loadcomplete')" style="width:100%;justify-content:center;height:44px;border-radius:12px;font-size:15px;">
-        <span class="material-icons-round">check_circle</span>
-        All Vehicles Loaded
+    <div class="map-load-cta">
+      <button type="button" class="btn-fill btn-load-next" id="btnYardMarkLoaded">
+        <span class="material-icons-round">local_shipping</span>
+        <span id="btnYardMarkLabel">Pull this vehicle, then tap — loaded on trailer</span>
       </button>
     </div>
+    <div style="padding:8px 16px 0;text-align:center;font-size:11px;color:var(--on-surface-var);line-height:1.35;">Tap a chip to preview that stop. Only the highlighted stop advances the route.</div>
+    <div style="padding:12px 16px 0;">
+      <button type="button" class="btn-outline" id="btnYardAllDone" style="width:100%;justify-content:center;height:42px;border-radius:12px;font-size:14px;display:none;">
+        <span class="material-icons-round">flag</span>Finish yard loading — all 9 staged
+      </button>
+    </div>
+  </div>
   </div>
 </div>
 
@@ -875,10 +1042,10 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
       <div class="divider"></div>
       <div class="lc-check-item"><div class="lc-chk ok"><span class="material-icons-round">inventory_2</span></div><div class="lc-text"><div class="lc-lbl">All VINs accounted for</div><div class="lc-val">9 Toyota vehicles · Load 041625-09</div></div></div>
       <div class="divider"></div>
-      <div class="lc-check-item"><div class="lc-chk ok"><span class="material-icons-round">timer</span></div><div class="lc-text"><div class="lc-lbl">Yard time</div><div class="lc-val">48 minutes · Avg: 62 min · Saved ~14 min</div></div></div>
+      <div class="lc-check-item"><div class="lc-chk ok"><span class="material-icons-round">timer</span></div><div class="lc-text"><div class="lc-lbl">Yard time</div><div class="lc-val">48 min this run vs ~62 min typical full pull — faster staging path (varies by yard)</div></div></div>
     </div>
 
-    <div class="section-lbl">Delivery</div>
+    <div class="section-lbl">At the dealer</div>
     <div class="card-el" style="margin-top:0;padding:14px 16px;margin-bottom:0;">
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="width:44px;height:44px;border-radius:12px;background:var(--primary-container);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span class="material-icons-round" style="color:var(--on-primary-container);font-size:22px;">store</span></div>
@@ -890,8 +1057,12 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
       </div>
     </div>
   </div>
-  <div class="confirm-bar" style="padding:16px;">
-    <button class="btn-fill" onclick="goTo('s-delivery')" style="width:100%;justify-content:center;height:48px;border-radius:14px;font-size:15px;"><span class="material-icons-round">navigation</span>Navigate to Delivery</button>
+  <div class="confirm-bar" style="padding:16px;flex-direction:column;gap:10px;align-items:stretch;">
+    <div style="font-size:11px;color:var(--on-surface-var);line-height:1.4;padding:0 4px;text-align:center;">Car-hauler prep for this drop — not a substitute for Google Maps or Trucker Path. Use your nav app on the road.</div>
+    <button type="button" class="btn-fill" id="btnOpenDealerGuide" style="width:100%;justify-content:center;min-height:52px;border-radius:14px;font-size:15px;flex-direction:column;gap:4px;padding:12px 16px;height:auto;">
+      <span style="display:flex;align-items:center;gap:8px;"><span class="material-icons-round">warehouse</span>Dealer arrival guide</span>
+      <span style="font-size:12px;font-weight:400;opacity:.92;">Drive-in, parking &amp; handoff notes for Renton Toyota</span>
+    </button>
   </div>
 </div>
 
@@ -902,11 +1073,15 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
   <div class="app-bar">
     <div class="app-bar-inner">
       <button class="icon-btn" onclick="goBack('s-loadcomplete')"><span class="material-icons-round">arrow_back</span></button>
-      <div class="app-bar-title">Delivery</div>
+      <div class="app-bar-title">Dealer arrival</div>
       <button class="icon-btn"><span class="material-icons-round">more_vert</span></button>
     </div>
   </div>
   <div class="scroll">
+
+    <div class="delivery-disclaimer">
+      <strong>On-lot &amp; handoff only.</strong> MONTAR does not replace your GPS. Dealer instructions here — how to drive in, where to park, approach, and notes — vary by store. Read before you roll in.
+    </div>
 
     <!-- dealer map preview -->
     <div class="dealer-hero">
@@ -960,7 +1135,7 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 
     <!-- approach guidance -->
     <div class="approach-card" style="margin-top:6px;">
-      <div class="ac-title"><span class="material-icons-round">navigation</span>Optimal Approach</div>
+      <div class="ac-title"><span class="material-icons-round">fork_right</span>Optimal approach (this dealer)</div>
       <div class="ac-step"><div class="ac-num">1</div><div class="ac-text">Take <strong>Rainier Ave N southbound</strong> — wider lanes, no overhead clearance issues, easier rig maneuver.</div></div>
       <div class="ac-step"><div class="ac-num">2</div><div class="ac-text"><strong>Do not use SW 41st St entrance</strong> — tight turn radius for 80-foot rig. Tight residential block on the approach.</div></div>
       <div class="ac-step"><div class="ac-num">3</div><div class="ac-text">Enter via <strong>Rainier Ave N driveway</strong> on the east side of the lot. Swing wide on entry.</div></div>
@@ -986,8 +1161,8 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
       <div class="nc-content"><div class="nc-title">Dealer contact</div><div class="nc-body">Mike Torres — Receiving Manager · (425) 555-0182. Call ahead if arriving after 4pm or if load has any damage to note.</div></div>
     </div>
 
-    <!-- drop-off sequence -->
-    <div class="section-lbl">Unload Sequence</div>
+    <div id="deliveryUnloadBlock" style="display:none;">
+    <div class="section-lbl">Multi-stop unload order</div>
     <div class="card-el" style="margin-top:0;">
       <div class="slot-list-item"><div class="sl-num" style="background:var(--success-container);color:var(--success);">6</div><div class="sl-info"><div class="sl-name">Highlander XLE → Slot A1</div><div class="sl-vin">5TDHZRBH9MS523875 · Bottom deck first</div></div><div class="sl-right"><div class="sl-reason">Unload first</div></div></div>
       <div class="slot-list-item"><div class="sl-num" style="background:var(--success-container);color:var(--success);">7</div><div class="sl-info"><div class="sl-name">Camry LE Hybrid → Slot A2</div><div class="sl-vin">4T1DAACK1SU559372</div></div><div class="sl-right"><div class="sl-reason">Bottom deck</div></div></div>
@@ -999,12 +1174,25 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
       <div class="slot-list-item"><div class="sl-num">4</div><div class="sl-info"><div class="sl-name">Corolla SE CVT → Slot B4</div><div class="sl-vin">4T1DAACK6SU566558</div></div><div class="sl-right"><div class="sl-reason">Top deck</div></div></div>
       <div class="slot-list-item"><div class="sl-num">5</div><div class="sl-info"><div class="sl-name">RAV4 Adventure → Slot B5</div><div class="sl-vin">2T3P1RFV2SC561402</div></div><div class="sl-right"><div class="sl-reason">Top deck</div></div></div>
     </div>
+    </div>
 
-    <div style="padding:16px;">
-      <button class="btn-fill" style="width:100%;justify-content:center;height:48px;border-radius:14px;font-size:15px;background:var(--green);">
-        <span class="material-icons-round">check_circle</span>
-        Confirm Delivery Complete
+    <div id="deliverySingleStopNote" style="margin:8px 16px 0;font-size:12px;color:var(--on-surface-var);line-height:1.45;">
+      Single-dealer drop: follow your trailer unload order. A step-by-step unload list appears here only for multi-stop deliveries.
+    </div>
+
+    <div id="deliveryBottomCta" style="padding:16px;">
+      <button type="button" class="btn-fill" id="btnEndDeliverySession" style="width:100%;justify-content:center;min-height:48px;border-radius:14px;font-size:15px;background:var(--green);flex-direction:column;gap:4px;padding:12px 16px;height:auto;">
+        <span style="display:flex;align-items:center;gap:8px;"><span class="material-icons-round">emoji_events</span>Wrap up session</span>
+        <span style="font-size:12px;font-weight:400;opacity:.92;">Save summary to Previous loads — nothing is sent to the dealer</span>
       </button>
+    </div>
+    <div id="sessionEndSummary" style="display:none;padding:0 16px 20px;">
+      <div class="session-end-banner">
+        <div style="font-size:13px;opacity:.85;">Estimated time saved (yard + dealer lot)</div>
+        <div class="big" id="sessionSavedMin">~14 min</div>
+        <div class="sub" id="sessionEndSub">Saved to Previous loads on Home. Nothing transmitted.</div>
+        <div id="sessionSavedDetail" style="font-size:12px;opacity:.82;margin-top:12px;line-height:1.45;text-align:left;max-width:280px;margin-left:auto;margin-right:auto;"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1012,6 +1200,41 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 </div><!-- /frame -->
 
 <script>
+// ── HAPTICS & SOUND ─────────────────────
+let audioCtx;
+function audioReady() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function beep(freq, dur, vol = 0.07) {
+  try {
+    const ctx = audioReady();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = freq;
+    g.gain.value = vol;
+    o.connect(g);
+    g.connect(ctx.destination);
+    const t = ctx.currentTime;
+    o.start(t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.stop(t + dur);
+  } catch (e) {}
+}
+function playSound(kind) {
+  audioReady();
+  if (kind === 'tap') beep(520, 0.06);
+  else if (kind === 'success') { beep(660, 0.08); setTimeout(() => beep(880, 0.1), 70); }
+  else if (kind === 'scan') { beep(380, 0.07); setTimeout(() => beep(520, 0.08), 60); }
+  else if (kind === 'confirm') beep(784, 0.12);
+  else if (kind === 'warn') { beep(220, 0.1); }
+  else if (kind === 'rig') beep(600, 0.05);
+}
+function haptic(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
+function hapticSuccess() { haptic([15, 45, 15]); }
+
 // ── RIG PICKER ──────────────────────────
 const rigData = [
   { name:'Cottrell CX-09LS', slots:'9', len:'80 ft', cargo:'47K lbs' },
@@ -1050,48 +1273,551 @@ pickerList.addEventListener('scroll', () => {
   if (clamped !== selectedRig) {
     selectedRig = clamped;
     updateRigDetails(selectedRig);
+    playSound('rig');
+    haptic(6);
   }
+});
+
+document.getElementById('btnConfirmRig').addEventListener('click', () => {
+  playSound('success');
+  hapticSuccess();
+  goTo('s-home', { silent: true });
 });
 
 // ── SCREEN TRANSITIONS ──────────────────
 let current = 's-splash';
 
-function goTo(id) {
-  const from = document.getElementById(current);
-  const to   = document.getElementById(id);
+const MULTI_STOP_DELIVERY = false;
+
+function onScreenEnter(id, from) {
+  const lightScreens = ['s-splash','s-rig','s-scan'];
+  const bar = document.getElementById('statusBar');
+  if (bar) bar.classList.toggle('light', lightScreens.includes(id));
+
+  if (id === 's-scan') startScanCapture();
+  if (id === 's-decode' && from === 's-scan') resetDecodeScreen();
+  if (id === 's-slots' && from === 's-decode') resetPlanScreen();
+  if (id === 's-map') initYardScreen();
+  if (id === 's-home') renderRecentLoads();
+  if (id === 's-delivery') {
+    const ub = document.getElementById('deliveryUnloadBlock');
+    const sn = document.getElementById('deliverySingleStopNote');
+    if (ub) ub.style.display = MULTI_STOP_DELIVERY ? 'block' : 'none';
+    if (sn) sn.style.display = MULTI_STOP_DELIVERY ? 'none' : 'block';
+    const cta = document.getElementById('deliveryBottomCta');
+    const sum = document.getElementById('sessionEndSummary');
+    if (cta) cta.style.display = '';
+    if (sum) sum.style.display = 'none';
+  }
+}
+
+function goTo(id, opts) {
+  const silent = opts && opts.silent;
+  const fromEl = document.getElementById(current);
+  const to = document.getElementById(id);
+  const fromId = current;
+  if (!silent) {
+    playSound('tap');
+    haptic(8);
+  }
   to.style.display = 'flex';
   to.style.animation = 'slideInR .32s cubic-bezier(.2,0,0,1) forwards';
-  from.style.animation = 'slideOutL .32s cubic-bezier(.2,0,0,1) forwards';
+  fromEl.style.animation = 'slideOutL .32s cubic-bezier(.2,0,0,1) forwards';
   setTimeout(() => {
-    from.style.display = 'none';
-    from.style.animation = '';
-    from.classList.remove('active');
+    fromEl.style.display = 'none';
+    fromEl.style.animation = '';
+    fromEl.classList.remove('active');
     to.style.animation = '';
     to.classList.add('active');
     current = id;
-    // status bar color
-    const lightScreens = ['s-splash','s-rig','s-scan'];
-    document.getElementById('statusBar').classList.toggle('light', lightScreens.includes(id));
+    onScreenEnter(id, fromId);
   }, 320);
 }
 
 function goBack(id) {
-  const from = document.getElementById(current);
-  const to   = document.getElementById(id);
+  const fromEl = document.getElementById(current);
+  const to = document.getElementById(id);
+  const fromId = current;
+  playSound('tap');
+  haptic(6);
   to.style.display = 'flex';
   to.style.animation = 'slideInL .3s cubic-bezier(.2,0,0,1) forwards';
-  from.style.animation = 'slideOutR .3s cubic-bezier(.2,0,0,1) forwards';
+  fromEl.style.animation = 'slideOutR .3s cubic-bezier(.2,0,0,1) forwards';
   setTimeout(() => {
-    from.style.display = 'none';
-    from.style.animation = '';
-    from.classList.remove('active');
+    fromEl.style.display = 'none';
+    fromEl.style.animation = '';
+    fromEl.classList.remove('active');
     to.style.animation = '';
     to.classList.add('active');
     current = id;
-    const lightScreens = ['s-splash','s-rig','s-scan'];
-    document.getElementById('statusBar').classList.toggle('light', lightScreens.includes(id));
+    onScreenEnter(id, fromId);
   }, 300);
 }
+
+// ── SCAN: simulated capture + accept ────
+let scanTimer;
+function startScanCapture() {
+  const root = document.getElementById('s-scan');
+  if (!root) return;
+  root.classList.remove('sheet-ready');
+  clearTimeout(scanTimer);
+  const line = document.getElementById('scanStatusLine');
+  if (line) line.textContent = 'Detecting VINs...';
+  scanTimer = setTimeout(() => {
+    playSound('scan');
+    haptic([18, 55, 22]);
+    if (line) line.textContent = 'VIN capture complete';
+    root.classList.add('sheet-ready');
+  }, 2400);
+}
+
+document.getElementById('btnScanAccept').addEventListener('click', () => {
+  playSound('success');
+  hapticSuccess();
+  goTo('s-decode');
+});
+
+// ── DECODE: per-VIN accept / edit ───────
+const acceptedVins = new Set();
+function resetDecodeScreen() {
+  acceptedVins.clear();
+  document.querySelectorAll('.veh-card-decode').forEach((card) => {
+    card.classList.remove('vin-accepted');
+    const vin = card.querySelector('.vin-text');
+    if (vin && vin.dataset.orig) vin.textContent = vin.dataset.orig;
+    const ok = card.querySelector('.btn-vin-ok');
+    if (ok) {
+      ok.classList.remove('success');
+      ok.disabled = false;
+      ok.innerHTML = '<span class="material-icons-round">check</span>';
+    }
+  });
+  syncOptimizeButton();
+}
+function syncOptimizeButton() {
+  const btn = document.getElementById('btnOptimizeLoad');
+  if (btn) btn.disabled = acceptedVins.size !== 9;
+}
+document.querySelectorAll('.vin-text').forEach((el) => { el.dataset.orig = el.textContent.trim(); });
+
+document.getElementById('s-decode').addEventListener('click', (e) => {
+  const card = e.target.closest('.veh-card-decode');
+  if (!card) return;
+  const i = +card.dataset.vix;
+  if (e.target.closest('.btn-vin-ok')) {
+    if (card.classList.contains('vin-accepted')) return;
+    acceptedVins.add(i);
+    card.classList.add('vin-accepted');
+    const ok = card.querySelector('.btn-vin-ok');
+    ok.classList.add('success');
+    ok.innerHTML = '<span class="material-icons-round">done</span>';
+    ok.disabled = true;
+    playSound('confirm');
+    haptic(12);
+    syncOptimizeButton();
+  }
+  if (e.target.closest('.btn-vin-edit')) {
+    const vinEl = card.querySelector('.vin-text');
+    const nv = prompt('Correct the VIN if the scan missed a character.', vinEl.textContent.trim());
+    if (nv && nv.replace(/\s/g, '').length >= 11) {
+      vinEl.textContent = nv.replace(/\s/g, '').toUpperCase().slice(0, 17);
+      acceptedVins.delete(i);
+      card.classList.remove('vin-accepted');
+      const ok = card.querySelector('.btn-vin-ok');
+      ok.classList.remove('success');
+      ok.disabled = false;
+      ok.innerHTML = '<span class="material-icons-round">check</span>';
+      playSound('tap');
+      haptic(10);
+      syncOptimizeButton();
+    }
+  }
+});
+
+document.getElementById('btnOptimizeLoad').addEventListener('click', () => {
+  if (acceptedVins.size !== 9) return;
+  playSound('success');
+  hapticSuccess();
+  goTo('s-slots');
+});
+
+document.getElementById('btnRescan').addEventListener('click', () => {
+  playSound('tap');
+  haptic(10);
+  goBack('s-scan');
+});
+
+// ── LOAD PLAN: per-slot confirm ─────────
+const planConfirmed = new Set();
+function confirmPlanSlot(sn) {
+  const row = document.querySelector(`#planCardList .slot-list-item[data-slot="${sn}"]`);
+  if (!row) return;
+  const btn = row.querySelector('.btn-ack-slot');
+  if (!btn || btn.classList.contains('done')) return;
+  planConfirmed.add(String(sn));
+  btn.classList.add('done');
+  btn.textContent = 'OK';
+  row.classList.add('is-confirmed');
+  row.classList.remove('show-reason');
+  const deckSlot = document.querySelector(`.rig-vis .slot[data-slot="${sn}"]`);
+  if (deckSlot) deckSlot.classList.add('confirmed');
+}
+function acceptAllPlanSlots() {
+  for (let i = 1; i <= 9; i++) confirmPlanSlot(String(i));
+  updatePlanProgress();
+}
+function resetPlanScreen() {
+  planConfirmed.clear();
+  document.querySelectorAll('.rig-vis .slot[data-slot]').forEach((s) => s.classList.remove('confirmed'));
+  document.querySelectorAll('#planCardList .slot-list-item').forEach((row) => {
+    row.classList.remove('is-confirmed', 'show-reason');
+    const btn = row.querySelector('.btn-ack-slot');
+    if (btn) {
+      btn.classList.remove('done');
+      btn.textContent = 'Confirm';
+    }
+  });
+  updatePlanProgress();
+}
+function updatePlanProgress() {
+  const el = document.getElementById('planProgress');
+  if (el) el.textContent = `${planConfirmed.size} of 9 vehicles confirmed`;
+  const cont = document.getElementById('btnPlanContinue');
+  if (cont) cont.disabled = planConfirmed.size !== 9;
+}
+
+document.getElementById('planCardList').addEventListener('click', (e) => {
+  const why = e.target.closest('.btn-why-montar');
+  if (why) {
+    e.preventDefault();
+    const row = why.closest('.slot-list-item');
+    const open = row.classList.toggle('show-reason');
+    document.querySelectorAll('#planCardList .slot-list-item.show-reason').forEach((r) => {
+      if (r !== row) r.classList.remove('show-reason');
+    });
+    playSound('tap');
+    haptic(6);
+    return;
+  }
+  const btn = e.target.closest('.btn-ack-slot');
+  if (!btn || btn.classList.contains('done')) return;
+  const sn = btn.getAttribute('data-slot');
+  confirmPlanSlot(sn);
+  playSound('confirm');
+  hapticSuccess();
+  updatePlanProgress();
+});
+
+document.getElementById('btnAcceptMontarPlan').addEventListener('click', () => {
+  playSound('success');
+  hapticSuccess();
+  acceptAllPlanSlots();
+});
+
+document.getElementById('btnPlanContinue').addEventListener('click', () => {
+  if (planConfirmed.size !== 9) return;
+  playSound('success');
+  hapticSuccess();
+  goTo('s-map');
+});
+
+document.getElementById('btnPlanAdjust').addEventListener('click', () => {
+  playSound('tap');
+  haptic(12);
+  goTo('s-warning');
+});
+
+document.getElementById('btnPlanInfo').addEventListener('click', () => {
+  playSound('tap');
+  haptic(8);
+  alert('MONTAR optimizes for DOT weight, deck height, and yard pull order. Confirm each row so we know you\'ve seen the reasoning. Use Adjustments if you need a different move—warnings appear before you override.');
+});
+
+// ── YARD LOADING MAP ────────────────────
+const YARD_STOPS = [
+  { title: 'Bay T042 — Camry XSE V6', dist: '~220 ft · Row T-A · North staging', walk: '~1.5 min walk · Paved lane' },
+  { title: 'Bay T043 — RAV4 XLE Premium', dist: '~190 ft · Row T-A', walk: '~1.3 min walk' },
+  { title: 'Bay T071 — Tacoma TRD 4x4', dist: '~280 ft · Row T-C · SUV row', walk: '~2.1 min walk · Cross main lane' },
+  { title: 'Bay T072 — Highlander XLE', dist: '~310 ft · Row T-C', walk: '~2.3 min walk' },
+  { title: 'Bay T048 — Corolla SE CVT', dist: '~240 ft · Row T-A · Right section', walk: '~1.7 min walk' },
+  { title: 'Bay T049 — RAV4 Adventure', dist: '~260 ft · Row T-A · Right section', walk: '~1.8 min walk' },
+  { title: 'Bay T044 — Camry LE Hybrid', dist: '~200 ft · Row T-A', walk: '~1.4 min walk' },
+  { title: 'Bay T045 — Camry XSE AWD', dist: '~230 ft · Row T-A', walk: '~1.6 min walk' },
+  { title: 'Bay T073 — Highlander XSE', dist: '~340 ft · Row T-C · East end', walk: '~2.5 min walk · Longest leg' },
+];
+let yardIdx = 0;
+
+function initYardScreen() {
+  yardIdx = 0;
+  document.querySelectorAll('#yardStopQ .sq-chip').forEach((c) => {
+    c.classList.remove('loaded', 'active');
+  });
+  const fin = document.getElementById('btnYardAllDone');
+  const main = document.getElementById('btnYardMarkLoaded');
+  if (fin) fin.style.display = 'none';
+  if (main) main.style.display = 'inline-flex';
+  renderYard();
+}
+
+function renderYard() {
+  const name = document.getElementById('yardNextName');
+  const dist = document.getElementById('yardNextDist');
+  const walk = document.getElementById('yardNextWalk');
+  const num = document.getElementById('yardNextNum');
+  const lbl = document.getElementById('btnYardMarkLabel');
+  if (yardIdx >= YARD_STOPS.length) {
+    if (name) name.textContent = 'All vehicles staged on trailer';
+    if (dist) dist.textContent = 'Ready to secure load & exit yard';
+    if (walk) walk.innerHTML = '<span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">check_circle</span>Walking route complete';
+    if (num) num.textContent = '✓';
+    if (lbl) lbl.textContent = 'Use the button below to close out yard loading';
+    return;
+  }
+  const s = YARD_STOPS[yardIdx];
+  if (num) num.textContent = String(yardIdx + 1);
+  if (name) name.textContent = s.title;
+  if (dist) dist.textContent = s.dist;
+  if (walk) walk.innerHTML = '<span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">directions_walk</span>' + s.walk;
+  if (lbl) lbl.textContent = 'Vehicle ' + (yardIdx + 1) + ' of 9 — tap when it\'s chained on the trailer';
+
+  document.querySelectorAll('#yardStopQ .sq-chip').forEach((chip) => {
+    const i = +chip.getAttribute('data-yi');
+    chip.classList.toggle('active', i === yardIdx);
+    chip.classList.toggle('loaded', i < yardIdx);
+  });
+}
+
+function yardMarkLoaded() {
+  if (yardIdx >= YARD_STOPS.length) return;
+  const chip = document.querySelector(`#yardStopQ .sq-chip[data-yi="${yardIdx}"]`);
+  if (chip) chip.classList.add('loaded');
+  yardIdx++;
+  playSound('success');
+  hapticSuccess();
+  if (yardIdx >= YARD_STOPS.length) {
+    document.getElementById('btnYardMarkLoaded').style.display = 'none';
+    const fin = document.getElementById('btnYardAllDone');
+    if (fin) fin.style.display = 'flex';
+    renderYard();
+  } else renderYard();
+}
+
+document.getElementById('btnYardMarkLoaded').addEventListener('click', yardMarkLoaded);
+
+document.getElementById('yardStopQ').addEventListener('click', (e) => {
+  const chip = e.target.closest('.sq-chip');
+  if (!chip) return;
+  const i = +chip.getAttribute('data-yi');
+  if (i === yardIdx) yardMarkLoaded();
+  else { playSound('tap'); haptic(5); }
+});
+
+document.getElementById('btnYardAllDone').addEventListener('click', () => {
+  playSound('success');
+  hapticSuccess();
+  goTo('s-loadcomplete');
+});
+
+// ── PREVIOUS LOADS (local) ─────────────
+const LS_PREV_LOADS = 'montar_previous_loads';
+const SEED_RECENT_LOADS = [
+  { headline: 'Port of Long Beach → Chino', support: '8 vehicles · 38,800 lbs · Mon' },
+  { headline: 'BNSF Miraloma → Fontana', support: '9 vehicles · 43,600 lbs · Sun' },
+];
+
+function loadPreviousLoadsFromStorage() {
+  try {
+    const raw = localStorage.getItem(LS_PREV_LOADS);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function savePreviousLoad(entry) {
+  const list = loadPreviousLoadsFromStorage();
+  list.unshift(entry);
+  localStorage.setItem(LS_PREV_LOADS, JSON.stringify(list.slice(0, 12)));
+}
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function renderRecentLoads() {
+  const mount = document.getElementById('recentLoadsMount');
+  if (!mount) return;
+  const stored = loadPreviousLoadsFromStorage();
+  const rows = [];
+  stored.slice(0, 8).forEach((s) => {
+    const h = s.headline;
+    if (!h) return;
+    rows.push({
+      headline: h,
+      support: s.support || '',
+    });
+  });
+  SEED_RECENT_LOADS.forEach((seed) => {
+    if (rows.length >= 5) return;
+    if (!rows.some((r) => r.headline === seed.headline)) rows.push(seed);
+  });
+  mount.innerHTML = rows
+    .map(
+      (r, i) => `
+      ${i ? '<div class="divider"></div>' : ''}
+      <div class="list-item">
+        <div class="li-lead"><span class="material-icons-round">local_shipping</span></div>
+        <div class="li-content"><div class="li-headline">${escHtml(r.headline)}</div><div class="li-support">${escHtml(r.support)}</div></div>
+        <span class="badge badge-ok" style="margin-left:8px;"><span class="material-icons-round" style="font-size:12px;">check</span>Done</span>
+      </div>`
+    )
+    .join('');
+}
+
+// ── LOAD COMPLETE → DEALER GUIDE ────────
+document.getElementById('btnOpenDealerGuide').addEventListener('click', () => {
+  playSound('confirm');
+  haptic(12);
+  goTo('s-delivery');
+});
+
+// ── DELIVERY: end session (driver assist) ─
+function computeSessionTimeSaved() {
+  const yardSaved = Math.round(10 + Math.random() * 13);
+  const r = Math.random();
+  let dealerAvoided = 0;
+  if (r < 0.2) dealerAvoided = Math.round(3 + Math.random() * 9);
+  else if (r < 0.75) dealerAvoided = Math.round(11 + Math.random() * 15);
+  else dealerAvoided = Math.round(19 + Math.random() * 12);
+  const total = Math.min(72, yardSaved + dealerAvoided);
+  return { yardSaved, dealerAvoided, total };
+}
+
+function endDeliverySession() {
+  const est = computeSessionTimeSaved();
+  const savedMin = est.total;
+  const headline = 'BNSF Orillia → Renton Toyota';
+  const support = `9 vehicles · ~${savedMin} min est. saved (yard + dealer lot) · ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+  savePreviousLoad({ headline, support, savedMin, yardSaved: est.yardSaved, dealerAvoided: est.dealerAvoided, ts: Date.now() });
+
+  const cta = document.getElementById('deliveryBottomCta');
+  const sum = document.getElementById('sessionEndSummary');
+  const elMin = document.getElementById('sessionSavedMin');
+  const det = document.getElementById('sessionSavedDetail');
+  if (elMin) elMin.textContent = '~' + savedMin + ' min';
+  if (det) {
+    det.textContent =
+      'Roughly ' +
+      est.yardSaved +
+      ' min less yard drag than a slow hour-long reload pattern, plus ~' +
+      est.dealerAvoided +
+      ' min of dealer-lot friction avoided (wrong gate, shuffle, or wait — not every day). Estimates for this session only.';
+  }
+  if (cta) cta.style.display = 'none';
+  if (sum) sum.style.display = 'block';
+
+  playSound('success');
+  hapticSuccess();
+  renderRecentLoads();
+  setTimeout(() => {
+    goTo('s-home', { silent: true });
+  }, 2200);
+}
+
+document.getElementById('btnEndDeliverySession').addEventListener('click', endDeliverySession);
+
+function goYardFromMontarAccept() {
+  playSound('success');
+  hapticSuccess();
+  goTo('s-map');
+}
+
+// ── ADJUSTMENT: driver choice / override ─
+(function initAdjustmentScreen() {
+  const adjOutcome = document.getElementById('adjOutcome');
+  const adjAckRow = document.getElementById('adjAckRow');
+  const adjAckRisk = document.getElementById('adjAckRisk');
+  const btnAdjCheck = document.getElementById('btnAdjCheck');
+  const btnAdjOverride = document.getElementById('btnAdjOverride');
+
+  function getAdjChoice() {
+    const r = document.querySelector('input[name="adjSlot1"]:checked');
+    return r ? r.value : 'keep';
+  }
+
+  function syncAdjAckVisibility() {
+    const risky = getAdjChoice() === 'highlander';
+    if (adjAckRow) adjAckRow.classList.toggle('show', risky);
+    if (!risky && adjAckRisk) adjAckRisk.checked = false;
+    syncAdjOverrideEnabled();
+  }
+
+  function syncAdjOverrideEnabled() {
+    if (!btnAdjOverride) return;
+    const risky = getAdjChoice() === 'highlander';
+    btnAdjOverride.disabled = !(risky && adjAckRisk && adjAckRisk.checked);
+  }
+
+  function clearOutcome() {
+    if (!adjOutcome) return;
+    adjOutcome.className = 'adj-outcome';
+    adjOutcome.style.display = 'none';
+    adjOutcome.textContent = '';
+  }
+
+  document.querySelectorAll('input[name="adjSlot1"]').forEach((el) => {
+    el.addEventListener('change', () => {
+      clearOutcome();
+      syncAdjAckVisibility();
+    });
+  });
+
+  if (btnAdjCheck) {
+    btnAdjCheck.addEventListener('click', () => {
+      playSound('confirm');
+      haptic(10);
+      const choice = getAdjChoice();
+      if (!adjOutcome) return;
+      if (choice === 'keep') {
+        adjOutcome.className = 'adj-outcome ok';
+        adjOutcome.style.display = 'block';
+        adjOutcome.textContent =
+          'Acceptance: feasibility matches MONTAR\'s clearance-safe plan. Continue with Accept plan, or add a note above for your own records.';
+        if (adjAckRow) adjAckRow.classList.remove('show');
+        if (adjAckRisk) adjAckRisk.checked = false;
+      } else {
+        adjOutcome.className = 'adj-outcome bad';
+        adjOutcome.style.display = 'block';
+        adjOutcome.textContent =
+          'Correction: Highlander XLE in Slot 1 fails top-deck height (70.9" vs 60.5" clearance). Warning: proceeding is on you. Check the box below to enable override.';
+        syncAdjAckVisibility();
+      }
+      syncAdjOverrideEnabled();
+    });
+  }
+
+  if (adjAckRisk) adjAckRisk.addEventListener('change', syncAdjOverrideEnabled);
+
+  if (btnAdjOverride) {
+    btnAdjOverride.addEventListener('click', () => {
+      playSound('warn');
+      haptic([40, 30, 60]);
+      goYardFromMontarAccept();
+    });
+  }
+
+  syncAdjAckVisibility();
+})();
+
+document.getElementById('btnAcceptMontar').addEventListener('click', goYardFromMontarAccept);
+document.getElementById('btnAcceptMontarInline').addEventListener('click', goYardFromMontarAccept);
+
+syncOptimizeButton();
+updatePlanProgress();
 
 // ── SPLASH AUTO-ADVANCE ─────────────────
 setTimeout(() => {
@@ -1104,6 +1830,8 @@ document.addEventListener('touchend', function(e) {
   if (now - (this._lt || 0) < 300) e.preventDefault();
   this._lt = now;
 }, { passive: false });
+
+renderRecentLoads();
 </script>
 </body>
 </html>
