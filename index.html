@@ -3,6 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+(function () {
+  if (window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)) {
+    document.documentElement.classList.add('pwa-standalone');
+  }
+})();
+</script>
 <title>MONTAR</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -79,6 +86,38 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
     height:var(--app-viewport-h, 100dvh);
     max-height:none;
   }
+}
+
+/* Installed PWA (home screen) — fill viewport; fixes iOS gap above home indicator */
+html.pwa-standalone{
+  height:100%;
+  min-height:100%;
+  min-height:-webkit-fill-available;
+  overflow:hidden;
+}
+html.pwa-standalone body{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  min-height:100%;
+  min-height:-webkit-fill-available;
+  max-height:100%;
+  max-height:-webkit-fill-available;
+  overflow:hidden;
+  overscroll-behavior:none;
+  -webkit-overflow-scrolling:auto;
+  display:block;
+}
+html.pwa-standalone .frame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  min-height:100%;
+  min-height:var(--app-viewport-h, 100%);
+  max-height:none;
+  flex:none;
 }
 .status-bar{position:absolute;top:0;left:0;right:0;height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;z-index:190;pointer-events:none;}
 .status-bar.light .st,.status-bar.light .si{color:#fff;}
@@ -1852,22 +1891,43 @@ setTimeout(() => {
 // ── iOS PWA FIXES ───────────────────────
 function syncAppViewportHeight() {
   try {
-    const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    if (h && h > 200) {
-      document.documentElement.style.setProperty('--app-viewport-h', h + 'px');
+    let h = window.innerHeight || 0;
+    if (window.visualViewport && window.visualViewport.height) {
+      h = Math.max(h, window.visualViewport.height);
+    }
+    const docH = document.documentElement.clientHeight;
+    const bodyH = document.body ? document.body.clientHeight : 0;
+    if (document.documentElement.classList.contains('pwa-standalone')) {
+      h = Math.max(h, docH, bodyH);
+    }
+    if (h < 200) return;
+    document.documentElement.style.setProperty('--app-viewport-h', h + 'px');
+    if (document.documentElement.classList.contains('pwa-standalone')) {
+      document.documentElement.style.height = h + 'px';
+      document.body.style.height = h + 'px';
+      document.body.style.minHeight = h + 'px';
+      document.body.style.maxHeight = h + 'px';
     }
   } catch (e) {}
 }
 syncAppViewportHeight();
+requestAnimationFrame(function () {
+  syncAppViewportHeight();
+  requestAnimationFrame(syncAppViewportHeight);
+});
 window.addEventListener('resize', syncAppViewportHeight);
 window.addEventListener('orientationchange', function() {
-  setTimeout(syncAppViewportHeight, 350);
+  setTimeout(syncAppViewportHeight, 50);
+  setTimeout(syncAppViewportHeight, 400);
 });
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', syncAppViewportHeight);
 }
 document.addEventListener('visibilitychange', function() {
   if (!document.hidden) syncAppViewportHeight();
+});
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) syncAppViewportHeight();
 });
 
 document.addEventListener('touchend', function(e) {
