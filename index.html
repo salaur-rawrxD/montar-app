@@ -88,34 +88,38 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
   }
 }
 
-/* Installed PWA (home screen) — fill viewport; fixes iOS gap above home indicator */
+/* Installed PWA (home screen) — edge-to-edge; avoid pixel caps that leave a band above home indicator */
 html.pwa-standalone{
   height:100%;
+  height:-webkit-fill-available;
   min-height:100%;
   min-height:-webkit-fill-available;
   overflow:hidden;
+  background:#000;
 }
 html.pwa-standalone body{
   position:fixed;
   inset:0;
   width:100%;
+  /* Do not cap max-height — iOS can report innerHeight slightly under layout viewport and show html bg gap */
   height:100%;
   min-height:100%;
   min-height:-webkit-fill-available;
-  max-height:100%;
-  max-height:-webkit-fill-available;
+  min-height:100dvh;
+  max-height:none;
   overflow:hidden;
   overscroll-behavior:none;
   -webkit-overflow-scrolling:auto;
   display:block;
+  background:#000;
 }
 html.pwa-standalone .frame{
   position:absolute;
   inset:0;
   width:100%;
-  height:100%;
-  min-height:100%;
-  min-height:var(--app-viewport-h, 100%);
+  /* inset:0 + fixed body fills screen; avoid --app-viewport-h / innerHeight caps that leave a bottom band on iOS */
+  height:auto;
+  min-height:0;
   max-height:none;
   flex:none;
 }
@@ -2117,22 +2121,27 @@ setTimeout(() => {
 // ── iOS PWA FIXES ───────────────────────
 function syncAppViewportHeight() {
   try {
+    const vv = window.visualViewport;
     let h = window.innerHeight || 0;
-    if (window.visualViewport && window.visualViewport.height) {
-      h = Math.max(h, window.visualViewport.height);
+    if (vv) {
+      h = Math.max(h, vv.height + (vv.offsetTop || 0));
     }
-    const docH = document.documentElement.clientHeight;
-    const bodyH = document.body ? document.body.clientHeight : 0;
-    if (document.documentElement.classList.contains('pwa-standalone')) {
-      h = Math.max(h, docH, bodyH);
+    const docH = document.documentElement.clientHeight || 0;
+    const docRect = document.documentElement.getBoundingClientRect();
+    const docRectH = docRect.height || 0;
+    h = Math.max(h, docH, docRectH);
+    if (document.body) {
+      h = Math.max(h, document.body.clientHeight || 0);
     }
     if (h < 200) return;
     document.documentElement.style.setProperty('--app-viewport-h', h + 'px');
     if (document.documentElement.classList.contains('pwa-standalone')) {
-      document.documentElement.style.height = h + 'px';
-      document.body.style.height = h + 'px';
-      document.body.style.minHeight = h + 'px';
-      document.body.style.maxHeight = h + 'px';
+      document.documentElement.style.removeProperty('height');
+      if (document.body) {
+        document.body.style.removeProperty('height');
+        document.body.style.removeProperty('min-height');
+        document.body.style.removeProperty('max-height');
+      }
     }
   } catch (e) {}
 }
