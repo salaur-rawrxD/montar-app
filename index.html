@@ -3,13 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script>
-(function () {
-  if (window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)) {
-    document.documentElement.classList.add('pwa-standalone');
-  }
-})();
-</script>
 <title>MONTAR</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -47,6 +40,12 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 
 /* PHONE FRAME — full viewport on device; framed preview on large desktop */
 .frame{width:100%;max-width:100%;height:100%;min-height:100%;min-height:100dvh;min-height:100svh;min-height:-webkit-fill-available;background:#000;position:relative;overflow:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);box-sizing:border-box;}
+html{width:100%;height:100%;-webkit-text-size-adjust:100%;}
+html,body{min-height:100%;min-height:100dvh;background:#1A1A2E;display:flex;align-items:stretch;justify-content:center;font-family:var(--font);overflow:hidden;}
+body{width:100%;margin:0;padding:0;box-sizing:border-box;}
+
+/* PHONE FRAME — full viewport on device; framed preview on large desktop */
+.frame{width:100%;max-width:100%;height:100%;min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;background:#000;position:relative;overflow:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);box-sizing:border-box;}
 .frame::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:0 0 20px 20px;z-index:200;display:none;}
 @media (min-width:520px) and (min-height:720px) and (pointer:fine){
   html,body{align-items:center;padding:12px;}
@@ -69,57 +68,43 @@ body{width:100%;margin:0;padding:0;box-sizing:border-box;}
     min-height:100svh;
     min-height:-webkit-fill-available;
   }
-  /* Fixed shell = fills iOS / PWA visual viewport (avoids gap above home indicator) */
+  /* Fixed shell: top+bottom stretch to layout viewport. Do not set height — it ignores bottom:0
+     and a px-tall --app-viewport-h can leave a strip of body bg above the home indicator. */
   .frame{
     position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
+    inset:0;
     flex:none;
     width:100%;
     max-width:100%;
-    height:100%;
-    min-height:100%;
-    min-height:var(--app-viewport-h, 100dvh);
-    min-height:var(--app-viewport-h, 100svh);
-    height:var(--app-viewport-h, 100dvh);
     max-height:none;
   }
 }
 
-/* Installed PWA (home screen) — edge-to-edge; avoid pixel caps that leave a band above home indicator */
+/* Installed PWA (home screen) — fill viewport; fixes iOS gap above home indicator */
 html.pwa-standalone{
   height:100%;
-  height:-webkit-fill-available;
   min-height:100%;
   min-height:-webkit-fill-available;
   overflow:hidden;
-  background:#000;
 }
 html.pwa-standalone body{
   position:fixed;
   inset:0;
   width:100%;
-  /* Do not cap max-height — iOS can report innerHeight slightly under layout viewport and show html bg gap */
   height:100%;
   min-height:100%;
   min-height:-webkit-fill-available;
-  min-height:100dvh;
-  max-height:none;
+  max-height:100%;
+  max-height:-webkit-fill-available;
   overflow:hidden;
   overscroll-behavior:none;
   -webkit-overflow-scrolling:auto;
   display:block;
-  background:#000;
 }
 html.pwa-standalone .frame{
   position:absolute;
   inset:0;
   width:100%;
-  /* inset:0 + fixed body fills screen; avoid --app-viewport-h / innerHeight caps that leave a bottom band on iOS */
-  height:auto;
-  min-height:0;
   max-height:none;
   flex:none;
 }
@@ -221,14 +206,46 @@ html.pwa-standalone .frame{
 .greeting-card::before{content:'';position:absolute;right:20px;bottom:-30px;width:80px;height:80px;border-radius:50%;background:rgba(232,98,10,.08);}
 .g-name{font-size:14px;opacity:.7;margin-bottom:4px;}
 .g-title{font-family:var(--display);font-size:clamp(20px,5vw,24px);font-weight:500;margin-bottom:16px;}
-.g-stats{display:flex;gap:24px;}
-.g-stat .n{font-family:var(--mono);font-size:22px;font-weight:500;color:#E8620A;}
-.g-stat .l{font-size:11px;opacity:.6;margin-top:2px;}
+.g-stats{display:flex;flex-wrap:wrap;gap:16px 20px;}
+.g-stat{flex:1 1 40%;min-width:120px;max-width:48%;}
+.g-stat .n{font-family:var(--mono);font-size:20px;font-weight:500;color:#E8620A;}
+.g-stat .l{font-size:11px;opacity:.6;margin-top:2px;line-height:1.3;}
 .scan-action{margin:16px;background:var(--primary);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;cursor:pointer;box-shadow:var(--e2);}
 .scan-icon{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .scan-icon .material-icons-round{font-size:28px;color:#fff;}
 .scan-text .t{font-size:16px;font-weight:600;color:#fff;}
 .scan-text .s{font-size:13px;color:rgba(255,255,255,.75);margin-top:2px;}
+/* Home: add load sheet picker */
+.load-sheet-picker{position:absolute;inset:0;z-index:120;display:none;flex-direction:column;justify-content:flex-end;pointer-events:none;}
+.load-sheet-picker.open{pointer-events:auto;}
+.load-sheet-picker-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);-webkit-tap-highlight-color:transparent;}
+.load-sheet-picker-panel{position:relative;background:var(--surface);border-radius:20px 20px 0 0;padding:8px 16px max(20px,env(safe-area-inset-bottom));box-shadow:0 -8px 32px rgba(0,0,0,.18);animation:slideUp .28s ease both;}
+.load-sheet-picker-panel .lsp-kicker{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--primary);margin-bottom:6px;}
+.load-sheet-picker-panel .lsp-title{font-family:var(--display);font-size:clamp(20px,5vw,22px);font-weight:500;color:var(--on-surface);line-height:1.2;margin-bottom:8px;}
+.load-sheet-picker-panel .lsp-desc{font-size:14px;color:var(--on-surface-var);line-height:1.5;margin-bottom:16px;}
+.lsp-opt{width:100%;display:flex;align-items:center;gap:14px;padding:14px 14px;margin-bottom:10px;border-radius:14px;border:1px solid var(--outline-var);background:var(--surface-low);cursor:pointer;font-family:var(--font);text-align:left;-webkit-tap-highlight-color:transparent;transition:background .15s,border-color .15s;}
+.lsp-opt:active{background:var(--surface-container);}
+.lsp-opt .material-icons-round:first-of-type{font-size:26px;color:var(--primary);flex-shrink:0;}
+.lsp-opt-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.lsp-opt-text strong{font-size:15px;font-weight:600;color:var(--on-surface);}
+.lsp-opt-text span{font-size:13px;color:var(--on-surface-var);line-height:1.35;}
+.lsp-opt .lsp-chev{color:var(--on-surface-var);font-size:22px;flex-shrink:0;opacity:.6;}
+.lsp-cancel{width:100%;margin-top:4px;padding:14px;border:none;background:transparent;font-family:var(--font);font-size:15px;font-weight:500;color:var(--on-surface-var);cursor:pointer;border-radius:12px;}
+.lsp-cancel:active{background:var(--surface-container);}
+.visually-hidden-file{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.prev-load-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--outline-var);}
+.prev-load-row:last-child{border-bottom:none;}
+.pl-body{min-width:0;flex:1;}
+.pl-date{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--on-surface-var);margin-bottom:6px;}
+.pl-route{font-size:15px;font-weight:600;color:var(--on-surface);line-height:1.3;}
+.pl-route .pl-arrow{color:var(--on-surface-var);font-weight:400;margin:0 4px;}
+.pl-meta{font-size:12px;color:var(--on-surface-var);margin-top:6px;line-height:1.45;font-family:var(--mono);letter-spacing:.02em;}
+.pl-meta span{color:var(--on-surface);}
+.pl-status{flex-shrink:0;font-size:11px;font-weight:700;color:var(--success);letter-spacing:.04em;text-transform:uppercase;margin-top:2px;}
+.session-time-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0 4px;text-align:center;}
+.session-time-cell{padding:12px 8px;background:var(--surface-container);border-radius:12px;border:1px solid var(--outline-var);}
+.stl-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--on-surface-var);margin-bottom:6px;}
+.stl-val{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--navy);}
 .list-item{display:flex;align-items:center;padding:12px 16px;min-height:56px;cursor:pointer;gap:0;}
 .li-lead{width:40px;height:40px;border-radius:50%;background:var(--primary-container);display:flex;align-items:center;justify-content:center;margin-right:16px;flex-shrink:0;}
 .li-lead .material-icons-round{font-size:20px;color:var(--on-primary-container);}
@@ -246,6 +263,9 @@ html.pwa-standalone .frame{
 .bol-mock .bm{font-size:5.5px;color:#666;margin-bottom:3px;}
 .bol-mock .bcols{display:grid;grid-template-columns:26mm 18mm 9mm 7mm;font-size:5.5px;font-weight:700;color:#555;border-bottom:1px solid #ccc;padding-bottom:2px;margin-bottom:2px;}
 .bol-mock .brow{display:grid;grid-template-columns:26mm 18mm 9mm 7mm;font-size:5.5px;padding:1px 0;border-bottom:1px dotted #ddd;}
+.scan-sheet-preview{display:none;width:min(310px,92vw);max-height:min(420px,62vh);object-fit:contain;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.5);position:relative;z-index:0;}
+#scanViewfinder.has-user-sheet .bol-mock{display:none;}
+#scanViewfinder.has-user-sheet .scan-sheet-preview{display:block;}
 .brow .bv{font-weight:600;color:#0B1726;}
 .brow .bl{color:#E8620A;font-weight:700;}
 .scan-frame{position:absolute;width:min(330px,94vw);aspect-ratio:330/210;height:auto;max-height:min(210px,42vh);top:50%;left:50%;transform:translate(-50%,-50%);}
@@ -327,29 +347,32 @@ html.pwa-standalone .frame{
 .btn-err{height:40px;padding:0 24px;border-radius:20px;background:var(--error-container);border:none;font-family:var(--font);font-size:14px;font-weight:500;color:var(--error);cursor:pointer;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-bottom:8px;}
 .btn-err .material-icons-round{font-size:18px;}
 
-/* ══ SCREEN 7: YARD MAP (Tesla-style) ═══ */
-.map-cont{position:relative;background:#12151a;overflow:hidden;}
-.map-cont-tesla{background:radial-gradient(ellipse 120% 80% at 50% 30%,#1e2633 0%,#0d0f14 55%,#080a0c 100%);}
-/* Yard: scroll map + sheet together; map was flex:1 and hid the bottom sheet */
+/* ══ SCREEN 7: YARD MAP (maps-style overlay) ═══ */
+.map-cont{position:relative;background:#e8e4df;overflow:hidden;}
+.map-style-gmaps{background:#e8e4df;}
 #s-map .yard-scroll{flex:1;min-height:0;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding-bottom:max(4px,env(safe-area-inset-bottom));}
-#s-map .map-cont{flex-shrink:0;height:clamp(228px,44vh,380px);min-height:210px;max-height:52vh;}
+#s-map .map-cont{flex-shrink:0;height:clamp(240px,46vh,400px);min-height:220px;max-height:54vh;}
 #s-map .map-tesla-svg{pointer-events:none;}
 #s-map .map-sheet{flex-shrink:0;}
-.map-tesla-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 80px rgba(0,0,0,.5);z-index:3;}
-.map-hud-top{position:absolute;top:0;left:0;right:0;z-index:4;padding:9px 12px 4px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.72);text-align:center;background:linear-gradient(to bottom,rgba(0,0,0,.72),rgba(0,0,0,.15));}
-.map-hud-sub{position:absolute;top:28px;left:0;right:0;z-index:4;padding:0 10px 8px;font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:.06em;color:rgba(255,255,255,.48);text-align:center;text-transform:uppercase;}
+.map-vignette-gm{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.35) 0%,transparent 28%,transparent 72%,rgba(255,255,255,.5) 100%);z-index:3;}
+.map-hud-top{position:absolute;top:10px;left:10px;right:10px;z-index:5;padding:8px 12px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;color:#3c4043;text-align:center;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-radius:20px;box-shadow:0 1px 3px rgba(60,64,67,.2);}
 .map-tesla-svg{position:absolute;inset:0;width:100%;height:100%;z-index:1;}
-.map-car-icon{fill:#3d4a5c;stroke:#5c6b82;stroke-width:0.6;}
-.map-car-glass{fill:#8fa3bc;opacity:.85;}
-.stall-base{fill:rgba(30,38,50,.9);stroke:rgba(90,104,128,.5);stroke-width:1;}
-.stall-hot{fill:rgba(232,98,10,.12);stroke:rgba(232,98,10,.85);stroke-width:1.2;filter:drop-shadow(0 0 6px rgba(232,98,10,.35));}
-.stall-done{fill:rgba(29,158,117,.15);stroke:rgba(74,222,128,.5);stroke-width:1;}
-.road-surface{fill:#252d3a;stroke:#3a4558;stroke-width:1;}
-.route-glow{stroke:#5eead4;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;opacity:.22;fill:none;filter:blur(1px);}
-.route-line{stroke:#FF9A5C;stroke-width:3.6;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:1;filter:drop-shadow(0 0 4px rgba(232,98,10,.55));}
-.next-pull-ring{fill:none;stroke:#ffb38a;stroke-width:2.2;animation:npulse 2.2s ease-in-out infinite;}
-@keyframes npulse{0%,100%{stroke-opacity:.55;opacity:.9}50%{stroke-opacity:1;opacity:1}}
-.rig-marker{fill:#E8620A;filter:drop-shadow(0 0 8px rgba(232,98,10,.8));}
+.ym-road{fill:#fff;stroke:#dadce0;stroke-width:1;}
+.ym-lot{fill:#d3d1cb;opacity:.85;}
+.map-car-icon{fill:#5f6368;stroke:#3c4043;stroke-width:0.35;}
+.map-car-glass{fill:#9aa0a6;opacity:.9;}
+.stall-base{fill:#f1f3f4;stroke:#dadce0;stroke-width:1;}
+.stall-hot{fill:#e8f0fe;stroke:#1a73e8;stroke-width:1.25;}
+.stall-done{fill:#e6f4ea;stroke:#1e8e3e;stroke-width:1;}
+.road-surface{fill:#fff;stroke:#dadce0;stroke-width:1;}
+.route-glow{stroke:#fff;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;opacity:.95;fill:none;}
+.route-line{stroke:#1a73e8;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;fill:none;}
+.next-pull-ring{fill:#fff;stroke:#1a73e8;stroke-width:1.5;filter:drop-shadow(0 1px 2px rgba(60,64,67,.25));}
+@keyframes npulse{0%,100%{stroke-opacity:.75}50%{stroke-opacity:1}}
+.rig-marker{fill:#1a73e8;stroke:#fff;stroke-width:2;}
+.ym-row-lbl{fill:#70757a;font-family:Roboto Mono,monospace;font-size:7px;font-weight:700;}
+.ym-stall-id{fill:#5f6368;font-family:Roboto Mono,monospace;font-size:5.5px;font-weight:700;}
+.ym-next-pill{fill:#1a73e8;font-family:Roboto Mono,monospace;font-size:6px;font-weight:700;}
 /* legacy asphalt (unused if Tesla SVG present) */
 .asphalt{position:absolute;inset:0;background:transparent;pointer-events:none;}
 /* painted rows */
@@ -383,15 +406,39 @@ html.pwa-standalone .frame{
 .yh-ring{width:20px;height:20px;border-radius:50%;background:rgba(232,98,10,.3);border:2px solid var(--primary);animation:yh 2s ease-in-out infinite;}
 @keyframes yh{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.5}}
 .yh-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:8px;height:8px;border-radius:50%;background:var(--primary);}
-/* bottom sheet */
+/* bottom sheet — yard: scannable, CTA is only strong orange */
+#s-map .map-sheet{background:#fafafa;border-radius:20px 20px 0 0;padding:0 0 max(12px,env(safe-area-inset-bottom));flex-shrink:0;box-shadow:0 -4px 24px rgba(60,64,67,.12);}
+#s-map .sheet-handle{width:36px;height:4px;background:#dadce0;border-radius:2px;margin:10px auto 12px;}
+.yard-pull-card{margin:0 16px 10px;background:#fff;border:1px solid #dadce0;border-radius:16px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 1px 2px rgba(60,64,67,.08);}
+.yard-pull-card::before{content:'';width:4px;align-self:stretch;min-height:48px;background:var(--navy);border-radius:3px;flex-shrink:0;}
+.yard-pull-main{flex:1;min-width:0;}
+.yard-pull-kicker{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5f6368;margin-bottom:4px;}
+.yard-pull-title{font-size:16px;font-weight:600;color:var(--on-surface);line-height:1.25;letter-spacing:-.01em;}
+.yard-meta-row{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;padding-top:10px;border-top:1px solid #f1f3f4;}
+.yard-meta-item{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:#5f6368;line-height:1.35;}
+.yard-meta-item .material-icons-round{font-size:16px;color:#1a73e8;margin-top:1px;flex-shrink:0;}
+.yard-meta-item strong{color:#3c4043;font-weight:600;}
+.yard-seq-badge{flex-shrink:0;width:40px;height:40px;border-radius:12px;background:#f1f3f4;border:1px solid #dadce0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:700;color:var(--navy);}
+.yard-next-strip{margin:0 16px 12px;padding:10px 12px;background:#f8f9fa;border:1px solid #e8eaed;border-radius:12px;display:flex;gap:10px;align-items:flex-start;flex-shrink:0;}
+.yard-next-strip .yn-ic{color:#5f6368;margin-top:2px;}
+.yard-next-strip .yn-lbl{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#80868b;margin-bottom:2px;}
+.yard-next-strip .yn-title{font-size:13px;font-weight:500;color:#3c4043;line-height:1.3;}
+.yard-next-strip .yn-hint{font-size:11px;color:#5f6368;margin-top:4px;line-height:1.35;}
+#s-map .stop-q{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;}
+#s-map .stop-q::-webkit-scrollbar{display:none;}
+#s-map .sq-chip{flex-shrink:0;background:#fff;border-radius:10px;padding:8px 10px;min-width:64px;border:1px solid #e8eaed;box-shadow:0 1px 1px rgba(60,64,67,.06);}
+#s-map .sq-chip.active{border-color:#1a73e8;box-shadow:0 0 0 1px #1a73e8;background:#e8f0fe;}
+#s-map .sq-chip.done{opacity:.55;border-color:#e8eaed;}
+#s-map .sqn{font-family:var(--mono);font-size:11px;font-weight:700;color:#1a73e8;}
+#s-map .sq-chip.done .sqn{color:#1e8e3e;}
+#s-map .sql{font-family:var(--mono);font-size:9px;color:#5f6368;}
+#s-map .sqv{font-size:8.5px;color:#80868b;}
+#s-map .map-load-cta{padding:4px 16px 8px;}
+#s-map .btn-yard-primary{display:flex;width:100%;justify-content:center;min-height:52px;border-radius:14px;font-size:15px;font-weight:600;flex-direction:column;gap:4px;padding:12px 16px;height:auto;background:var(--primary);color:#fff;border:none;box-shadow:0 2px 8px rgba(232,98,10,.35);}
+#s-map .btn-yard-primary .btn-yard-sub{font-size:12px;font-weight:500;opacity:.92;line-height:1.3;}
+.yard-foot-hint{padding:4px 20px 0;text-align:center;font-size:11px;color:#80868b;line-height:1.4;}
 .map-sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:0 0 max(16px,env(safe-area-inset-bottom));flex-shrink:0;box-shadow:0 -2px 10px rgba(0,0,0,.1);}
 .sheet-handle{width:32px;height:4px;background:var(--outline-var);border-radius:2px;margin:12px auto 14px;}
-.next-stop{margin:0 16px 12px;background:var(--primary);border-radius:12px;padding:13px 16px;display:flex;align-items:center;gap:12px;}
-.ns-num{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
-.ns-info{flex:1;}
-.ns-lbl{font-size:10px;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.08em;}
-.ns-name{font-size:15px;font-weight:600;color:#fff;margin-top:2px;}
-.ns-dist{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.65);margin-top:1px;}
 .stop-q{display:flex;gap:7px;padding:0 16px;overflow-x:auto;}
 .stop-q::-webkit-scrollbar{display:none;}
 .sq-chip{flex-shrink:0;background:var(--surface-container);border-radius:8px;padding:7px 10px;min-width:66px;border:1.5px solid transparent;}
@@ -460,33 +507,10 @@ html.pwa-standalone .frame{
 .ac-text strong{color:#fff;font-weight:500;}
 
 /* ── SCAN: capture confirmation ───────── */
-#s-scan{position:relative;}
 #s-scan .viewfinder{cursor:default;}
-.scan-sheet-preview{position:absolute;inset:max(10px,2vw);width:auto;height:auto;max-width:calc(100% - 20px);max-height:calc(100% - 20px);margin:auto;object-fit:cover;border-radius:14px;box-shadow:0 12px 48px rgba(0,0,0,.55);z-index:2;display:none;}
-#s-scan.has-preview .bol-mock{opacity:.22;transition:opacity .35s ease;}
-#s-scan.has-preview .scan-frame{z-index:3;}
-#s-scan.has-preview .scan-line,#s-scan.scan-state-analyzing .scan-line{animation:none;opacity:.35;}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
-.scan-phase-pick{padding:0 4px 4px;}
-.scan-pick-hint{font-size:17px;font-weight:600;color:#fff;margin-bottom:6px;letter-spacing:-.02em;}
-.scan-pick-sub{font-size:12px;color:rgba(255,255,255,.5);line-height:1.45;margin-bottom:18px;max-width:340px;margin-left:auto;margin-right:auto;}
-.scan-actions-row{display:flex;flex-direction:column;gap:10px;max-width:400px;margin:0 auto;}
-.btn-scan-primary,.btn-scan-secondary{width:100%;min-height:52px;border-radius:14px;font-family:var(--font);font-size:15px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;border:none;transition:transform .12s ease,opacity .2s;}
-.btn-scan-primary{background:linear-gradient(180deg,#ff8c38 0%,var(--primary) 100%);color:#fff;box-shadow:0 4px 20px rgba(232,98,10,.45);}
-.btn-scan-primary:active{transform:scale(.98);}
-.btn-scan-secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.22);}
-.btn-scan-secondary:active{transform:scale(.98);}
-.scan-analyzing-overlay{display:none;position:absolute;inset:0;z-index:30;background:rgba(5,8,12,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px;flex-direction:column;}
-#s-scan.scan-state-analyzing .scan-analyzing-overlay{display:flex;}
-.scan-analyze-card{text-align:center;max-width:300px;}
-.scan-analyze-ring{width:52px;height:52px;margin:0 auto 20px;border-radius:50%;border:3px solid rgba(232,98,10,.25);border-top-color:var(--primary);animation:scanSpin .85s linear infinite;}
-@keyframes scanSpin{to{transform:rotate(360deg)}}
-.scan-analyze-title{font-size:18px;font-weight:600;color:#fff;margin-bottom:8px;letter-spacing:-.02em;}
-.scan-analyze-sub{font-size:13px;color:rgba(255,255,255,.5);line-height:1.45;}
 .scan-phase-done{display:none;}
-#s-scan.sheet-ready .scan-phase-pick{display:none;}
+#s-scan.sheet-ready .scan-phase-scan{display:none;}
 #s-scan.sheet-ready .scan-phase-done{display:block;}
-.scan-phase-done{padding-top:4px;}
 .scan-done-card{background:rgba(29,107,62,.25);border:1px solid rgba(74,222,128,.45);border-radius:16px;padding:16px 18px;margin-bottom:12px;text-align:left;}
 .scan-done-title{font-size:15px;font-weight:600;color:#fff;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
 .scan-done-title .material-icons-round{color:#4ADE80;font-size:20px;}
@@ -552,17 +576,25 @@ html.pwa-standalone .frame{
 .adj-ack-row input{margin-top:2px;}
 .delivery-disclaimer{margin:8px 16px 0;padding:12px 14px;background:var(--surface-container);border-radius:12px;font-size:12px;line-height:1.45;color:var(--on-surface-var);border-left:3px solid var(--primary);}
 .delivery-disclaimer strong{color:var(--on-surface);}
-.session-end-banner{margin:8px 16px 0;padding:14px;background:linear-gradient(135deg,var(--navy) 0%,#1a3040 100%);border-radius:14px;color:#fff;text-align:center;}
-.session-end-banner .big{font-family:var(--display);font-size:28px;font-weight:500;color:#4ADE80;}
-.session-end-banner .sub{font-size:13px;opacity:.75;margin-top:6px;line-height:1.4;}
+.session-end-overlay{position:absolute;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:20px 16px;background:rgba(32,33,36,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.session-end-panel{position:relative;width:100%;max-width:340px;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:20px 18px 18px;text-align:center;}
+.session-end-x{position:absolute;top:10px;right:10px;width:40px;height:40px;border:none;border-radius:50%;background:var(--surface-container);color:var(--on-surface);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.session-end-x .material-icons-round{font-size:22px;}
+.session-end-banner{margin:0;padding:0;background:transparent;border-radius:0;color:var(--on-surface);text-align:center;}
+.session-end-banner .sub{font-size:13px;color:var(--on-surface-var);margin-top:8px;line-height:1.45;}
+.session-end-banner .session-hdr{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--on-surface-var);margin-bottom:4px;}
 
 /* ── YARD LOADING MAP ─────────────────── */
-.map-inline-tip{position:absolute;top:52px;left:8px;right:8px;z-index:5;max-height:40%;overflow-y:auto;padding:8px 10px;background:rgba(5,8,12,.82);border:1px solid rgba(232,98,10,.45);border-radius:12px;font-size:11px;line-height:1.4;color:rgba(255,255,255,.93);box-shadow:0 4px 16px rgba(0,0,0,.4);-webkit-overflow-scrolling:touch;}
-.map-inline-tip .mit-k{font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.12em;color:#ffc49c;text-transform:uppercase;margin-bottom:3px;}
-.map-inline-tip ul{margin:4px 0 0 16px;padding:0;color:rgba(255,255,255,.78);font-size:10px;line-height:1.35;}
-.map-inline-tip li{margin:1px 0;}
-.map-legend-bar{position:absolute;bottom:10px;left:10px;right:10px;display:flex;justify-content:center;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:8px 12px;z-index:6;pointer-events:none;background:rgba(6,8,12,.82);backdrop-filter:blur(8px);border-radius:10px;border:1px solid rgba(255,255,255,.08);}
-.map-legend-bar span{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.04em;}
+#s-map .map-inline-tip{position:absolute;top:46px;left:8px;right:auto;z-index:5;width:auto;max-width:calc(100% - 16px);margin:0;padding:0;background:transparent;border:none;box-shadow:none;}
+#s-map .map-inline-tip summary{display:flex;align-items:center;gap:5px;list-style:none;cursor:pointer;font-size:11px;font-weight:600;color:#3c4043;padding:6px 12px 6px 10px;background:rgba(255,255,255,.96);border:1px solid #dadce0;border-radius:20px;box-shadow:0 1px 3px rgba(60,64,67,.12);-webkit-tap-highlight-color:transparent;}
+#s-map .map-inline-tip summary::-webkit-details-marker{display:none;}
+#s-map .map-inline-tip summary .material-icons-round{font-size:16px;color:#1a73e8;}
+#s-map .map-tip-body{margin-top:8px;max-width:min(288px,calc(100vw - 40px));max-height:min(168px,26vh);overflow-y:auto;padding:10px 12px;background:rgba(255,255,255,.97);border:1px solid #dadce0;border-radius:12px;font-size:11px;line-height:1.4;color:#5f6368;box-shadow:0 2px 10px rgba(60,64,67,.1);-webkit-overflow-scrolling:touch;}
+#s-map .map-tip-body .mit-lede{margin:0 0 8px;color:#202124;font-size:11px;line-height:1.35;}
+#s-map .map-tip-body ul{margin:0;padding:0 0 0 14px;}
+#s-map .map-tip-body li{margin:4px 0;}
+#s-map .map-legend-bar{position:absolute;bottom:8px;left:8px;right:8px;display:flex;justify-content:center;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:6px 10px;z-index:6;pointer-events:none;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border-radius:20px;border:1px solid #dadce0;box-shadow:0 1px 2px rgba(60,64,67,.1);}
+#s-map .map-legend-bar span{font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:.03em;color:#5f6368;}
 .map-rig-tag{position:absolute;z-index:26;transform:translate(-50%,-100%);background:var(--navy);color:#fff;font-family:var(--mono);font-size:8px;font-weight:700;padding:4px 8px;border-radius:6px;box-shadow:var(--e2);white-space:nowrap;}
 .map-rig-tag::after{content:'';position:absolute;left:50%;bottom:-5px;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);}
 .spot{box-shadow:inset 0 0 0 1px rgba(0,0,0,.2);}
@@ -572,15 +604,8 @@ html.pwa-standalone .frame{
 .sq-chip.loaded{opacity:.55;border-color:var(--success)!important;background:rgba(183,240,207,.4)!important;}
 .sq-chip.loaded .sqn{color:var(--success)!important;}
 .map-load-cta{padding:12px 16px 0;}
-.btn-load-next{width:100%;justify-content:center;min-height:52px;border-radius:12px;font-size:15px;flex-direction:column;align-items:center;gap:4px;padding:12px 14px;height:auto;}
-.btn-yard-sub{display:block;font-size:12px;font-weight:500;opacity:.88;line-height:1.3;max-width:280px;}
+.btn-load-next{width:100%;justify-content:center;height:46px;border-radius:12px;font-size:15px;}
 .ns-walk{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.85);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;}
-.yard-leg-meta{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.55);margin-top:6px;line-height:1.35;}
-.yard-up-next{margin:0 16px 12px;padding:12px 14px;background:var(--surface-container);border-radius:12px;border:1px solid var(--outline-var);}
-.yun-lbl{font-size:9px;font-weight:700;color:var(--on-surface-var);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
-.yun-name{font-size:14px;font-weight:600;color:var(--on-surface);line-height:1.25;}
-.yun-hint{font-size:11px;color:var(--primary);margin-top:4px;line-height:1.35;}
-.yun-empty{font-size:12px;color:var(--on-surface-var);line-height:1.4;}
 </style>
 </head>
 <body>
@@ -686,13 +711,14 @@ html.pwa-standalone .frame{
       <div class="g-stats">
         <div class="g-stat"><div class="n">7</div><div class="l">Loads this week</div></div>
         <div class="g-stat"><div class="n">63</div><div class="l">Vehicles moved</div></div>
-        <div class="g-stat"><div class="n">100%</div><div class="l">DOT compliant</div></div>
+        <div class="g-stat"><div class="n">~52 min</div><div class="l">Avg load time (rolling)</div></div>
+        <div class="g-stat"><div class="n">1.1</div><div class="l">Avg dealer stops / run</div></div>
       </div>
     </div>
 
-    <div class="scan-action" onclick="goTo('s-scan')">
-      <div class="scan-icon"><span class="material-icons-round">document_scanner</span></div>
-      <div class="scan-text"><div class="t">Capture load sheet</div><div class="s">Camera or upload · Cottrell CX-09LS</div></div>
+    <div class="scan-action" id="btnOpenLoadSheetPicker" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="loadSheetPicker">
+      <div class="scan-icon"><span class="material-icons-round">post_add</span></div>
+      <div class="scan-text"><div class="t">Add load sheet</div><div class="s">Snap or upload your BOL — we read VINs and prep your optimized pull · Cottrell CX-09LS</div></div>
       <span class="material-icons-round" style="color:#fff;font-size:20px;">arrow_forward</span>
     </div>
 
@@ -723,6 +749,29 @@ html.pwa-standalone .frame{
     <div class="nav-item"><div class="nav-ind"><span class="material-icons-round">map</span></div><span class="nav-lbl">Yards</span></div>
     <div class="nav-item"><div class="nav-ind"><span class="material-icons-round">person</span></div><span class="nav-lbl">Profile</span></div>
   </div>
+
+  <input type="file" id="inputLoadSheetCamera" class="visually-hidden-file" accept="image/*" capture="environment" aria-hidden="true">
+  <input type="file" id="inputLoadSheetUpload" class="visually-hidden-file" accept="image/*" aria-hidden="true">
+
+  <div id="loadSheetPicker" class="load-sheet-picker" aria-hidden="true">
+    <div class="load-sheet-picker-backdrop" id="loadSheetPickerBackdrop" aria-hidden="true"></div>
+    <div class="load-sheet-picker-panel" role="dialog" aria-modal="true" aria-labelledby="loadSheetPickerTitle">
+      <div class="lsp-kicker">Optimize your run</div>
+      <div class="lsp-title" id="loadSheetPickerTitle">Add your load sheet</div>
+      <p class="lsp-desc">Choose how to bring in your BOL. We use it to read VINs and build your yard pull order — same rig, smarter sequence.</p>
+      <button type="button" class="lsp-opt" id="btnPickLoadSheetCamera">
+        <span class="material-icons-round">photo_camera</span>
+        <span class="lsp-opt-text"><strong>Take photo</strong><span>Open the camera and photograph the sheet</span></span>
+        <span class="material-icons-round lsp-chev">chevron_right</span>
+      </button>
+      <button type="button" class="lsp-opt" id="btnPickLoadSheetUpload">
+        <span class="material-icons-round">add_photo_alternate</span>
+        <span class="lsp-opt-text"><strong>Upload image</strong><span>Pick a photo or file from your library</span></span>
+        <span class="material-icons-round lsp-chev">chevron_right</span>
+      </button>
+      <button type="button" class="lsp-cancel" id="btnLoadSheetPickerCancel">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════ -->
@@ -731,10 +780,10 @@ html.pwa-standalone .frame{
 <div class="screen" id="s-scan" style="background:#000;">
   <div class="scan-toolbar">
     <button class="icon-btn" onclick="goBack('s-home')" style="color:#fff;"><span class="material-icons-round">arrow_back</span></button>
-    <span class="scan-title">Capture BOL</span>
+    <span class="scan-title">Load sheet</span>
   </div>
   <div class="viewfinder" id="scanViewfinder">
-    <img class="scan-sheet-preview" id="scanSheetPreview" alt="Selected load sheet preview" />
+    <img id="scanSheetPreview" class="scan-sheet-preview" alt="">
     <div class="bol-mock">
       <div class="bh">MASTER UNIFORM STRAIGHT BILL OF LADING — UNITED ROAD</div>
       <div class="bm">CARRIER: United Road · ORIGIN: BNSF ORILLIA – RENTON WA · LOAD: 041625-09</div>
@@ -755,36 +804,22 @@ html.pwa-standalone .frame{
       <div class="scan-line"></div>
     </div>
   </div>
-  <input type="file" id="inputScanCamera" class="sr-only" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true" />
-  <input type="file" id="inputScanUpload" class="sr-only" accept="image/*" tabindex="-1" aria-hidden="true" />
   <div class="scan-bottom" id="scanBottom">
-    <div class="scan-phase-pick" id="scanPhasePick">
-      <div class="scan-pick-hint">Add your load sheet</div>
-      <div class="scan-pick-sub">Use the camera or a saved photo. For this pilot, processing runs locally — the decoded list below is a fixed demo.</div>
-      <div class="scan-actions-row">
-        <button type="button" class="btn-scan-primary" id="btnTakePhoto">
-          <span class="material-icons-round">photo_camera</span>
-          Take Photo
-        </button>
-        <button type="button" class="btn-scan-secondary" id="btnUploadImage">
-          <span class="material-icons-round">upload_file</span>
-          Upload Image
-        </button>
-      </div>
+    <div class="scan-phase-scan" id="scanPhaseScan">
+      <div class="scan-status" id="scanStatusLine">Detecting VINs...</div>
+      <div class="scan-sub" id="scanPhaseSub">Reading VINs from your sheet…</div>
+      <div class="vin-chip"><span class="material-icons-round">check_circle</span>4T1G11AK8PU123481</div>
+      <div class="vin-chip" style="animation-delay:.15s"><span class="material-icons-round">check_circle</span>2T3P1RFV8PW847263</div>
+      <div class="vin-chip" style="animation-delay:.3s"><span class="material-icons-round">check_circle</span>3TMLB5JN3SM178449</div>
+      <div class="vin-chip" style="animation-delay:.45s"><span class="material-icons-round">check_circle</span>5TDHZRBH9MS523875</div>
+      <div class="vin-chip" style="animation-delay:.6s"><span class="material-icons-round">check_circle</span>4T1DAACK6SU566558</div>
     </div>
     <div class="scan-phase-done" id="scanPhaseDone">
       <div class="scan-done-card">
-        <div class="scan-done-title"><span class="material-icons-round">verified</span>Load sheet ready</div>
-        <div class="scan-done-body">VINs and lane tags are staged for review. Next screen matches our pilot dataset — swap in live OCR when you wire the backend.</div>
+        <div class="scan-done-title"><span class="material-icons-round">verified</span><span id="scanDoneTitleLbl">Sheet captured</span></div>
+        <div class="scan-done-body" id="scanDoneBody">We read the VINs on your sheet. Review them next, or go back and add a clearer photo if something looks off.</div>
       </div>
       <button type="button" class="btn-fill btn-scan-accept" id="btnScanAccept"><span class="material-icons-round">arrow_forward</span>Accept &amp; review vehicles</button>
-    </div>
-  </div>
-  <div class="scan-analyzing-overlay" id="scanAnalyzingOverlay" aria-live="polite">
-    <div class="scan-analyze-card">
-      <div class="scan-analyze-ring" role="status"></div>
-      <p class="scan-analyze-title">Analyzing load sheet…</p>
-      <p class="scan-analyze-sub">Matching VIN rows and yard tags · demo extraction (fixed sample output)</p>
     </div>
   </div>
 </div>
@@ -806,7 +841,7 @@ html.pwa-standalone .frame{
       <div>
         <div class="dt">Vehicles detected</div>
         <div class="ds">BNSF Orillia · Load 041625-09</div>
-        <div style="margin-top:6px;"><span class="badge badge-ok"><span class="material-icons-round" style="font-size:12px;">document_scanner</span>Sheet processed — verify each VIN</span></div>
+        <div style="margin-top:6px;"><span class="badge badge-ok"><span class="material-icons-round" style="font-size:12px;">document_scanner</span>Scan complete — verify each VIN</span></div>
       </div>
     </div>
     <div class="decode-hint">Accept each VIN if it matches the metal, or edit before optimizing. MONTAR will only build a load plan from accepted rows.</div>
@@ -972,7 +1007,7 @@ html.pwa-standalone .frame{
         <input type="radio" name="adjSlot1" value="highlander" />
         <span class="adj-opt-lbl">Move Highlander XLE into Slot 1 <small>Requires review — conflicts with deck height</small></span>
       </label>
-      <textarea class="adj-note" id="adjDriverNote" placeholder="Driver note (optional): e.g. dealer staging, strap / crossbar preference…"></textarea>
+      <textarea class="adj-note" id="adjDriverNote" placeholder="Driver note (optional): e.g. dealer staging request, chain placement…"></textarea>
       <div class="adj-actions">
         <button type="button" class="btn-outline btn-adj-check" id="btnAdjCheck"><span class="material-icons-round" style="font-size:18px;">fact_check</span>Apply &amp; recheck feasibility</button>
       </div>
@@ -1001,116 +1036,104 @@ html.pwa-standalone .frame{
     </div>
   </div>
   <div class="yard-scroll">
-  <div class="map-cont map-cont-tesla">
-    <div class="map-tesla-vignette"></div>
-    <div class="map-hud-top">BNSF ORILLIA · RENTON WA · YARD PULL MAP</div>
-    <div class="map-hud-sub" id="yardHudSub">Optimized pull order · 2 rows · minimal backtrack</div>
-    <div class="map-inline-tip" aria-hidden="true">
-      <div class="mit-k">How to read this</div>
-      <strong style="color:#fff;font-weight:600;font-size:12px;">Rig &rarr; bay · this leg only</strong>
-      <ul>
-        <li><strong style="color:#FF9A5C;">Orange path</strong> — shortest aisle route from your rig to the <em>current</em> stall (sequence minimizes zig-zags).</li>
-        <li><strong style="color:#ffb38a;">Orange stalls</strong> — this load. Order is Row T-A west&rarr;east, then Row T-C — fewer steps than row-hopping.</li>
-        <li><strong style="color:#9bb0cc;">Car icons</strong> — units still in the bay. Bottom dot = your rig position.</li>
-      </ul>
-    </div>
+  <div class="map-cont map-style-gmaps">
+    <div class="map-vignette-gm"></div>
+    <div class="map-hud-top">BNSF Orillia · Renton · Yard map</div>
+    <details class="map-inline-tip">
+      <summary><span class="material-icons-round">info_outline</span>Map key</summary>
+      <div class="map-tip-body">
+        <p class="mit-lede"><strong style="color:#202124;">This leg only.</strong> The blue line updates when you confirm each pull.</p>
+        <ul>
+          <li><strong style="color:#1a73e8;">Path</strong> — walk from your rig to the active stall.</li>
+          <li><strong style="color:#1a73e8;">Blue stalls</strong> — this load. Gray — other / empty.</li>
+          <li><strong style="color:#5f6368;">Shapes</strong> — vehicles; bottom dot — your rig.</li>
+        </ul>
+      </div>
+    </details>
     <svg class="map-tesla-svg" viewBox="0 0 393 330" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-label="Yard map">
       <defs>
-        <pattern id="teslaGrid" width="18" height="18" patternUnits="userSpaceOnUse">
-          <path d="M18 0H0V18" fill="none" stroke="#7a8aa8" stroke-opacity=".07"/>
+        <pattern id="ymGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M20 0H0V20" fill="none" stroke="#c4c7c5" stroke-opacity=".25" stroke-width="0.5"/>
         </pattern>
-        <linearGradient id="mapGround" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#1e2635"/><stop offset="1" stop-color="#0c0f14"/>
-        </linearGradient>
-        <filter id="routeGlow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <marker id="arrT" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#ffb38a"/></marker>
+        <marker id="arrGm" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#1a73e8"/></marker>
       </defs>
-      <rect width="393" height="330" fill="url(#mapGround)"/>
-      <rect width="393" height="330" fill="url(#teslaGrid)"/>
-      <!-- Drive aisles -->
-      <rect x="0" y="48" width="393" height="24" class="road-surface" rx="3"/>
-      <rect x="0" y="134" width="393" height="22" class="road-surface" rx="3"/>
-      <rect x="0" y="220" width="393" height="22" class="road-surface" rx="3"/>
-      <rect x="184" y="24" width="26" height="306" class="road-surface" rx="3"/>
-      <line x1="0" y1="60" x2="393" y2="60" stroke="#1a2029" stroke-width="1" stroke-dasharray="4 6" opacity=".5"/>
-      <line x1="0" y1="145" x2="393" y2="145" stroke="#1a2029" stroke-width="1" stroke-dasharray="4 6" opacity=".5"/>
-      <!-- Row labels -->
-      <text x="12" y="42" fill="rgba(255,255,255,.35)" font-family="Roboto Mono,monospace" font-size="8" font-weight="700">ROW T-A</text>
-      <text x="12" y="128" fill="rgba(255,255,255,.35)" font-family="Roboto Mono,monospace" font-size="8" font-weight="700">ROW T-B</text>
-      <text x="12" y="214" fill="rgba(255,255,255,.35)" font-family="Roboto Mono,monospace" font-size="8" font-weight="700">ROW T-C</text>
-      <text x="12" y="298" fill="rgba(255,255,255,.35)" font-family="Roboto Mono,monospace" font-size="8" font-weight="700">ROW T-D</text>
-      <!-- Stalls row A -->
+      <rect width="393" height="330" fill="#e8e4df"/>
+      <rect width="393" height="330" fill="url(#ymGrid)" opacity=".45"/>
+      <rect x="0" y="72" width="393" height="86" class="ym-lot" rx="2"/>
+      <rect x="0" y="168" width="393" height="86" class="ym-lot" rx="2"/>
+      <rect x="0" y="48" width="393" height="24" class="ym-road" rx="3"/>
+      <rect x="0" y="134" width="393" height="22" class="ym-road" rx="3"/>
+      <rect x="0" y="220" width="393" height="22" class="ym-road" rx="3"/>
+      <rect x="184" y="24" width="26" height="306" class="ym-road" rx="3"/>
+      <text x="10" y="42" class="ym-row-lbl">ROW T-A</text>
+      <text x="10" y="128" class="ym-row-lbl">ROW T-B</text>
+      <text x="10" y="214" class="ym-row-lbl">ROW T-C</text>
+      <text x="10" y="298" class="ym-row-lbl">ROW T-D</text>
       <rect x="8" y="26" width="28" height="18" rx="3" class="stall-base"/><rect x="40" y="26" width="28" height="18" rx="3" class="stall-base"/>
       <rect x="72" y="26" width="28" height="18" rx="3" class="stall-hot"/><rect x="104" y="26" width="28" height="18" rx="3" class="stall-hot"/>
       <rect x="136" y="26" width="28" height="18" rx="3" class="stall-hot"/><rect x="168" y="26" width="28" height="18" rx="3" class="stall-hot"/>
       <rect x="212" y="26" width="28" height="18" rx="3" class="stall-base"/><rect x="244" y="26" width="28" height="18" rx="3" class="stall-base"/>
       <rect x="276" y="26" width="28" height="18" rx="3" class="stall-hot"/><rect x="308" y="26" width="28" height="18" rx="3" class="stall-hot"/>
       <rect x="340" y="26" width="28" height="18" rx="3" class="stall-base"/>
-      <!-- Cars in stalls (top-down) -->
-      <g transform="translate(76,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
-      <g transform="translate(108,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
-      <g transform="translate(140,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
-      <g transform="translate(172,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
-      <g transform="translate(280,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
-      <g transform="translate(312,29)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
-      <text x="78" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T042</text>
-      <text x="110" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T043</text>
-      <text x="142" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T044</text>
-      <text x="174" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T045</text>
-      <text x="282" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T048</text>
-      <text x="314" y="24" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T049</text>
-      <g id="yardNextPullGroup" transform="translate(0,0)">
-        <text x="86" y="19" text-anchor="middle" fill="#ffc49c" font-family="Roboto Mono,monospace" font-size="7" font-weight="700">NEXT PULL</text>
-        <rect x="69" y="23" width="34" height="24" rx="5" class="next-pull-ring"/>
-      </g>
-      <!-- Row B empty stalls -->
+      <g transform="translate(76,29)"><rect width="20" height="11" rx="2.5" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(108,29)"><rect width="20" height="11" rx="2.5" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(140,29)"><rect width="20" height="11" rx="2.5" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(172,29)"><rect width="20" height="11" rx="2.5" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(280,29)"><rect width="20" height="11" rx="2.5" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(312,29)"><rect width="20" height="11" rx="2.5" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <text x="78" y="24" class="ym-stall-id">T042</text>
+      <text x="110" y="24" class="ym-stall-id">T043</text>
+      <text x="142" y="24" class="ym-stall-id">T044</text>
+      <text x="174" y="24" class="ym-stall-id">T045</text>
+      <text x="282" y="24" class="ym-stall-id">T048</text>
+      <text x="314" y="24" class="ym-stall-id">T049</text>
       <rect x="8" y="112" width="28" height="18" rx="3" class="stall-base"/><rect x="40" y="112" width="28" height="18" rx="3" class="stall-base"/>
       <rect x="72" y="112" width="28" height="18" rx="3" class="stall-base"/><rect x="104" y="112" width="28" height="18" rx="3" class="stall-base"/>
-      <!-- Row C -->
       <rect x="8" y="198" width="28" height="18" rx="3" class="stall-base"/><rect x="40" y="198" width="28" height="18" rx="3" class="stall-base"/>
       <rect x="72" y="198" width="28" height="18" rx="3" class="stall-hot"/><rect x="104" y="198" width="28" height="18" rx="3" class="stall-hot"/>
       <rect x="212" y="198" width="28" height="18" rx="3" class="stall-hot"/>
-      <g transform="translate(76,201)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
-      <g transform="translate(108,201)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
-      <g transform="translate(216,201)"><rect width="20" height="11" rx="2" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
-      <text x="78" y="196" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T071</text>
-      <text x="110" y="196" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T072</text>
-      <text x="218" y="196" fill="rgba(255,255,255,.4)" font-family="Roboto Mono,monospace" font-size="6" font-weight="700">T073</text>
-      <!-- Row D -->
+      <g transform="translate(76,201)"><rect width="20" height="11" rx="2.5" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(108,201)"><rect width="20" height="11" rx="2.5" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <g transform="translate(216,201)"><rect width="20" height="11" rx="2.5" class="map-car-icon"/><rect x="5" y="2" width="10" height="4" rx="1" class="map-car-glass"/></g>
+      <text x="78" y="196" class="ym-stall-id">T071</text>
+      <text x="110" y="196" class="ym-stall-id">T072</text>
+      <text x="218" y="196" class="ym-stall-id">T073</text>
       <rect x="8" y="284" width="28" height="18" rx="3" class="stall-base"/><rect x="40" y="284" width="28" height="18" rx="3" class="stall-base"/>
-      <!-- Active leg: rig → current bay (updated per stop; sequenced to reduce backtrack) -->
       <g id="yardRoutePaths">
-        <path id="yardRouteGlow" class="route-glow" filter="url(#routeGlow)" d="" />
-        <path id="yardRouteLine" class="route-line" marker-end="url(#arrT)" d="" />
+        <path id="yardRouteGlow" class="route-glow" d="" />
+        <path id="yardRouteLine" class="route-line" marker-end="url(#arrGm)" d="" />
       </g>
-      <!-- Rig + heading -->
-      <circle cx="30" cy="318" r="7" class="rig-marker"/>
-      <text x="42" y="314" fill="#ffb38a" font-family="Roboto Mono,monospace" font-size="9" font-weight="700">YOUR RIG</text>
-      <text x="42" y="325" fill="rgba(255,255,255,.45)" font-family="Roboto Mono,monospace" font-size="7">Entry lane · face north</text>
+      <g id="yardNextPullGroup" transform="translate(0,0)">
+        <rect x="66" y="15" width="40" height="16" rx="8" fill="#fff" stroke="#1a73e8" stroke-width="1.2"/>
+        <text x="86" y="26" text-anchor="middle" fill="#1a73e8" font-family="Roboto Mono,monospace" font-size="7" font-weight="700">NEXT</text>
+      </g>
+      <circle cx="30" cy="318" r="8" class="rig-marker"/>
+      <text x="44" y="314" fill="#1a73e8" font-family="Roboto Mono,monospace" font-size="8.5" font-weight="700">You</text>
+      <text x="44" y="324" fill="#5f6368" font-family:Roboto Mono,monospace" font-size="6.5">Rig position</text>
     </svg>
-    <div class="map-legend-bar"><span style="color:#5eead4;">● Glow</span><span style="color:#FF9A5C;">━ This leg only</span><span style="color:#E8620A;">■ This load</span><span style="color:#9bb0cc;">▭ Unit</span></div>
+    <div class="map-legend-bar"><span>Path</span><span style="color:#1a73e8;">━━</span><span>Load stall</span><span style="color:#1a73e8;">■</span><span>Vehicle</span><span style="color:#5f6368;">▭</span></div>
   </div>
 
-  <!-- bottom sheet -->
   <div class="map-sheet">
     <div class="sheet-handle"></div>
-    <div class="next-stop" id="yardNextCard">
-      <div class="ns-num" id="yardNextNum">1</div>
-      <div class="ns-info">
-        <div class="ns-lbl">Current pull — route from your rig</div>
-        <div class="ns-name" id="yardNextName">Bay T042 — Camry XSE V6</div>
-        <div class="ns-dist" id="yardNextDist">~220 ft · Row T-A · north staging</div>
-        <div class="ns-walk" id="yardNextWalk"><span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">directions_walk</span>~1.5 min walk · paved lane</div>
-        <div class="yard-leg-meta" id="yardLegMeta">Leg 1 of 9 · Full leg from rig</div>
+    <div class="yard-pull-card" id="yardNextCard">
+      <div class="yard-seq-badge" id="yardNextNum">1</div>
+      <div class="yard-pull-main">
+        <div class="yard-pull-kicker">Current pull</div>
+        <div class="yard-pull-title" id="yardNextName">Bay T042 — Camry XSE V6</div>
+        <div class="yard-meta-row">
+          <div class="yard-meta-item"><span class="material-icons-round">straighten</span><div><strong>Distance</strong><br><span id="yardNextDist">~220 ft · Row T-A</span></div></div>
+          <div class="yard-meta-item"><span class="material-icons-round">directions_walk</span><div><strong>Walk</strong><br><span id="yardNextWalkInline">~1.5 min · staging lane</span></div></div>
+        </div>
       </div>
-      <span class="material-icons-round" style="color:#fff;font-size:22px;">pin_drop</span>
     </div>
-    <div class="yard-up-next" id="yardUpNextWrap">
-      <div class="yun-lbl" id="yardUpNextLbl">Next car (plan ahead)</div>
-      <div class="yun-name" id="yardUpNextName">Bay T043 — RAV4 XLE Premium</div>
-      <div class="yun-hint" id="yardUpNextHint">Same row — short walk east after you strap</div>
+    <div class="yard-next-strip" id="yardUpNextWrap">
+      <span class="material-icons-round yn-ic" style="font-size:20px;">arrow_circle_right</span>
+      <div>
+        <div class="yn-lbl" id="yardUpNextLbl">Up next</div>
+        <div class="yn-title" id="yardUpNextName">Bay T043 — RAV4 XLE Premium</div>
+        <div class="yn-hint" id="yardUpNextHint">Same row — short walk after you strap.</div>
+      </div>
     </div>
     <div class="stop-q" id="yardStopQ">
       <div class="sq-chip" data-yi="0"><div class="sqn">1</div><div class="sql">T042</div><div class="sqv">Camry XSE</div></div>
@@ -1124,18 +1147,15 @@ html.pwa-standalone .frame{
       <div class="sq-chip" data-yi="8"><div class="sqn">9</div><div class="sql">T073</div><div class="sqv">Highlander</div></div>
     </div>
     <div class="map-load-cta">
-      <button type="button" class="btn-fill btn-load-next" id="btnYardMarkLoaded">
-        <span class="material-icons-round">verified</span>
-        <span style="display:flex;flex-direction:column;align-items:center;gap:2px;">
-          <span id="btnYardMarkTitle">Strapped &amp; loaded — confirm</span>
-          <span class="btn-yard-sub" id="btnYardMarkSub">Vehicle 1 of 9 · wheel straps tensioned, then continue</span>
-        </span>
+      <button type="button" class="btn-fill btn-yard-primary" id="btnYardMarkLoaded">
+        <span style="display:flex;align-items:center;gap:8px;"><span class="material-icons-round" style="font-size:22px;">check_circle</span><span id="btnYardMarkTitle">Strapped &amp; loaded</span></span>
+        <span class="btn-yard-sub" id="btnYardMarkSub">Vehicle 1 of 9 · confirm, then continue to next stall</span>
       </button>
     </div>
-    <div style="padding:8px 16px 0;text-align:center;font-size:11px;color:var(--on-surface-var);line-height:1.35;">Highlighted stall = active pull. Queue follows load order + shortest yard path — tap chips to scan the sequence.</div>
-    <div style="padding:12px 16px 0;">
-      <button type="button" class="btn-outline" id="btnYardAllDone" style="width:100%;justify-content:center;height:42px;border-radius:12px;font-size:14px;display:none;">
-        <span class="material-icons-round">flag</span>Finish yard loading — all 9 staged
+    <p class="yard-foot-hint">Highlighted chip = active stall. Tap it to confirm, or use the button above.</p>
+    <div style="padding:8px 16px 0;">
+      <button type="button" class="btn-outline" id="btnYardAllDone" style="width:100%;justify-content:center;min-height:44px;border-radius:12px;font-size:14px;display:none;border-color:#dadce0;color:#1a73e8;">
+        <span class="material-icons-round">flag</span>All 9 loaded — finish yard
       </button>
     </div>
   </div>
@@ -1308,15 +1328,28 @@ html.pwa-standalone .frame{
     <div id="deliveryBottomCta" style="padding:16px;">
       <button type="button" class="btn-fill" id="btnEndDeliverySession" style="width:100%;justify-content:center;min-height:48px;border-radius:14px;font-size:15px;background:var(--green);flex-direction:column;gap:4px;padding:12px 16px;height:auto;">
         <span style="display:flex;align-items:center;gap:8px;"><span class="material-icons-round">emoji_events</span>Wrap up session</span>
-        <span style="font-size:12px;font-weight:400;opacity:.92;">Save summary to Previous loads — nothing is sent to the dealer</span>
+        <span style="font-size:12px;font-weight:400;opacity:.92;">Adds this run to Previous loads on Home for your records. Dealers are not notified from Montar.</span>
       </button>
     </div>
-    <div id="sessionEndSummary" style="display:none;padding:0 16px 20px;">
+  </div>
+  <div id="sessionEndOverlay" class="session-end-overlay" style="display:none;" aria-hidden="true">
+    <div class="session-end-panel" role="dialog" aria-modal="true" aria-labelledby="sessionDialogTitle">
+      <button type="button" class="session-end-x" id="btnSessionEndDismiss" aria-label="Close"><span class="material-icons-round">close</span></button>
       <div class="session-end-banner">
-        <div style="font-size:13px;opacity:.85;">Estimated time saved (yard + dealer lot)</div>
-        <div class="big" id="sessionSavedMin">~14 min</div>
-        <div class="sub" id="sessionEndSub">Saved to Previous loads on Home. Nothing transmitted.</div>
-        <div id="sessionSavedDetail" style="font-size:12px;opacity:.82;margin-top:12px;line-height:1.45;text-align:left;max-width:280px;margin-left:auto;margin-right:auto;"></div>
+        <div class="session-hdr" id="sessionDialogTitle">Session saved</div>
+        <div style="font-size:13px;color:var(--on-surface-var);">Timing for this session</div>
+        <div class="session-time-grid">
+          <div class="session-time-cell">
+            <div class="stl-lbl">Yard · loading</div>
+            <div class="stl-val" id="sessionYardMin">~48 min</div>
+          </div>
+          <div class="session-time-cell">
+            <div class="stl-lbl">Dealer · unloading</div>
+            <div class="stl-val" id="sessionDealerMin">~24 min</div>
+          </div>
+        </div>
+        <div class="sub" id="sessionEndSub">Saved to Previous loads on Home with today's load date. Nothing is shared with the dealer from here.</div>
+        <div class="sub" id="sessionSavedDetail" style="margin-top:12px;text-align:left;"></div>
       </div>
     </div>
   </div>
@@ -1329,59 +1362,23 @@ html.pwa-standalone .frame{
 let audioCtx;
 function audioReady() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
-/** iOS Safari / PWA: AudioContext stays suspended until a real user gesture. Splash auto-advances without one, and scroll does not unlock audio — first touch must call resume(). */
-function unlockAudioFromUserGesture() {
-  try {
-    const ctx = audioReady();
-    const warm = () => {
-      try {
-        const buf = ctx.createBuffer(1, 1, ctx.sampleRate);
-        const src = ctx.createBufferSource();
-        src.buffer = buf;
-        src.connect(ctx.destination);
-        src.start(0);
-      } catch (e) {}
-    };
-    if (ctx.state === 'suspended') {
-      ctx.resume().then(warm).catch(warm);
-    } else {
-      warm();
-    }
-  } catch (e) {}
-}
-(function bindAudioGestureUnlock() {
-  let done = false;
-  const opts = { capture: true, passive: true };
-  function onFirstPointer() {
-    if (done) return;
-    done = true;
-    document.removeEventListener('touchstart', onFirstPointer, opts);
-    document.removeEventListener('pointerdown', onFirstPointer, opts);
-    unlockAudioFromUserGesture();
-  }
-  document.addEventListener('touchstart', onFirstPointer, opts);
-  document.addEventListener('pointerdown', onFirstPointer, opts);
-})();
 function beep(freq, dur, vol = 0.07) {
   try {
     const ctx = audioReady();
-    const run = () => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.value = freq;
-      g.gain.value = vol;
-      o.connect(g);
-      g.connect(ctx.destination);
-      const t = ctx.currentTime;
-      o.start(t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-      o.stop(t + dur);
-    };
-    if (ctx.state === 'running') run();
-    else ctx.resume().then(run).catch(() => {});
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = freq;
+    g.gain.value = vol;
+    o.connect(g);
+    g.connect(ctx.destination);
+    const t = ctx.currentTime;
+    o.start(t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.stop(t + dur);
   } catch (e) {}
 }
 function playSound(kind) {
@@ -1455,7 +1452,7 @@ function onScreenEnter(id, from) {
   const bar = document.getElementById('statusBar');
   if (bar) bar.classList.toggle('light', lightScreens.includes(id));
 
-  if (id === 's-scan') resetScanScreen();
+  if (id === 's-scan') startScanCapture();
   if (id === 's-decode' && from === 's-scan') resetDecodeScreen();
   if (id === 's-slots' && from === 's-decode') resetPlanScreen();
   if (id === 's-map') initYardScreen();
@@ -1466,9 +1463,12 @@ function onScreenEnter(id, from) {
     if (ub) ub.style.display = MULTI_STOP_DELIVERY ? 'block' : 'none';
     if (sn) sn.style.display = MULTI_STOP_DELIVERY ? 'none' : 'block';
     const cta = document.getElementById('deliveryBottomCta');
-    const sum = document.getElementById('sessionEndSummary');
+    const ov = document.getElementById('sessionEndOverlay');
     if (cta) cta.style.display = '';
-    if (sum) sum.style.display = 'none';
+    if (ov) {
+      ov.style.display = 'none';
+      ov.setAttribute('aria-hidden', 'true');
+    }
   }
 }
 
@@ -1515,85 +1515,144 @@ function goBack(id) {
   }, 300);
 }
 
-// ── SCAN: camera / upload → analyze → accept ─
-let scanAnalyzeTimer;
-let scanPreviewUrl = null;
+// ── HOME: load sheet picker (camera / upload, PWA-safe) ──
+let scanSheetObjectUrl = null;
+let scanSheetSource = null;
 
-function resetScanScreen() {
-  const root = document.getElementById('s-scan');
-  if (!root) return;
-  clearTimeout(scanAnalyzeTimer);
-  root.classList.remove('sheet-ready', 'scan-state-analyzing', 'has-preview');
-  const prev = document.getElementById('scanSheetPreview');
-  if (prev) {
-    prev.style.display = 'none';
-    if (scanPreviewUrl) {
-      try {
-        URL.revokeObjectURL(scanPreviewUrl);
-      } catch (e) {}
-      scanPreviewUrl = null;
-    }
-    prev.removeAttribute('src');
+function revokeScanSheetPreview() {
+  if (scanSheetObjectUrl) {
+    URL.revokeObjectURL(scanSheetObjectUrl);
+    scanSheetObjectUrl = null;
   }
-  const cam = document.getElementById('inputScanCamera');
-  const up = document.getElementById('inputScanUpload');
-  if (cam) cam.value = '';
-  if (up) up.value = '';
+  scanSheetSource = null;
 }
 
-function handleScanFileInput(file) {
-  if (!file || !file.type.startsWith('image/')) return;
-  const root = document.getElementById('s-scan');
+function applyScanSheetPreview() {
+  const vf = document.getElementById('scanViewfinder');
   const img = document.getElementById('scanSheetPreview');
-  if (!root || !img) return;
-  if (scanPreviewUrl) {
-    try {
-      URL.revokeObjectURL(scanPreviewUrl);
-    } catch (e) {}
+  if (!vf || !img) return;
+  if (scanSheetObjectUrl) {
+    img.src = scanSheetObjectUrl;
+    vf.classList.add('has-user-sheet');
+  } else {
+    img.removeAttribute('src');
+    vf.classList.remove('has-user-sheet');
   }
-  scanPreviewUrl = URL.createObjectURL(file);
-  img.src = scanPreviewUrl;
-  img.style.display = 'block';
-  root.classList.add('has-preview');
-  beginScanAnalyzing();
 }
 
-function beginScanAnalyzing() {
+function openLoadSheetPicker() {
+  const el = document.getElementById('loadSheetPicker');
+  if (!el) return;
+  playSound('tap');
+  haptic(8);
+  el.style.display = 'flex';
+  el.classList.add('open');
+  el.setAttribute('aria-hidden', 'false');
+}
+
+function closeLoadSheetPicker() {
+  const el = document.getElementById('loadSheetPicker');
+  if (!el) return;
+  el.style.display = 'none';
+  el.classList.remove('open');
+  el.setAttribute('aria-hidden', 'true');
+}
+
+function handleLoadSheetFile(file, source) {
+  if (!file || !/^image\//.test(file.type)) return;
+  revokeScanSheetPreview();
+  scanSheetObjectUrl = URL.createObjectURL(file);
+  scanSheetSource = source;
+  closeLoadSheetPicker();
+  goTo('s-scan');
+}
+
+(function initLoadSheetPicker() {
+  const openBtn = document.getElementById('btnOpenLoadSheetPicker');
+  const camPick = document.getElementById('btnPickLoadSheetCamera');
+  const upPick = document.getElementById('btnPickLoadSheetUpload');
+  const cancel = document.getElementById('btnLoadSheetPickerCancel');
+  const backdrop = document.getElementById('loadSheetPickerBackdrop');
+  const inputCam = document.getElementById('inputLoadSheetCamera');
+  const inputUp = document.getElementById('inputLoadSheetUpload');
+  if (openBtn) {
+    openBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openLoadSheetPicker();
+    });
+    openBtn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLoadSheetPicker();
+      }
+    });
+  }
+  if (camPick && inputCam) {
+    camPick.addEventListener('click', () => {
+      playSound('tap');
+      haptic(8);
+      inputCam.click();
+    });
+  }
+  if (upPick && inputUp) {
+    upPick.addEventListener('click', () => {
+      playSound('tap');
+      haptic(8);
+      inputUp.click();
+    });
+  }
+  if (cancel) cancel.addEventListener('click', () => { playSound('tap'); haptic(6); closeLoadSheetPicker(); });
+  if (backdrop) backdrop.addEventListener('click', () => { playSound('tap'); haptic(6); closeLoadSheetPicker(); });
+  if (inputCam) {
+    inputCam.addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) handleLoadSheetFile(f, 'camera');
+      e.target.value = '';
+    });
+  }
+  if (inputUp) {
+    inputUp.addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (f) handleLoadSheetFile(f, 'upload');
+      e.target.value = '';
+    });
+  }
+})();
+
+// ── SCAN: simulated capture + accept ────
+let scanTimer;
+function startScanCapture() {
   const root = document.getElementById('s-scan');
   if (!root) return;
-  clearTimeout(scanAnalyzeTimer);
-  root.classList.add('scan-state-analyzing');
-  playSound('confirm');
-  haptic(10);
-  scanAnalyzeTimer = setTimeout(() => {
-    root.classList.remove('scan-state-analyzing');
-    root.classList.add('sheet-ready');
+  root.classList.remove('sheet-ready');
+  clearTimeout(scanTimer);
+  applyScanSheetPreview();
+  const line = document.getElementById('scanStatusLine');
+  const sub = document.getElementById('scanPhaseSub');
+  const titleLbl = document.getElementById('scanDoneTitleLbl');
+  const bodyEl = document.getElementById('scanDoneBody');
+  if (line) line.textContent = 'Detecting VINs...';
+  if (sub) {
+    if (scanSheetSource === 'upload') sub.textContent = 'Reading VINs from your uploaded image…';
+    else if (scanSheetSource === 'camera') sub.textContent = 'Reading VINs from your photo…';
+    else sub.textContent = 'Reading VINs from your sheet…';
+  }
+  if (titleLbl) {
+    if (scanSheetSource === 'upload') titleLbl.textContent = 'Image uploaded';
+    else if (scanSheetSource === 'camera') titleLbl.textContent = 'Photo captured';
+    else titleLbl.textContent = 'Sheet captured';
+  }
+  if (bodyEl) {
+    bodyEl.textContent =
+      'We read the VINs on your sheet. Review them next, or go back and add a clearer photo if something looks off.';
+  }
+  scanTimer = setTimeout(() => {
     playSound('scan');
     haptic([18, 55, 22]);
-  }, 2300);
+    if (line) line.textContent = 'VIN capture complete';
+    root.classList.add('sheet-ready');
+  }, 2400);
 }
-
-document.getElementById('btnTakePhoto').addEventListener('click', () => {
-  playSound('tap');
-  haptic(8);
-  document.getElementById('inputScanCamera').click();
-});
-
-document.getElementById('btnUploadImage').addEventListener('click', () => {
-  playSound('tap');
-  haptic(8);
-  document.getElementById('inputScanUpload').click();
-});
-
-document.getElementById('inputScanCamera').addEventListener('change', function () {
-  const f = this.files && this.files[0];
-  if (f) handleScanFileInput(f);
-});
-
-document.getElementById('inputScanUpload').addEventListener('change', function () {
-  const f = this.files && this.files[0];
-  if (f) handleScanFileInput(f);
-});
 
 document.getElementById('btnScanAccept').addEventListener('click', () => {
   playSound('success');
@@ -1758,7 +1817,6 @@ document.getElementById('btnPlanInfo').addEventListener('click', () => {
 });
 
 // ── YARD LOADING MAP ────────────────────
-// Path templates: rig → stall (orange leg on map). Pull order = Row T-A west→east, then Row T-C west→east to cut cross-yard backtracking.
 function yardPathRowA(sx) {
   return 'M30,318 L30,165 L196,165 L196,78 L' + sx + ',78 L' + sx + ',52';
 }
@@ -1766,15 +1824,15 @@ function yardPathRowC(sx) {
   return 'M30,318 L30,165 L196,165 L196,198 L' + sx + ',198 L' + sx + ',208';
 }
 const YARD_STOPS = [
-  { title: 'Bay T042 — Camry XSE V6', dist: '~210 ft · Row T-A · from rig', walk: '~1.5 min walk · staging lane', routeD: yardPathRowA(86), nextPull: 'translate(0,0)', legMeta: 'Leg 1 of 9 · Full leg from rig · Row T-A sweep', upNextHint: 'Same row — short walk east after you strap' },
-  { title: 'Bay T043 — RAV4 XLE Premium', dist: '~45 ft · Row T-A · next stall east', walk: '~25 sec walk · no row change', routeD: yardPathRowA(118), nextPull: 'translate(32,0)', legMeta: 'Leg 2 of 9 · Stay on T-A — minimal steps', upNextHint: 'Still T-A — continue east two stalls' },
-  { title: 'Bay T044 — Camry LE Hybrid', dist: '~38 ft · Row T-A', walk: '~20 sec walk', routeD: yardPathRowA(152), nextPull: 'translate(64,0)', legMeta: 'Leg 3 of 9 · Same aisle · no backtrack', upNextHint: 'Next stall east — prep deck height for sedan' },
-  { title: 'Bay T045 — Camry XSE AWD', dist: '~35 ft · Row T-A', walk: '~20 sec walk', routeD: yardPathRowA(182), nextPull: 'translate(96,0)', legMeta: 'Leg 4 of 9 · Finish left block before crossing', upNextHint: 'Jump to east T-A — then SUV row last on this deck' },
-  { title: 'Bay T048 — Corolla SE CVT', dist: '~95 ft · Row T-A · east section', walk: '~50 sec walk · skip empty stalls', routeD: yardPathRowA(292), nextPull: 'translate(206,0)', legMeta: 'Leg 5 of 9 · East T-A — straight shot', upNextHint: 'Adjacent stall — RAV4 after Corolla' },
-  { title: 'Bay T049 — RAV4 Adventure', dist: '~38 ft · Row T-A · east end', walk: '~22 sec walk', routeD: yardPathRowA(324), nextPull: 'translate(228,0)', legMeta: 'Leg 6 of 9 · Last T-A pull — then drop to T-C', upNextHint: 'Switch to Row T-C — SUVs (longest walk of run)' },
-  { title: 'Bay T071 — Tacoma TRD 4x4', dist: '~175 ft · Row T-C · via main aisle', walk: '~1.9 min walk · one row change', routeD: yardPathRowC(86), nextPull: 'translate(0,177)', legMeta: 'Leg 7 of 9 · Row T-C west — SUVs', upNextHint: 'Next stall east — Highlander same row' },
-  { title: 'Bay T072 — Highlander XLE', dist: '~38 ft · Row T-C', walk: '~22 sec walk', routeD: yardPathRowC(118), nextPull: 'translate(32,177)', legMeta: 'Leg 8 of 9 · Stay on T-C', upNextHint: 'Final pull — east end of T-C' },
-  { title: 'Bay T073 — Highlander XSE', dist: '~110 ft · Row T-C · east end', walk: '~1.1 min walk', routeD: yardPathRowC(224), nextPull: 'translate(136,177)', legMeta: 'Leg 9 of 9 · Last unit — then secure & exit', upNextHint: '' },
+  { title: 'Bay T042 — Camry XSE V6', dist: '~220 ft · Row T-A', walk: '~1.5 min · staging lane', routeD: yardPathRowA(86), nextPull: 'translate(0,0)', upNextHint: 'Same row — short walk east' },
+  { title: 'Bay T043 — RAV4 XLE Premium', dist: '~45 ft · Row T-A', walk: '~25 sec · no row change', routeD: yardPathRowA(118), nextPull: 'translate(32,0)', upNextHint: 'Continue east along T-A' },
+  { title: 'Bay T044 — Camry LE Hybrid', dist: '~38 ft · Row T-A', walk: '~20 sec', routeD: yardPathRowA(152), nextPull: 'translate(64,0)', upNextHint: 'Next stall east' },
+  { title: 'Bay T045 — Camry XSE AWD', dist: '~35 ft · Row T-A', walk: '~20 sec', routeD: yardPathRowA(182), nextPull: 'translate(96,0)', upNextHint: 'Then jump to east T-A' },
+  { title: 'Bay T048 — Corolla SE CVT', dist: '~95 ft · Row T-A east', walk: '~50 sec', routeD: yardPathRowA(292), nextPull: 'translate(206,0)', upNextHint: 'Adjacent stall — RAV4 next' },
+  { title: 'Bay T049 — RAV4 Adventure', dist: '~38 ft · Row T-A', walk: '~22 sec', routeD: yardPathRowA(324), nextPull: 'translate(228,0)', upNextHint: 'Then Row T-C SUVs' },
+  { title: 'Bay T071 — Tacoma TRD 4x4', dist: '~175 ft · Row T-C', walk: '~1.9 min · main aisle', routeD: yardPathRowC(86), nextPull: 'translate(0,177)', upNextHint: 'Highlander same row' },
+  { title: 'Bay T072 — Highlander XLE', dist: '~38 ft · Row T-C', walk: '~22 sec', routeD: yardPathRowC(118), nextPull: 'translate(32,177)', upNextHint: 'Final pull east on T-C' },
+  { title: 'Bay T073 — Highlander XSE', dist: '~110 ft · Row T-C east', walk: '~1.1 min', routeD: yardPathRowC(224), nextPull: 'translate(138,177)', upNextHint: '' },
 ];
 let yardIdx = 0;
 
@@ -1783,13 +1841,11 @@ function setYardRoutePaths(idx) {
   const line = document.getElementById('yardRouteLine');
   const paths = document.getElementById('yardRoutePaths');
   const pull = document.getElementById('yardNextPullGroup');
-  const hud = document.getElementById('yardHudSub');
   if (idx >= YARD_STOPS.length) {
     if (glow) glow.setAttribute('d', '');
     if (line) line.setAttribute('d', '');
     if (paths) paths.style.display = 'none';
     if (pull) pull.style.display = 'none';
-    if (hud) hud.textContent = 'All units staged · final strap / equipment check';
     return;
   }
   const s = YARD_STOPS[idx];
@@ -1800,7 +1856,6 @@ function setYardRoutePaths(idx) {
     pull.style.display = 'block';
     pull.setAttribute('transform', s.nextPull);
   }
-  if (hud) hud.textContent = 'Active leg · map matches pull ' + (idx + 1) + ' of 9';
 }
 
 function initYardScreen() {
@@ -1810,67 +1865,63 @@ function initYardScreen() {
   });
   const fin = document.getElementById('btnYardAllDone');
   const main = document.getElementById('btnYardMarkLoaded');
-  const upWrap = document.getElementById('yardUpNextWrap');
+  const up = document.getElementById('yardUpNextWrap');
   if (fin) fin.style.display = 'none';
-  if (main) main.style.display = 'inline-flex';
-  if (upWrap) upWrap.style.display = 'block';
+  if (main) main.style.display = 'flex';
+  if (up) up.style.display = 'flex';
   renderYard();
 }
 
 function renderYard() {
   const name = document.getElementById('yardNextName');
   const dist = document.getElementById('yardNextDist');
-  const walk = document.getElementById('yardNextWalk');
+  const walkEl = document.getElementById('yardNextWalkInline');
   const num = document.getElementById('yardNextNum');
-  const legMeta = document.getElementById('yardLegMeta');
   const titleEl = document.getElementById('btnYardMarkTitle');
   const subEl = document.getElementById('btnYardMarkSub');
   const upName = document.getElementById('yardUpNextName');
   const upHint = document.getElementById('yardUpNextHint');
   const upLbl = document.getElementById('yardUpNextLbl');
+  const kicker = document.querySelector('#yardNextCard .yard-pull-kicker');
   const upWrap = document.getElementById('yardUpNextWrap');
   if (yardIdx >= YARD_STOPS.length) {
-    if (name) name.textContent = 'All vehicles staged on trailer';
-    if (dist) dist.textContent = 'Straps checked · ready to roll to dealer';
-    if (walk) walk.innerHTML = '<span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">check_circle</span>Yard path complete';
+    if (kicker) kicker.textContent = 'Yard queue complete';
+    if (name) name.textContent = 'All units on trailer';
+    if (dist) dist.textContent = '—';
+    if (walkEl) walkEl.textContent = 'Secure straps · exit when clear';
     if (num) num.textContent = '✓';
-    if (legMeta) legMeta.textContent = 'Queue finished — optimized row order (demo)';
-    if (titleEl) titleEl.textContent = 'Yard loading complete';
-    if (subEl) subEl.textContent = 'Use the button below to continue';
-    if (upLbl) upLbl.textContent = 'All set';
-    if (upName) {
-      upName.classList.remove('yun-empty');
-      upName.textContent = 'No more pulls in this queue';
-    }
-    if (upHint) {
-      upHint.textContent = 'Double-check strap tension, crossbars, and clearance before departure.';
-      upHint.style.display = 'block';
-    }
-    if (upWrap) upWrap.style.display = 'block';
+    if (titleEl) titleEl.textContent = 'Done loading';
+    if (subEl) subEl.textContent = 'Use finish below to continue';
+    if (upWrap) upWrap.style.display = 'none';
     setYardRoutePaths(yardIdx);
+    document.querySelectorAll('#yardStopQ .sq-chip').forEach((chip) => {
+      const i = +chip.getAttribute('data-yi');
+      chip.classList.remove('active');
+      chip.classList.add('loaded');
+    });
     return;
   }
   const s = YARD_STOPS[yardIdx];
+  if (kicker) kicker.textContent = 'Current pull';
   if (num) num.textContent = String(yardIdx + 1);
   if (name) name.textContent = s.title;
   if (dist) dist.textContent = s.dist;
-  if (walk) walk.innerHTML = '<span class="material-icons-round" style="font-size:14px;vertical-align:-3px;">directions_walk</span>' + s.walk;
-  if (legMeta) legMeta.textContent = s.legMeta;
-  if (titleEl) titleEl.textContent = 'Strapped & loaded — confirm';
-  if (subEl) subEl.textContent = 'Vehicle ' + (yardIdx + 1) + ' of 9 · straps tensioned, then load next';
+  if (walkEl) walkEl.textContent = s.walk;
+  if (titleEl) titleEl.textContent = 'Strapped & loaded';
+  if (subEl) subEl.textContent = 'Vehicle ' + (yardIdx + 1) + ' of 9 · confirm to advance queue';
   const next = YARD_STOPS[yardIdx + 1];
-  if (next && upName && upHint && upLbl) {
-    upLbl.textContent = 'Next car (plan ahead)';
+  if (next && upName && upHint && upLbl && upWrap) {
+    upLbl.textContent = 'Up next';
     upName.textContent = next.title;
-    upHint.textContent = next.upNextHint || 'Review deck placement before you roll';
+    upHint.textContent = next.upNextHint || 'Preview the next stall before you roll.';
     upHint.style.display = next.upNextHint ? 'block' : 'none';
-    if (upWrap) upWrap.style.display = 'block';
-  } else if (upWrap && upName && upHint && upLbl) {
+    upWrap.style.display = 'flex';
+  } else if (upName && upHint && upLbl && upWrap) {
     upLbl.textContent = 'Last vehicle';
-    upName.textContent = 'After this, secure & exit the yard';
-    upHint.textContent = 'Final check: tie-downs, crossbars, deck clearance';
+    upName.textContent = 'After this — secure & exit yard';
+    upHint.textContent = 'Final tie-down and clearance check.';
     upHint.style.display = 'block';
-    upWrap.style.display = 'block';
+    upWrap.style.display = 'flex';
   }
   setYardRoutePaths(yardIdx);
 
@@ -1915,9 +1966,34 @@ document.getElementById('btnYardAllDone').addEventListener('click', () => {
 // ── PREVIOUS LOADS (local) ─────────────
 const LS_PREV_LOADS = 'montar_previous_loads';
 const SEED_RECENT_LOADS = [
-  { headline: 'Port of Long Beach → Chino', support: '8 vehicles · 38,800 lbs · Mon' },
-  { headline: 'BNSF Miraloma → Fontana', support: '9 vehicles · 43,600 lbs · Sun' },
+  { origin: 'BNSF Orillia', destination: 'Lexus of Bellevue · Bellevue, WA', vehicleCount: 8, yardMin: 46, dealerMin: 31, ts: Date.now() - 86400000 * 2 },
+  { origin: 'Port of Tacoma', destination: 'BMW of Bellevue · Bellevue, WA', vehicleCount: 9, yardMin: 52, dealerMin: 24, ts: Date.now() - 86400000 * 5 },
+  { origin: 'BNSF Auburn', destination: 'Acura of Redmond · Redmond, WA', vehicleCount: 7, yardMin: 41, dealerMin: 19, ts: Date.now() - 86400000 * 8 },
+  { origin: 'Rail Miraloma', destination: 'Mercedes-Benz of Bellevue · Bellevue, WA', vehicleCount: 9, yardMin: 55, dealerMin: 28, ts: Date.now() - 86400000 * 11 },
+  { origin: 'BNSF Orillia', destination: 'Audi Bellevue · Bellevue, WA', vehicleCount: 9, yardMin: 43, dealerMin: 22, ts: Date.now() - 86400000 * 14 },
+  { origin: 'Portland IC', destination: 'Volvo Cars Redmond · Redmond, WA', vehicleCount: 6, yardMin: 38, dealerMin: 17, ts: Date.now() - 86400000 * 18 },
+  { origin: 'Port of Long Beach', destination: 'Chino Auto Hub · Chino, CA', vehicleCount: 8, yardMin: 61, dealerMin: 35, ts: Date.now() - 86400000 * 24 },
 ];
+
+const SESSION_DEALER_OPTIONS = [
+  'Honda of Bellevue · Bellevue, WA',
+  'BMW of Redmond · Redmond, WA',
+  'Lexus of Bellevue · Bellevue, WA',
+  'Mercedes-Benz of Bellevue · Bellevue, WA',
+  'Subaru of Bellevue · Bellevue, WA',
+  'Porsche Bellevue · Bellevue, WA',
+  'Land Rover Redmond · Redmond, WA',
+  'Toyota of Renton · Renton, WA',
+];
+
+function formatLoadDate(ts) {
+  if (ts == null || ts === '') return '';
+  try {
+    return new Date(ts).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  } catch (e) {
+    return '';
+  }
+}
 
 function loadPreviousLoadsFromStorage() {
   try {
@@ -1942,33 +2018,68 @@ function escHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
+function normalizePrevLoadEntry(s) {
+  if (s.origin && s.destination) {
+    const loadDate = formatLoadDate(s.ts) || s.dateShort || '';
+    return {
+      origin: s.origin,
+      destination: s.destination,
+      vehicleCount: s.vehicleCount != null ? s.vehicleCount : 9,
+      yardMin: s.yardMin != null ? s.yardMin : null,
+      dealerMin: s.dealerMin != null ? s.dealerMin : null,
+      savedMin: s.savedMin != null ? s.savedMin : null,
+      loadDate,
+    };
+  }
+  const h = String(s.headline || '');
+  const parts = h.split('→').map((x) => x.trim());
+  const origin = parts[0] || h || '—';
+  const destination = parts[1] || '—';
+  let vehicleCount = 9;
+  let savedMin = s.savedMin != null ? s.savedMin : null;
+  let loadDate = formatLoadDate(s.ts) || '';
+  if (s.support) {
+    const vm = s.support.match(/(\d+)\s*vehicles?/i);
+    if (vm) vehicleCount = +vm[1];
+    const tm = s.support.match(/~\s*(\d+)\s*min/i);
+    if (tm) savedMin = +tm[1];
+  }
+  if (!loadDate && s.ts) loadDate = formatLoadDate(s.ts);
+  return { origin, destination, vehicleCount, yardMin: null, dealerMin: null, savedMin, loadDate };
+}
+
 function renderRecentLoads() {
   const mount = document.getElementById('recentLoadsMount');
   if (!mount) return;
   const stored = loadPreviousLoadsFromStorage();
   const rows = [];
   stored.slice(0, 8).forEach((s) => {
-    const h = s.headline;
-    if (!h) return;
-    rows.push({
-      headline: h,
-      support: s.support || '',
-    });
+    if (!s.headline && !s.origin) return;
+    rows.push(normalizePrevLoadEntry(s));
   });
   SEED_RECENT_LOADS.forEach((seed) => {
-    if (rows.length >= 5) return;
-    if (!rows.some((r) => r.headline === seed.headline)) rows.push(seed);
+    if (rows.length >= 7) return;
+    const n = normalizePrevLoadEntry(seed);
+    if (!rows.some((r) => r.origin === n.origin && r.destination === n.destination)) rows.push(n);
   });
   mount.innerHTML = rows
-    .map(
-      (r, i) => `
-      ${i ? '<div class="divider"></div>' : ''}
-      <div class="list-item">
-        <div class="li-lead"><span class="material-icons-round">local_shipping</span></div>
-        <div class="li-content"><div class="li-headline">${escHtml(r.headline)}</div><div class="li-support">${escHtml(r.support)}</div></div>
-        <span class="badge badge-ok" style="margin-left:8px;"><span class="material-icons-round" style="font-size:12px;">check</span>Done</span>
-      </div>`
-    )
+    .map((r) => {
+      let times = '';
+      if (r.yardMin != null && r.dealerMin != null) {
+        times = ' · <span>Yard ~' + escHtml(String(r.yardMin)) + ' min</span> · <span>Unload ~' + escHtml(String(r.dealerMin)) + ' min</span>';
+      } else if (r.savedMin != null) {
+        times = ' · <span>~' + escHtml(String(r.savedMin)) + ' min</span>';
+      }
+      return `
+      <div class="prev-load-row">
+        <div class="pl-body">
+          <div class="pl-date">Load date · ${escHtml(r.loadDate || '—')}</div>
+          <div class="pl-route">${escHtml(r.origin)}<span class="pl-arrow">→</span>${escHtml(r.destination)}</div>
+          <div class="pl-meta"><span>${r.vehicleCount} vehicles</span>${times}</div>
+        </div>
+        <div class="pl-status">Done</div>
+      </div>`;
+    })
     .join('');
 }
 
@@ -1980,49 +2091,69 @@ document.getElementById('btnOpenDealerGuide').addEventListener('click', () => {
 });
 
 // ── DELIVERY: end session (driver assist) ─
-function computeSessionTimeSaved() {
-  const yardSaved = Math.round(10 + Math.random() * 13);
-  const r = Math.random();
-  let dealerAvoided = 0;
-  if (r < 0.2) dealerAvoided = Math.round(3 + Math.random() * 9);
-  else if (r < 0.75) dealerAvoided = Math.round(11 + Math.random() * 15);
-  else dealerAvoided = Math.round(19 + Math.random() * 12);
-  const total = Math.min(72, yardSaved + dealerAvoided);
-  return { yardSaved, dealerAvoided, total };
+function computeSessionLoadDurations() {
+  const yardMin = Math.round(36 + Math.random() * 28);
+  const dealerMin = Math.round(14 + Math.random() * 26);
+  return { yardMin, dealerMin };
 }
 
 function endDeliverySession() {
-  const est = computeSessionTimeSaved();
-  const savedMin = est.total;
-  const headline = 'BNSF Orillia → Renton Toyota';
-  const support = `9 vehicles · ~${savedMin} min est. saved (yard + dealer lot) · ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
-  savePreviousLoad({ headline, support, savedMin, yardSaved: est.yardSaved, dealerAvoided: est.dealerAvoided, ts: Date.now() });
+  const { yardMin, dealerMin } = computeSessionLoadDurations();
+  const origin = 'BNSF Orillia';
+  const destination = SESSION_DEALER_OPTIONS[Math.floor(Math.random() * SESSION_DEALER_OPTIONS.length)];
+  const vehicleCount = 9;
+  const ts = Date.now();
+  const loadDateLabel = formatLoadDate(ts);
+  const headline = origin + ' → ' + destination;
+  savePreviousLoad({
+    origin,
+    destination,
+    vehicleCount,
+    yardMin,
+    dealerMin,
+    headline,
+    ts,
+  });
 
   const cta = document.getElementById('deliveryBottomCta');
-  const sum = document.getElementById('sessionEndSummary');
-  const elMin = document.getElementById('sessionSavedMin');
+  const ov = document.getElementById('sessionEndOverlay');
+  const elY = document.getElementById('sessionYardMin');
+  const elD = document.getElementById('sessionDealerMin');
   const det = document.getElementById('sessionSavedDetail');
-  if (elMin) elMin.textContent = '~' + savedMin + ' min';
+  if (elY) elY.textContent = '~' + yardMin + ' min';
+  if (elD) elD.textContent = '~' + dealerMin + ' min';
   if (det) {
     det.textContent =
-      'Roughly ' +
-      est.yardSaved +
-      ' min less yard drag than a slow hour-long reload pattern, plus ~' +
-      est.dealerAvoided +
-      ' min of dealer-lot friction avoided (wrong gate, shuffle, or wait — not every day). Estimates for this session only.';
+      loadDateLabel +
+      ' · ' +
+      destination +
+      '. Close when you are ready to go back to Home.';
   }
   if (cta) cta.style.display = 'none';
-  if (sum) sum.style.display = 'block';
+  if (ov) {
+    ov.style.display = 'flex';
+    ov.setAttribute('aria-hidden', 'false');
+  }
 
   playSound('success');
   hapticSuccess();
   renderRecentLoads();
-  setTimeout(() => {
-    goTo('s-home', { silent: true });
-  }, 2200);
 }
 
 document.getElementById('btnEndDeliverySession').addEventListener('click', endDeliverySession);
+
+document.getElementById('btnSessionEndDismiss').addEventListener('click', () => {
+  const ov = document.getElementById('sessionEndOverlay');
+  const cta = document.getElementById('deliveryBottomCta');
+  if (ov) {
+    ov.style.display = 'none';
+    ov.setAttribute('aria-hidden', 'true');
+  }
+  if (cta) cta.style.display = '';
+  playSound('tap');
+  haptic(8);
+  goTo('s-home', { silent: true });
+});
 
 function goYardFromMontarAccept() {
   playSound('success');
@@ -2121,27 +2252,21 @@ setTimeout(() => {
 // ── iOS PWA FIXES ───────────────────────
 function syncAppViewportHeight() {
   try {
-    const vv = window.visualViewport;
     let h = window.innerHeight || 0;
-    if (vv) {
-      h = Math.max(h, vv.height + (vv.offsetTop || 0));
+    if (window.visualViewport && window.visualViewport.height) {
+      h = Math.max(h, window.visualViewport.height);
     }
-    const docH = document.documentElement.clientHeight || 0;
-    const docRect = document.documentElement.getBoundingClientRect();
-    const docRectH = docRect.height || 0;
-    h = Math.max(h, docH, docRectH);
-    if (document.body) {
-      h = Math.max(h, document.body.clientHeight || 0);
+    const docH = document.documentElement.clientHeight;
+    const bodyH = document.body ? document.body.clientHeight : 0;
+    if (document.documentElement.classList.contains('pwa-standalone')) {
+      h = Math.max(h, docH, bodyH);
     }
     if (h < 200) return;
-    document.documentElement.style.setProperty('--app-viewport-h', h + 'px');
     if (document.documentElement.classList.contains('pwa-standalone')) {
-      document.documentElement.style.removeProperty('height');
-      if (document.body) {
-        document.body.style.removeProperty('height');
-        document.body.style.removeProperty('min-height');
-        document.body.style.removeProperty('max-height');
-      }
+      document.documentElement.style.height = h + 'px';
+      document.body.style.height = h + 'px';
+      document.body.style.minHeight = h + 'px';
+      document.body.style.maxHeight = h + 'px';
     }
   } catch (e) {}
 }
