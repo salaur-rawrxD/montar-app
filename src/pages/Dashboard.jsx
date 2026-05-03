@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { useStore } from '../app/state/loadSessionStore.js';
 import BottomNav from '../components/shell/BottomNav.jsx';
+import SyncStatus from '../components/common/SyncStatus.jsx';
 import { buildPreviousLoadRows } from '../data/mockLoads.js';
 import { RIG_CONFIGS } from '../data/trailerConfigs.js';
 
@@ -41,7 +42,10 @@ export default function Dashboard() {
             <div className="dash-context-driver">ADAN ESPURO · SHIFT ACTIVE</div>
             <div className="dash-context-rig">{rig.name}</div>
           </div>
-          <div className="dash-rig-pill">{rig.slots} slots</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <SyncStatus />
+            <div className="dash-rig-pill">{rig.slots} slots</div>
+          </div>
         </div>
         {/* Compact metric strip — operational data only */}
         <div className="dash-metrics" style={{ marginBottom: 16 }}>

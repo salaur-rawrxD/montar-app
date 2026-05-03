@@ -6,6 +6,7 @@ import { runLoadPlanner } from '../../logic/loadPlanner.js';
 import { calculateDotCompliance } from '../../logic/dotCompliance.js';
 import { buildYardStops } from '../../logic/yardPlanner.js';
 import { buildDeliveryPlan } from '../../logic/deliveryPlanner.js';
+import { saveCompleteSession } from '../../services/loadSessionService.js';
 
 function haptic(ms) {
   try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) {}
@@ -104,7 +105,7 @@ export const useStore = create((set, get) => ({
 
   generateLoadPlan() {
     const { vehicles, acceptedIdxs, selectedRigIdx } = get();
-    const rig = RIG_CONFIGS[selectedRigIdx];
+    const rig    = RIG_CONFIGS[selectedRigIdx];
     const accepted = vehicles.filter((_, i) => acceptedIdxs.includes(i));
     const plan   = runLoadPlanner(accepted, rig);
     const dot    = calculateDotCompliance(accepted, rig);
@@ -118,6 +119,7 @@ export const useStore = create((set, get) => ({
       deliveryPlan: dplan,
       confirmedSlots: [],
       yardIdx: 0,
+      syncStatus: 'local',
     });
   },
 
@@ -159,24 +161,55 @@ export const useStore = create((set, get) => ({
 
   endSession() {
     const { yardStartTs } = get();
-    const yardMin   = yardStartTs ? Math.max(1, Math.round((Date.now() - yardStartTs) / 60000)) : (36 + Math.floor(Math.random() * 28));
-    const dealerMin = 14 + Math.floor(Math.random() * 26);
-    const destination = SESSION_DEALER_OPTIONS[Math.floor(Math.random() * SESSION_DEALER_OPTIONS.length)];
+    const yardMin   = yardStartTs
+      ? Math.max(1, Math.round((Date.now() - yardStartTs) / 60000))
+      : (36 + Math.floor(Math.random() * 28));
+    const dealerMin    = 14 + Math.floor(Math.random() * 26);
+    const destination  = SESSION_DEALER_OPTIONS[Math.floor(Math.random() * SESSION_DEALER_OPTIONS.length)];
     const entry = {
-      origin: 'BNSF Orillia',
+      origin:       'BNSF Orillia',
       destination,
       vehicleCount: 9,
       yardMin,
       dealerMin,
       ts: Date.now(),
     };
+
+    // 1. Always save to localStorage first (works offline)
     savePreviousLoad(entry);
     hapticSuccess();
+    const sessionEndData = { yardMin, dealerMin, destination, loadDate: formatLoadDate(entry.ts) };
     set({
-      previousLoads: loadPreviousLoads(),
+      previousLoads:    loadPreviousLoads(),
       sessionEndVisible: true,
-      sessionEndData: { yardMin, dealerMin, destination, loadDate: formatLoadDate(entry.ts) },
+      sessionEndData,
+      syncStatus:        'local',
     });
+
+    // 2. Fire-and-forget Supabase sync — never blocks the UI
+    const snapshot = { ...get(), sessionEndData };
+    setTimeout(() => get()._syncSession(snapshot), 0);
+  },
+
+  // Internal — called from endSession via setTimeout, never directly
+  async _syncSession(snapshot) {
+    set({ syncStatus: 'syncing' });
+    try {
+      const { success, errors } = await saveCompleteSession(snapshot);
+      if (success) {
+        set({ syncStatus: 'saved', syncedAt: Date.now(), syncError: null });
+      } else {
+        // 'offline' means Supabase is not configured — stay on 'local', not 'failed'
+        const isOffline = errors?.every((e) => e === 'offline') ??
+                          !snapshot.syncStatus; // crude but safe
+        set({
+          syncStatus: isOffline ? 'local' : 'failed',
+          syncError:  isOffline ? null : (errors?.[0] ?? 'Sync error'),
+        });
+      }
+    } catch (err) {
+      set({ syncStatus: 'failed', syncError: err?.message ?? 'Sync error' });
+    }
   },
 
   dismissSession() {
@@ -185,6 +218,16 @@ export const useStore = create((set, get) => ({
     const { currentScreen } = get();
     set({ prevScreen: currentScreen, currentScreen: 'home', navDir: 'forward' });
   },
+
+  // ── Sync status ──────────────────────────────────────────────────
+  // 'idle'    — no session started yet
+  // 'local'   — saved to localStorage, Supabase not configured
+  // 'syncing' — actively writing to Supabase
+  // 'saved'   — persisted to Supabase successfully
+  // 'failed'  — Supabase write failed (localStorage copy is intact)
+  syncStatus: 'idle',
+  syncError:  null,
+  syncedAt:   null,
 
   // ── Previous loads ──────────────────────────────────────────────
   previousLoads: loadPreviousLoads(),
