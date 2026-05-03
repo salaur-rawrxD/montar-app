@@ -194,7 +194,62 @@ CREATE POLICY "anon_all" ON operator_overrides FOR ALL TO anon USING (true) WITH
 
 For production, replace the anon policies with driver-scoped auth policies once authentication is added.
 
-### 5. Verify it works
+### 5. Test the connection (quick check)
+
+Before running the full app, verify your credentials and tables with:
+
+```bash
+npm run test:supabase
+```
+
+**Where to find your credentials**
+
+In the Supabase dashboard, go to **Settings → API** (left sidebar). Copy:
+- **Project URL** → `VITE_SUPABASE_URL`
+- **Project API keys → anon / public** → `VITE_SUPABASE_ANON_KEY`
+
+**Create `.env.local` in the project root** (never commit this file):
+
+```
+VITE_SUPABASE_URL=your_project_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+```
+
+**What success looks like**
+
+```
+Montar — Supabase Connection Test
+──────────────────────────────────────────────────
+
+[1] Environment variables
+  ✓ PASS  VITE_SUPABASE_URL = https://xxxx.supabase.co
+  ✓ PASS  VITE_SUPABASE_ANON_KEY = sb_publishable_xxxx…
+
+[2] Table access
+  ✓ PASS  loads
+  ✓ PASS  load_vehicles
+  ✓ PASS  vehicle_specs
+  ✓ PASS  load_assignments
+  ✓ PASS  yard_stops
+  ✓ PASS  delivery_stops
+  ✓ PASS  operator_overrides
+
+──────────────────────────────────────────────────
+All checks passed. Supabase is connected and all tables are accessible.
+```
+
+**Common errors**
+
+| Error message | Fix |
+|---|---|
+| `VITE_SUPABASE_URL is missing` | Create `.env.local` with both vars |
+| `VITE_SUPABASE_ANON_KEY is missing` | Add the anon key to `.env.local` |
+| `Table missing or inaccessible` | Run the CREATE TABLE SQL from step 3 above |
+| `RLS/policy issue` | Run the CREATE POLICY SQL from step 4 above |
+| `Invalid API key` | Wrong anon key — copy it again from Settings → API |
+| Wrong project URL | Double-check the Project URL ends in `.supabase.co` |
+
+### 6. Verify with the full app
 
 Start the dev server and run a full session (Splash → Rig → Dashboard → Sample sheet → Yard → Wrap up). After wrapping, the Dashboard header should briefly show **"Saving…"** then **"Saved"**. Check the `loads` table in Supabase Table Editor to confirm the row appeared.
 
