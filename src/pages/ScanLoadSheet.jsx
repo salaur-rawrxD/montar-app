@@ -14,27 +14,27 @@ const SEED_VINS = [
 ];
 
 export default function ScanLoadSheet() {
-  const goBack           = useStore((s) => s.goBack);
-  const goTo             = useStore((s) => s.goTo);
-  const scanSheetSource  = useStore((s) => s.scanSheetSource);
+  const goBack            = useStore((s) => s.goBack);
+  const goTo              = useStore((s) => s.goTo);
+  const scanSheetSource   = useStore((s) => s.scanSheetSource);
   const scanSheetObjectUrl = useStore((s) => s.scanSheetObjectUrl);
 
-  const [phase, setPhase] = useState('scanning'); // 'scanning' | 'done'
-  const [visibleChips, setVisibleChips] = useState(0);
+  const [phase, setPhase]           = useState('scanning');
+  const [visibleChips, setVisible]  = useState(0);
 
   useEffect(() => {
     setPhase('scanning');
-    setVisibleChips(0);
+    setVisible(0);
     let i = 0;
-    const chipTimer = setInterval(() => {
+    const t = setInterval(() => {
       i++;
-      setVisibleChips(i);
+      setVisible(i);
       if (i >= SEED_VINS.length) {
-        clearInterval(chipTimer);
+        clearInterval(t);
         setTimeout(() => setPhase('done'), 500);
       }
     }, 220);
-    return () => clearInterval(chipTimer);
+    return () => clearInterval(t);
   }, [scanSheetSource]);
 
   const hasUserSheet = scanSheetSource && scanSheetSource !== 'sample';
@@ -54,9 +54,9 @@ export default function ScanLoadSheet() {
       </div>
 
       <div className="viewfinder" id="scanViewfinder">
-        {hasUserSheet && scanSheetObjectUrl ? (
-          <img id="scanSheetPreview" className="scan-sheet-preview" src={scanSheetObjectUrl} alt="Load sheet" />
-        ) : null}
+        {hasUserSheet && scanSheetObjectUrl
+          ? <img id="scanSheetPreview" className="scan-sheet-preview" src={scanSheetObjectUrl} alt="Load sheet" />
+          : null}
 
         <div className="bol-mock">
           <div className="bh">MASTER UNIFORM STRAIGHT BILL OF LADING — UNITED ROAD</div>
@@ -83,23 +83,30 @@ export default function ScanLoadSheet() {
       <div className="scan-bottom" id="scanBottom">
         {phase === 'scanning' ? (
           <div className="scan-phase-scan" id="scanPhaseScan">
-            <div className="scan-status" id="scanStatusLine">Detecting VINs...</div>
-            <div className="scan-sub" id="scanPhaseSub">Reading VINs from your sheet…</div>
-            {SEED_VINS.slice(0, visibleChips).map((vin, i) => (
-              <div key={vin} className="vin-chip" style={{ animationDelay: `${i * 0.15}s` }}>
-                <span className="material-icons-round">check_circle</span>{vin}
-              </div>
-            ))}
+            {/* Live count-up */}
+            <div className="scan-counter">
+              {visibleChips > 0 ? `Found ${visibleChips} of ${SEED_VINS.length} VINs…` : 'Scanning BOL…'}
+            </div>
+            <div className="scan-status">
+              {visibleChips === 0 ? 'Detecting VINs…' : `Reading BOL — ${visibleChips} of ${SEED_VINS.length} found`}
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 0 }}>
+              {SEED_VINS.slice(0, visibleChips).map((vin, i) => (
+                <div key={vin} className="vin-chip">
+                  <span className="material-icons-round">check_circle</span>{vin}
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="scan-phase-done" id="scanPhaseDone" style={{ display: 'block' }}>
             <div className="scan-done-card">
               <div className="scan-done-title">
                 <span className="material-icons-round">verified</span>
-                <span id="scanDoneTitleLbl">Sheet captured</span>
+                <span id="scanDoneTitleLbl">{SEED_VINS.length} VINs captured</span>
               </div>
               <div className="scan-done-body" id="scanDoneBody">
-                We read the VINs on your sheet. Review them next, or go back and add a clearer photo if something looks off.
+                All {SEED_VINS.length} VINs read from BOL. Review each vehicle and accept before optimizing.
               </div>
             </div>
             <button
@@ -110,7 +117,7 @@ export default function ScanLoadSheet() {
               onClick={() => goTo('decode')}
             >
               <span className="material-icons-round">arrow_forward</span>
-              Accept &amp; review vehicles
+              Review {SEED_VINS.length} vehicles
             </button>
           </div>
         )}

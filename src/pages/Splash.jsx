@@ -5,7 +5,7 @@ export default function Splash() {
   const goTo = useStore((s) => s.goTo);
 
   useEffect(() => {
-    const t = setTimeout(() => goTo('rig', { silent: true }), 1800);
+    const t = setTimeout(() => goTo('rig', { silent: true }), 1400);
     return () => clearTimeout(t);
   }, [goTo]);
 
@@ -16,7 +16,7 @@ export default function Splash() {
           <div className="splash-m">M</div>
           <div className="splash-name">MONTAR</div>
           <div className="splash-bar" />
-          <div className="splash-tag">Load Faster. Move more cars.</div>
+          <div className="splash-tag">Load faster. Move more cars.</div>
         </div>
       </div>
     </div>

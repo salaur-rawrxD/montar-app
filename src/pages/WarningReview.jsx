@@ -8,146 +8,201 @@ export default function WarningReview() {
   const initYardSession  = useStore((s) => s.initYardSession);
   const loadPlan         = useStore((s) => s.loadPlan);
 
-  const [adjChoice, setAdjChoice]     = useState('keep');
-  const [driverNote, setDriverNote]   = useState('');
-  const [outcomeState, setOutcome]    = useState(null); // null | 'ok' | 'bad'
-  const [ackChecked, setAckChecked]   = useState(false);
-  const [overrideEnabled, setOverrideEnabled] = useState(false);
-  const [showAckRow, setShowAckRow]   = useState(false);
+  const [adjChoice, setAdjChoice]   = useState('keep');
+  const [driverNote, setDriverNote] = useState('');
+  const [outcome, setOutcome]       = useState(null);
+  const [ackChecked, setAck]        = useState(false);
+
+  const slot1 = loadPlan?.slots?.find((s) => s.slot === 1);
+  const v1    = slot1?.vehicle;
+  const isOverridable = adjChoice === 'highlander' && outcome === 'bad' && ackChecked;
 
   function acceptAndGoYard() {
     acceptMontarPlan();
-    goTo('map');
-  }
-
-  function handleRecheck() {
-    if (adjChoice === 'keep') {
-      setOutcome('ok');
-      setShowAckRow(false);
-      setOverrideEnabled(false);
-    } else {
-      setOutcome('bad');
-      setShowAckRow(true);
-    }
-  }
-
-  function handleAckChange(checked) {
-    setAckChecked(checked);
-    setOverrideEnabled(checked);
-  }
-
-  function handleOverride() {
-    if (!overrideEnabled) return;
     initYardSession();
     goTo('map');
   }
 
-  const slot1 = loadPlan?.slots?.find((s) => s.slot === 1);
-  const v1 = slot1?.vehicle;
+  function handleRecheck() {
+    setOutcome(adjChoice === 'keep' ? 'ok' : 'bad');
+    if (adjChoice === 'keep') setAck(false);
+  }
+
+  function handleOverride() {
+    if (!isOverridable) return;
+    initYardSession();
+    goTo('map');
+  }
 
   return (
     <div className="screen active" id="s-warning">
-      <div className="app-bar">
+      {/* App bar — sits above the danger zone */}
+      <div className="app-bar" style={{ background: 'var(--danger)', paddingBottom: 0 }}>
         <div className="app-bar-inner">
-          <button className="icon-btn" onClick={() => goBack('slots')}>
+          <button className="icon-btn" style={{ color: 'rgba(255,255,255,.75)' }} onClick={() => goBack('slots')}>
             <span className="material-icons-round">arrow_back</span>
           </button>
-          <div className="app-bar-title">Slot 1 — Adjustment</div>
+          <div className="app-bar-title" style={{ color: '#fff', fontSize: 18 }}>Slot 1 — Adjustment</div>
           <div style={{ width: 48 }} />
         </div>
       </div>
 
-      <div className="scroll">
-        <div className="adj-quick-cta">
-          <div className="adj-quick-copy">Prefer MONTAR's clearance-safe plan? You can still review details below.</div>
-          <button type="button" className="btn-fill" id="btnAcceptMontarInline" onClick={acceptAndGoYard}>
-            <span className="material-icons-round" style={{ fontSize: 18 }}>check</span>
+      {/* Full-bleed danger zone */}
+      <div className="danger-zone">
+        <div className="danger-zone-top">
+          <div className="danger-icon-wrap">
+            <span className="material-icons-round">warning</span>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div className="danger-title">Clearance Warning</div>
+            <div className="danger-body">
+              Moving the Highlander XLE to Slot 1 creates a height conflict. At 70.9" it exceeds the deck clearance of 60.5" by 10.4 inches.
+            </div>
+          </div>
+        </div>
+        <div className="danger-quick-accept">
+          <div className="danger-quick-copy">Prefer MONTAR's safe plan? Accept it now.</div>
+          <button type="button" className="danger-quick-btn" onClick={acceptAndGoYard}>
+            <span className="material-icons-round" style={{ fontSize: 16 }}>check</span>
             Accept plan
           </button>
         </div>
+      </div>
 
-        <div className="warn-banner">
-          <span className="material-icons-round">warning</span>
-          <div>
-            <div className="warn-title">Clearance Warning</div>
-            <div className="warn-body">
-              Moving the Highlander XLE to Slot 1 creates a height clearance issue. At 70.9" it exceeds the deck clearance of 60.5".
-            </div>
-          </div>
-        </div>
-
+      <div className="scroll">
+        {/* Why the assigned vehicle belongs here */}
         <div className="reason-card">
           <div className="reason-hdr">
-            <div className="reason-title">Why {v1 ? `${v1.year} ${v1.make} ${v1.model}` : 'this vehicle'} belongs in Slot 1</div>
-            <div className="reason-sub">Reasoning behind this assignment</div>
+            <div className="reason-title">Why {v1 ? `${v1.make} ${v1.model}` : 'this vehicle'} belongs in Slot 1</div>
+            <div className="reason-sub">MONTAR's reasoning for this assignment</div>
           </div>
-          <div className="reason-row"><div className="ri-ok"><span className="material-icons-round">straighten</span></div><div className="rl"><div className="rl-lbl">Height clearance</div><div className="rl-val">{v1 ? `${v1.make} ${v1.model} ${v1.heightIn}"` : ''} · Deck clearance 60.5" · Margin {v1 ? (60.5 - v1.heightIn).toFixed(1) : '3.6'}"</div></div><span className="badge badge-ok">OK</span></div>
-          <div className="reason-row"><div className="ri-ok"><span className="material-icons-round">scale</span></div><div className="rl"><div className="rl-lbl">Front axle weight</div><div className="rl-val">Contributes ~1,420 lbs to steer axle · Limit 12,000 lbs</div></div><span className="badge badge-ok">OK</span></div>
-          <div className="reason-row"><div className="ri-warn"><span className="material-icons-round">rotate_right</span></div><div className="rl"><div className="rl-lbl">Loading sequence</div><div className="rl-val">Slot 1 loads reversed — cab-over position required</div></div><span className="badge badge-warn">Note</span></div>
-          <div className="reason-row"><div className="ri-err"><span className="material-icons-round">height</span></div><div className="rl"><div className="rl-lbl">Your change — Highlander XLE</div><div className="rl-val">70.9" exceeds Slot 1 clearance by 10.4"</div></div><span className="badge badge-err">Fail</span></div>
+          <div className="reason-row">
+            <div className="ri-ok"><span className="material-icons-round">straighten</span></div>
+            <div className="rl">
+              <div className="rl-lbl">Height clearance</div>
+              <div className="rl-val">{v1 ? `${v1.heightIn}"` : '56.9"'} · Deck 60.5" · Margin {v1 ? (60.5 - v1.heightIn).toFixed(1) : '3.6'}"</div>
+            </div>
+            <span className="badge badge-ok">Pass</span>
+          </div>
+          <div className="reason-row">
+            <div className="ri-ok"><span className="material-icons-round">scale</span></div>
+            <div className="rl">
+              <div className="rl-lbl">Front axle weight</div>
+              <div className="rl-val">~1,420 lbs to steer axle · Limit 12,000 lbs</div>
+            </div>
+            <span className="badge badge-ok">Pass</span>
+          </div>
+          <div className="reason-row">
+            <div className="ri-warn"><span className="material-icons-round">rotate_right</span></div>
+            <div className="rl">
+              <div className="rl-lbl">Loading sequence</div>
+              <div className="rl-val">Slot 1 loads reversed — cab-over position required</div>
+            </div>
+            <span className="badge badge-warn">Note</span>
+          </div>
+          <div className="reason-row">
+            <div className="ri-err"><span className="material-icons-round">height</span></div>
+            <div className="rl">
+              <div className="rl-lbl">Your change — Highlander XLE</div>
+              <div className="rl-val">70.9" exceeds clearance by 10.4"</div>
+            </div>
+            <span className="badge badge-err">Fail</span>
+          </div>
         </div>
 
-        <div className="card-fill" style={{ marginTop: 6 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--on-surface)', marginBottom: 5 }}>MONTAR's suggestion</div>
+        {/* MONTAR suggestion */}
+        <div style={{ margin: '10px 16px 0', padding: '14px 16px', background: 'var(--surface-container)', borderRadius: 'var(--card-r)', border: '1px solid var(--outline-var)' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--on-surface)', marginBottom: 5 }}>MONTAR's recommendation</div>
           <div style={{ fontSize: 13, color: 'var(--on-surface-var)', lineHeight: 1.55 }}>
-            Keep the Camry XSE in Slot 1. The Highlander XLE has adequate clearance and better weight distribution on the bottom deck in Slot 6.
+            Keep {v1 ? `${v1.make} ${v1.model}` : 'the Camry XSE'} in Slot 1. The Highlander XLE has adequate clearance on the bottom deck in Slot 6 and better weight distribution there.
           </div>
         </div>
 
-        <div className="adj-panel" id="adjPanel">
-          <div className="adj-panel-h"><span className="material-icons-round">tune</span>Try a change (driver choice)</div>
-          <label className="adj-opt">
-            <input type="radio" name="adjSlot1" value="keep" checked={adjChoice === 'keep'} onChange={() => setAdjChoice('keep')} />
-            <span className="adj-opt-lbl">Keep MONTAR: Camry XSE V6 in Slot 1 <small>Recommended — clearance safe</small></span>
-          </label>
-          <label className="adj-opt">
-            <input type="radio" name="adjSlot1" value="highlander" checked={adjChoice === 'highlander'} onChange={() => setAdjChoice('highlander')} />
-            <span className="adj-opt-lbl">Move Highlander XLE into Slot 1 <small>Requires review — conflicts with deck height</small></span>
-          </label>
+        {/* Driver choice — large tappable option cards */}
+        <div className="section-lbl" style={{ paddingTop: 14 }}>Driver adjustment</div>
+        <div style={{ padding: '0 16px' }}>
+          <div
+            className={`adj-option-card${adjChoice === 'keep' ? ' selected' : ''}`}
+            onClick={() => { setAdjChoice('keep'); setOutcome(null); setAck(false); }}
+          >
+            <div className="adj-option-radio" />
+            <div>
+              <div className="adj-option-lbl">Keep MONTAR's assignment</div>
+              <div className="adj-option-sub">Recommended · {v1 ? `${v1.make} ${v1.model}` : 'Camry XSE'} in Slot 1 · clearance safe</div>
+            </div>
+          </div>
+          <div
+            className={`adj-option-card${adjChoice === 'highlander' ? ' selected-danger' : ''}`}
+            onClick={() => { setAdjChoice('highlander'); setOutcome(null); setAck(false); }}
+          >
+            <div className="adj-option-radio" />
+            <div>
+              <div className="adj-option-lbl" style={{ color: adjChoice === 'highlander' ? 'var(--error)' : undefined }}>Move Highlander XLE to Slot 1</div>
+              <div className="adj-option-sub">Height conflict — requires driver acknowledgement</div>
+            </div>
+          </div>
           <textarea
             className="adj-note"
-            id="adjDriverNote"
-            placeholder="Driver note (optional): e.g. dealer staging request, chain placement…"
+            placeholder="Driver note (optional): dealer staging request, chain placement…"
             value={driverNote}
             onChange={(e) => setDriverNote(e.target.value)}
           />
-          <div className="adj-actions">
-            <button type="button" className="btn-outline btn-adj-check" id="btnAdjCheck" onClick={handleRecheck}>
-              <span className="material-icons-round" style={{ fontSize: 18 }}>fact_check</span>
-              Apply &amp; recheck feasibility
-            </button>
-          </div>
-          {outcomeState === 'ok' && (
-            <div id="adjOutcome" className="adj-outcome ok">
-              MONTAR's plan is clearance-safe. Camry XSE V6 in Slot 1 is the recommended assignment.
-            </div>
+          <button
+            type="button"
+            className="btn-outline"
+            style={{ width: '100%', justifyContent: 'center', marginTop: 10, height: 44 }}
+            onClick={handleRecheck}
+          >
+            <span className="material-icons-round" style={{ fontSize: 18 }}>fact_check</span>
+            Apply &amp; recheck feasibility
+          </button>
+          {outcome === 'ok' && (
+            <div className="adj-outcome ok">MONTAR's plan is clearance-safe. {v1 ? `${v1.make} ${v1.model}` : 'Camry XSE'} in Slot 1 is the recommended assignment.</div>
           )}
-          {outcomeState === 'bad' && (
-            <div id="adjOutcome" className="adj-outcome bad">
-              Height conflict detected. Highlander XLE at 70.9" exceeds the 60.5" clearance for Slot 1. This override requires driver acknowledgement.
-            </div>
-          )}
-          {showAckRow && (
-            <label id="adjAckRow" className="adj-ack-row show">
-              <input type="checkbox" id="adjAckRisk" checked={ackChecked} onChange={(e) => handleAckChange(e.target.checked)} />
-              <span>I understand this conflicts with deck clearance and accept responsibility if I proceed with an override.</span>
-            </label>
+          {outcome === 'bad' && (
+            <>
+              <div className="adj-outcome bad">
+                Height conflict confirmed. Highlander XLE at 70.9" exceeds the 60.5" clearance for Slot 1 by 10.4 inches. This override is the driver's sole responsibility.
+              </div>
+              <div className="adj-ack-card">
+                <input
+                  type="checkbox"
+                  id="adjAckRisk"
+                  checked={ackChecked}
+                  onChange={(e) => setAck(e.target.checked)}
+                />
+                <label htmlFor="adjAckRisk" className="adj-ack-text">
+                  I understand this creates a deck clearance conflict and accept full responsibility for this override.
+                </label>
+              </div>
+            </>
           )}
         </div>
+        <div style={{ height: 16 }} />
       </div>
 
+      {/* Override action bar */}
       <div className="override-bar">
-        <button type="button" className="btn-err" id="btnAdjOverride" disabled={!overrideEnabled} onClick={handleOverride}>
-          <span className="material-icons-round">warning</span>Override — I accept the risk
+        <button
+          type="button"
+          className="btn-err"
+          id="btnAdjOverride"
+          disabled={!isOverridable}
+          onClick={handleOverride}
+          style={{ cursor: isOverridable ? 'pointer' : 'not-allowed' }}
+        >
+          <span className="material-icons-round">warning</span>
+          Override — I accept the risk
         </button>
         <button
           type="button"
           className="btn-fill"
           id="btnAcceptMontar"
-          style={{ width: '100%', justifyContent: 'center', height: 40, borderRadius: 20, fontFamily: 'var(--font)', fontSize: 14, fontWeight: 500 }}
+          style={{ width: '100%', justifyContent: 'center' }}
           onClick={acceptAndGoYard}
         >
-          <span className="material-icons-round">check</span>Accept MONTAR's Plan
+          <span className="material-icons-round">verified</span>
+          Accept MONTAR's Plan
         </button>
       </div>
     </div>

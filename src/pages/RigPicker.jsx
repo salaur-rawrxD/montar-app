@@ -2,6 +2,15 @@ import { useRef, useEffect } from 'react';
 import { useStore } from '../app/state/loadSessionStore.js';
 import { RIG_CONFIGS } from '../data/trailerConfigs.js';
 
+const RIG_SUBS = [
+  '9-car · Stinger-steer · QuickLoader',
+  '7-car · Stinger-steer · Standard',
+  '9-car · Hydraulic deck · Wide body',
+  '9-car · Stinger · Aluminum frame',
+  '5-car · Single deck · Short haul',
+  '5-car · Stinger · Regional routes',
+];
+
 export default function RigPicker() {
   const selectedRigIdx = useStore((s) => s.selectedRigIdx);
   const selectRig      = useStore((s) => s.selectRig);
@@ -23,15 +32,6 @@ export default function RigPicker() {
     el.addEventListener('scroll', onScroll, { passive: true });
     return () => el.removeEventListener('scroll', onScroll);
   }, [selectedRigIdx, selectRig]);
-
-  const RIG_SUBS = [
-    '9-car · Stinger-steer · QuickLoader',
-    '7-car · Stinger-steer · Standard',
-    '9-car · Hydraulic deck · Wide body',
-    '9-car · Stinger · Aluminum frame',
-    '5-car · Single deck · Short haul',
-    '5-car · Stinger · Regional routes',
-  ];
 
   return (
     <div className="screen active" id="s-rig" data-testid="rig-picker-screen" style={{ background: 'var(--navy)' }}>
@@ -74,11 +74,20 @@ export default function RigPicker() {
         </div>
 
         <div className="rig-details" id="rigDetails">
-          <div className="rig-details-title" id="rigDetailName">{rig.name}</div>
+          <div className="rig-details-title">Specs — operator verification required</div>
           <div className="rig-specs" id="rigSpecs">
-            <div className="rig-spec"><div className="rs-val">{rig.slots}</div><div className="rs-lbl">Max slots</div></div>
-            <div className="rig-spec"><div className="rs-val">{rig.len}</div><div className="rs-lbl">Length</div></div>
-            <div className="rig-spec"><div className="rs-val">{rig.cargo}</div><div className="rs-lbl">Max cargo</div></div>
+            <div className="rig-spec">
+              <div className="rs-val">{rig.slots}</div>
+              <div className="rs-lbl">Slots</div>
+            </div>
+            <div className="rig-spec">
+              <div className="rs-val">{rig.len}</div>
+              <div className="rs-lbl">Length</div>
+            </div>
+            <div className="rig-spec">
+              <div className="rs-val">{rig.cargo}</div>
+              <div className="rs-lbl">Max cargo</div>
+            </div>
           </div>
         </div>
       </div>

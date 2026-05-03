@@ -2,19 +2,19 @@ import { useStore } from '../app/state/loadSessionStore.js';
 import YardMap from '../components/maps/YardMap.jsx';
 
 export default function YardMapPage() {
-  const goBack      = useStore((s) => s.goBack);
-  const goTo        = useStore((s) => s.goTo);
-  const yardStops   = useStore((s) => s.yardStops);
-  const yardIdx     = useStore((s) => s.yardIdx);
+  const goBack       = useStore((s) => s.goBack);
+  const goTo         = useStore((s) => s.goTo);
+  const yardStops    = useStore((s) => s.yardStops);
+  const yardIdx      = useStore((s) => s.yardIdx);
   const markYardStop = useStore((s) => s.markYardStop);
 
-  const current  = yardStops[yardIdx] || null;
-  const next     = yardStops[yardIdx + 1] || null;
-  const allDone  = yardIdx >= yardStops.length;
+  const current = yardStops[yardIdx] || null;
+  const next    = yardStops[yardIdx + 1] || null;
+  const allDone = yardIdx >= yardStops.length;
 
   function shortName(title) {
     const m = title?.match(/—\s*(.+)/);
-    return m ? m[1] : title;
+    return m ? m[1].split(' ').slice(0, 2).join(' ') : title;
   }
 
   return (
@@ -37,11 +37,12 @@ export default function YardMapPage() {
         <div className="map-sheet">
           <div className="sheet-handle" />
 
+          {/* Current pull card */}
           {current && (
             <div className="yard-pull-card" id="yardNextCard">
               <div className="yard-seq-badge" id="yardNextNum">{yardIdx + 1}</div>
               <div className="yard-pull-main">
-                <div className="yard-pull-kicker">Current pull</div>
+                <div className="yard-pull-kicker">Pull {yardIdx + 1} of {yardStops.length}</div>
                 <div className="yard-pull-title" id="yardNextName">{current.title}</div>
                 <div className="yard-meta-row">
                   <div className="yard-meta-item">
@@ -57,17 +58,19 @@ export default function YardMapPage() {
             </div>
           )}
 
+          {/* Up next */}
           {next && (
             <div className="yard-next-strip" id="yardUpNextWrap">
-              <span className="material-icons-round yn-ic" style={{ fontSize: 20 }}>arrow_circle_right</span>
+              <span className="material-icons-round yn-ic">arrow_circle_right</span>
               <div>
-                <div className="yn-lbl" id="yardUpNextLbl">Up next</div>
+                <div className="yn-lbl">Up next</div>
                 <div className="yn-title" id="yardUpNextName">{next.title}</div>
                 <div className="yn-hint" id="yardUpNextHint">{current?.upNextHint || ''}</div>
               </div>
             </div>
           )}
 
+          {/* Stop chips — scrollable row */}
           <div className="stop-q" id="yardStopQ">
             {yardStops.map((s, i) => {
               const isDone   = i < yardIdx;
@@ -87,14 +90,14 @@ export default function YardMapPage() {
             })}
           </div>
 
+          {/* Primary CTA */}
           <div className="map-load-cta">
             {allDone ? (
               <button
                 type="button"
-                className="btn-outline"
+                className="btn-yard-finish"
                 id="btnYardAllDone"
                 data-testid="finish-yard-button"
-                style={{ width: '100%', justifyContent: 'center', minHeight: 44, borderRadius: 12, fontSize: 14, borderColor: '#dadce0', color: '#1a73e8', display: 'flex', alignItems: 'center', gap: 8 }}
                 onClick={() => goTo('loadcomplete')}
               >
                 <span className="material-icons-round">flag</span>
@@ -113,12 +116,12 @@ export default function YardMapPage() {
                   <span id="btnYardMarkTitle">Strapped &amp; loaded</span>
                 </span>
                 <span className="btn-yard-sub" id="btnYardMarkSub">
-                  Vehicle {yardIdx + 1} of {yardStops.length} · confirm, then continue to next stall
+                  Pull {yardIdx + 1} of {yardStops.length} · confirm and move to next stall
                 </span>
               </button>
             )}
           </div>
-          <p className="yard-foot-hint">Highlighted chip = active stall. Tap it to confirm, or use the button above.</p>
+          <p className="yard-foot-hint">Active chip highlights your current stall. Tap it or use the button above.</p>
         </div>
       </div>
     </div>

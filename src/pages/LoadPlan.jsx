@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../app/state/loadSessionStore.js';
 import TrailerMap from '../components/planning/TrailerMap.jsx';
-import LoadPlanSummary from '../components/planning/LoadPlanSummary.jsx';
 
 export default function LoadPlan() {
   const goBack           = useStore((s) => s.goBack);
@@ -20,16 +19,12 @@ export default function LoadPlan() {
   const totalSlots   = loadPlan.slots.length;
   const confirmedCnt = confirmedSlots.length;
   const allConfirmed = confirmedCnt === totalSlots;
-
   const grossPct     = dotStatus ? Math.round((dotStatus.estimatedCargoLb / (loadPlan.maxCargoLb || 47000)) * 100) : 0;
+  const progressPct  = totalSlots > 0 ? Math.round((confirmedCnt / totalSlots) * 100) : 0;
 
   function handleContinue() {
     initYardSession();
     goTo('map');
-  }
-
-  function handleAdjust() {
-    goTo('warning');
   }
 
   return (
@@ -47,31 +42,18 @@ export default function LoadPlan() {
       </div>
 
       <div className="scroll">
-        <div className="plan-intro">
-          <div className="plan-intro-title">
-            <span className="material-icons-round" style={{ fontSize: 18, color: 'var(--primary)' }}>touch_app</span>
-            You're in the loop
-          </div>
-          <div className="plan-intro-body">
-            Confirm each slot when you're satisfied. Optional: open <strong>Why this slot?</strong> for MONTAR's reasoning. Adjustments stay available with guardrails.
-          </div>
-        </div>
-
-        <div className="plan-progress" id="planProgress">
-          {confirmedCnt} of {totalSlots} vehicles confirmed
-        </div>
-
+        {/* Weight / DOT status */}
         {dotStatus && (
           <div className="wt-card">
             <div className="wt-header">
               <div>
-                <div className="wt-lbl">Total Load Weight</div>
+                <div className="wt-lbl">Estimated load weight</div>
                 <div className="wt-val">{dotStatus.estimatedCargoLb?.toLocaleString()} lbs</div>
-                <div className="wt-limit">Limit: {loadPlan.maxCargoLb?.toLocaleString()} lbs available cargo</div>
+                <div className="wt-limit">Cargo limit · {loadPlan.maxCargoLb?.toLocaleString()} lbs</div>
               </div>
               <div className="wt-ok">
                 <span className="material-icons-round" style={{ fontSize: 14 }}>check_circle</span>
-                DOT OK
+                Est. OK
               </div>
             </div>
             <div className="wt-track">
@@ -85,26 +67,32 @@ export default function LoadPlan() {
           </div>
         )}
 
+        {/* Deck diagram */}
         <TrailerMap slots={loadPlan.slots} confirmedSlots={confirmedSlots} />
 
-        <div className="section-lbl">Verify each placement</div>
+        {/* Progress bar */}
+        <div className="plan-progress-bar">
+          <div className="plan-progress-track">
+            <div className="plan-progress-fill" style={{ width: `${progressPct}%` }} />
+          </div>
+          <div className="plan-progress-label">{confirmedCnt}/{totalSlots}</div>
+        </div>
+
+        {/* Slot list */}
+        <div className="section-lbl" style={{ paddingTop: 12 }}>Verify each placement</div>
         <div className="card-el" style={{ marginTop: 0 }} id="planCardList">
           {loadPlan.slots.map((s) => {
-            const isConfirmed  = confirmedSlots.includes(s.slot);
-            const showReason   = openReasonSlot === s.slot;
+            const isConfirmed = confirmedSlots.includes(s.slot);
+            const showReason  = openReasonSlot === s.slot;
             const vName = s.vehicle ? `${s.vehicle.year} ${s.vehicle.make} ${s.vehicle.model}` : '—';
 
             return (
               <div
                 key={s.slot}
-                className={`slot-list-item${isConfirmed ? ' is-confirmed' : ''}${showReason ? ' show-reason' : ''}`}
+                className={`slot-list-item${isConfirmed ? ' is-confirmed' : ''}`}
                 data-slot={s.slot}
               >
-                <div className={`sl-num${!s.vehicle ? ' ' : ''}`}
-                  style={!s.vehicle ? { background: 'var(--surface-container)', color: 'var(--on-surface-var)' } : {}}
-                >
-                  {s.slot}
-                </div>
+                <div className="sl-num">{s.slot}</div>
                 <div className="sl-info">
                   <div className="sl-name">{vName}</div>
                   <div className="sl-vin">{s.vehicle?.vin}</div>
@@ -129,13 +117,13 @@ export default function LoadPlan() {
                     data-slot={s.slot}
                     onClick={() => confirmSlot(s.slot)}
                   >
-                    {isConfirmed ? (
-                      <><span className="material-icons-round">check_circle</span>Confirmed</>
-                    ) : 'Confirm'}
+                    {isConfirmed
+                      ? <><span className="material-icons-round">check_circle</span>Confirmed</>
+                      : 'Confirm'}
                   </button>
                 </div>
                 {showReason && (
-                  <div className="sl-montar-detail" style={{ display: 'block' }}>
+                  <div className="sl-montar-detail">
                     {s.reasoning || 'Standard assignment based on weight and height scoring.'}
                   </div>
                 )}
@@ -145,32 +133,70 @@ export default function LoadPlan() {
         </div>
       </div>
 
+      {/* Action bar — correct hierarchy */}
       <div className="confirm-bar plan-actions">
-        <p className="plan-foot-short">Trust the full plan, review adjustments, or confirm each row — your call.</p>
-        <button
-          type="button"
-          className="btn-outline btn-accept-montar-outline"
-          id="btnAcceptMontarPlan"
-          onClick={acceptMontarPlan}
-        >
-          <span className="material-icons-round">verified</span>
-          Accept MONTAR's plan
-        </button>
-        <button type="button" className="btn-outline" id="btnPlanAdjust" onClick={handleAdjust}>
-          <span className="material-icons-round">tune</span>
-          Adjustments &amp; overrides
-        </button>
-        <button
-          type="button"
-          className="btn-fill btn-yContinue"
-          id="btnPlanContinue"
-          data-testid="continue-to-yard-button"
-          disabled={!allConfirmed}
-          onClick={handleContinue}
-        >
-          <span className="material-icons-round">arrow_forward</span>
-          Continue to yard loading
-        </button>
+        {!allConfirmed ? (
+          <>
+            {/* PRIMARY: Accept MONTAR's plan — the main trust signal */}
+            <button
+              type="button"
+              className="btn-accept-montar-primary"
+              id="btnAcceptMontarPlan"
+              onClick={acceptMontarPlan}
+            >
+              <span className="material-icons-round">verified</span>
+              Accept MONTAR's plan
+            </button>
+            {/* SECONDARY: Continue when all manually confirmed */}
+            <button
+              type="button"
+              className="btn-fill btn-yContinue"
+              id="btnPlanContinue"
+              data-testid="continue-to-yard-button"
+              disabled
+              style={{ opacity: .45 }}
+            >
+              <span className="material-icons-round">arrow_forward</span>
+              Continue to yard loading
+            </button>
+            {/* TERTIARY: Adjustments */}
+            <button
+              type="button"
+              className="btn-outline"
+              id="btnPlanAdjust"
+              onClick={() => goTo('warning')}
+              style={{ height: 40, fontSize: 13 }}
+            >
+              <span className="material-icons-round">tune</span>
+              Adjustments &amp; overrides
+            </button>
+            <p className="plan-foot">Confirm each slot individually or accept the full plan above.</p>
+          </>
+        ) : (
+          <>
+            {/* All confirmed — continue is the only action */}
+            <button
+              type="button"
+              className="btn-fill btn-yContinue"
+              id="btnPlanContinue"
+              data-testid="continue-to-yard-button"
+              onClick={handleContinue}
+            >
+              <span className="material-icons-round">arrow_forward</span>
+              Continue to yard loading
+            </button>
+            <button
+              type="button"
+              className="btn-outline"
+              id="btnPlanAdjust"
+              onClick={() => goTo('warning')}
+              style={{ height: 40, fontSize: 13 }}
+            >
+              <span className="material-icons-round">tune</span>
+              Adjustments &amp; overrides
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
