@@ -620,7 +620,7 @@ html.pwa-standalone .frame{
 <!-- ══════════════════════════════════════ -->
 <!-- S0: SPLASH                             -->
 <!-- ══════════════════════════════════════ -->
-<div class="screen active" id="s-splash" style="background:var(--navy);">
+<div class="screen active" id="s-splash" data-testid="splash-screen" style="background:var(--navy);">
   <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
     <div class="splash-logo">
       <div class="splash-m">M</div>
@@ -634,7 +634,7 @@ html.pwa-standalone .frame{
 <!-- ══════════════════════════════════════ -->
 <!-- S1: RIG PICKER                         -->
 <!-- ══════════════════════════════════════ -->
-<div class="screen" id="s-rig" style="background:var(--navy);">
+<div class="screen" id="s-rig" data-testid="rig-picker-screen" style="background:var(--navy);">
   <div class="app-bar" style="background:transparent;">
     <div class="app-bar-inner" style="padding-top:0;">
       <div style="width:48px;"></div>
@@ -696,7 +696,7 @@ html.pwa-standalone .frame{
 <!-- ══════════════════════════════════════ -->
 <!-- S2: HOME                              -->
 <!-- ══════════════════════════════════════ -->
-<div class="screen" id="s-home">
+<div class="screen" id="s-home" data-testid="dashboard-screen">
   <div class="app-bar">
     <div class="app-bar-inner">
       <div class="app-bar-title lg">MONTAR</div>
@@ -716,7 +716,7 @@ html.pwa-standalone .frame{
       </div>
     </div>
 
-    <div class="scan-action" id="btnOpenLoadSheetPicker" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="loadSheetPicker">
+    <div class="scan-action" id="btnOpenLoadSheetPicker" data-testid="add-load-sheet-button" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="loadSheetPicker">
       <div class="scan-icon"><span class="material-icons-round">post_add</span></div>
       <div class="scan-text"><div class="t">Add load sheet</div><div class="s">Snap or upload your BOL — we read VINs and prep your optimized pull · Cottrell CX-09LS</div></div>
       <span class="material-icons-round" style="color:#fff;font-size:20px;">arrow_forward</span>
@@ -769,6 +769,11 @@ html.pwa-standalone .frame{
         <span class="lsp-opt-text"><strong>Upload image</strong><span>Pick a photo or file from your library</span></span>
         <span class="material-icons-round lsp-chev">chevron_right</span>
       </button>
+      <button type="button" class="lsp-opt" id="btnPickSampleSheet" data-testid="use-sample-sheet-button">
+        <span class="material-icons-round">auto_awesome</span>
+        <span class="lsp-opt-text"><strong>Use sample sheet</strong><span>Demo mode — loads the built-in BOL</span></span>
+        <span class="material-icons-round lsp-chev">chevron_right</span>
+      </button>
       <button type="button" class="lsp-cancel" id="btnLoadSheetPickerCancel">Cancel</button>
     </div>
   </div>
@@ -777,7 +782,7 @@ html.pwa-standalone .frame{
 <!-- ══════════════════════════════════════ -->
 <!-- S3: SCAN                               -->
 <!-- ══════════════════════════════════════ -->
-<div class="screen" id="s-scan" style="background:#000;">
+<div class="screen" id="s-scan" data-testid="scan-screen" style="background:#000;">
   <div class="scan-toolbar">
     <button class="icon-btn" onclick="goBack('s-home')" style="color:#fff;"><span class="material-icons-round">arrow_back</span></button>
     <span class="scan-title">Load sheet</span>
@@ -819,7 +824,7 @@ html.pwa-standalone .frame{
         <div class="scan-done-title"><span class="material-icons-round">verified</span><span id="scanDoneTitleLbl">Sheet captured</span></div>
         <div class="scan-done-body" id="scanDoneBody">We read the VINs on your sheet. Review them next, or go back and add a clearer photo if something looks off.</div>
       </div>
-      <button type="button" class="btn-fill btn-scan-accept" id="btnScanAccept"><span class="material-icons-round">arrow_forward</span>Accept &amp; review vehicles</button>
+      <button type="button" class="btn-fill btn-scan-accept" id="btnScanAccept" data-testid="accept-scan-button"><span class="material-icons-round">arrow_forward</span>Accept &amp; review vehicles</button>
     </div>
   </div>
 </div>
@@ -827,7 +832,7 @@ html.pwa-standalone .frame{
 <!-- ══════════════════════════════════════ -->
 <!-- S4: DECODE                             -->
 <!-- ══════════════════════════════════════ -->
-<div class="screen" id="s-decode">
+<div class="screen" id="s-decode" data-testid="decode-screen">
   <div class="app-bar">
     <div class="app-bar-inner">
       <button class="icon-btn" onclick="goBack('s-scan')"><span class="material-icons-round">arrow_back</span></button>
@@ -846,26 +851,26 @@ html.pwa-standalone .frame{
     </div>
     <div class="decode-hint">Accept each VIN if it matches the metal, or edit before optimizing. MONTAR will only build a load plan from accepted rows.</div>
     <div class="section-lbl">Decoded Vehicles</div>
-    <div class="veh-card veh-card-decode" data-vix="0"><div class="veh-rank">1</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry XSE V6</div><div class="veh-vin vin-text">4T1G11AK8PU123481</div></div><div class="veh-meta"><span class="badge badge-neu">3,572 lbs</span><span class="badge badge-pri" style="font-size:10px;">T042</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" title="Accept VIN"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit" title="Edit VIN"><span class="material-icons-round">edit</span></button></div></div>
-    <div class="veh-card veh-card-decode" data-vix="1"><div class="veh-rank">2</div><div class="veh-info"><div class="veh-name">2025 Toyota RAV4 XLE Premium</div><div class="veh-vin vin-text">2T3P1RFV8PW847263</div></div><div class="veh-meta"><span class="badge badge-neu">4,015 lbs</span><span class="badge badge-pri" style="font-size:10px;">T043</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
-    <div class="veh-card veh-card-decode" data-vix="2"><div class="veh-rank">3</div><div class="veh-info"><div class="veh-name">2025 Toyota Tacoma TRD 4x4</div><div class="veh-vin vin-text">3TMLB5JN3SM178449</div></div><div class="veh-meta"><span class="badge badge-warn">4,480 lbs</span><span class="badge badge-pri" style="font-size:10px;">T071</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
-    <div class="veh-card veh-card-decode" data-vix="3"><div class="veh-rank">4</div><div class="veh-info"><div class="veh-name">2025 Toyota Highlander XLE</div><div class="veh-vin vin-text">5TDHZRBH9MS523875</div></div><div class="veh-meta"><span class="badge badge-warn">4,705 lbs</span><span class="badge badge-pri" style="font-size:10px;">T072</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
-    <div class="veh-card veh-card-decode" data-vix="4"><div class="veh-rank">5</div><div class="veh-info"><div class="veh-name">2025 Toyota Corolla SE CVT</div><div class="veh-vin vin-text">4T1DAACK6SU566558</div></div><div class="veh-meta"><span class="badge badge-neu">3,097 lbs</span><span class="badge badge-pri" style="font-size:10px;">T048</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
-    <div class="veh-card veh-card-decode" data-vix="5"><div class="veh-rank">6</div><div class="veh-info"><div class="veh-name">2025 Toyota RAV4 Adventure</div><div class="veh-vin vin-text">2T3P1RFV2SC561402</div></div><div class="veh-meta"><span class="badge badge-neu">4,015 lbs</span><span class="badge badge-pri" style="font-size:10px;">T049</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
-    <div class="veh-card veh-card-decode" data-vix="6"><div class="veh-rank">7</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry LE Hybrid</div><div class="veh-vin vin-text">4T1DAACK1SU559372</div></div><div class="veh-meta"><span class="badge badge-neu">3,616 lbs</span><span class="badge badge-pri" style="font-size:10px;">T044</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
-    <div class="veh-card veh-card-decode" data-vix="7"><div class="veh-rank">8</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry XSE AWD</div><div class="veh-vin vin-text">4T1DAACK8SU046040</div></div><div class="veh-meta"><span class="badge badge-neu">3,682 lbs</span><span class="badge badge-pri" style="font-size:10px;">T045</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
-    <div class="veh-card veh-card-decode" data-vix="8"><div class="veh-rank">9</div><div class="veh-info"><div class="veh-name">2025 Toyota Highlander XSE</div><div class="veh-vin vin-text">5TDHZRBH9MS500001</div></div><div class="veh-meta"><span class="badge badge-warn">4,705 lbs</span><span class="badge badge-pri" style="font-size:10px;">T073</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="0"><div class="veh-rank">1</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry XSE V6</div><div class="veh-vin vin-text">4T1G11AK8PU123481</div></div><div class="veh-meta"><span class="badge badge-neu">3,572 lbs</span><span class="badge badge-pri" style="font-size:10px;">T042</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" data-testid="accept-vin-button" title="Accept VIN"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit" title="Edit VIN"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="1"><div class="veh-rank">2</div><div class="veh-info"><div class="veh-name">2025 Toyota RAV4 XLE Premium</div><div class="veh-vin vin-text">2T3P1RFV8PW847263</div></div><div class="veh-meta"><span class="badge badge-neu">4,015 lbs</span><span class="badge badge-pri" style="font-size:10px;">T043</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" data-testid="accept-vin-button"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="2"><div class="veh-rank">3</div><div class="veh-info"><div class="veh-name">2025 Toyota Tacoma TRD 4x4</div><div class="veh-vin vin-text">3TMLB5JN3SM178449</div></div><div class="veh-meta"><span class="badge badge-warn">4,480 lbs</span><span class="badge badge-pri" style="font-size:10px;">T071</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" data-testid="accept-vin-button"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="3"><div class="veh-rank">4</div><div class="veh-info"><div class="veh-name">2025 Toyota Highlander XLE</div><div class="veh-vin vin-text">5TDHZRBH9MS523875</div></div><div class="veh-meta"><span class="badge badge-warn">4,705 lbs</span><span class="badge badge-pri" style="font-size:10px;">T072</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" data-testid="accept-vin-button"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="4"><div class="veh-rank">5</div><div class="veh-info"><div class="veh-name">2025 Toyota Corolla SE CVT</div><div class="veh-vin vin-text">4T1DAACK6SU566558</div></div><div class="veh-meta"><span class="badge badge-neu">3,097 lbs</span><span class="badge badge-pri" style="font-size:10px;">T048</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" data-testid="accept-vin-button"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="5"><div class="veh-rank">6</div><div class="veh-info"><div class="veh-name">2025 Toyota RAV4 Adventure</div><div class="veh-vin vin-text">2T3P1RFV2SC561402</div></div><div class="veh-meta"><span class="badge badge-neu">4,015 lbs</span><span class="badge badge-pri" style="font-size:10px;">T049</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" data-testid="accept-vin-button"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="6"><div class="veh-rank">7</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry LE Hybrid</div><div class="veh-vin vin-text">4T1DAACK1SU559372</div></div><div class="veh-meta"><span class="badge badge-neu">3,616 lbs</span><span class="badge badge-pri" style="font-size:10px;">T044</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" data-testid="accept-vin-button"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="7"><div class="veh-rank">8</div><div class="veh-info"><div class="veh-name">2025 Toyota Camry XSE AWD</div><div class="veh-vin vin-text">4T1DAACK8SU046040</div></div><div class="veh-meta"><span class="badge badge-neu">3,682 lbs</span><span class="badge badge-pri" style="font-size:10px;">T045</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" data-testid="accept-vin-button"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
+    <div class="veh-card veh-card-decode" data-vix="8"><div class="veh-rank">9</div><div class="veh-info"><div class="veh-name">2025 Toyota Highlander XSE</div><div class="veh-vin vin-text">5TDHZRBH9MS500001</div></div><div class="veh-meta"><span class="badge badge-warn">4,705 lbs</span><span class="badge badge-pri" style="font-size:10px;">T073</span></div><div class="veh-actions"><button type="button" class="btn-mini primary btn-vin-ok" data-testid="accept-vin-button"><span class="material-icons-round">check</span></button><button type="button" class="btn-mini btn-vin-edit"><span class="material-icons-round">edit</span></button></div></div>
   </div>
   <div class="confirm-bar">
     <button type="button" class="btn-outline" id="btnRescan">Re-scan</button>
-    <button type="button" class="btn-fill" id="btnOptimizeLoad" disabled><span class="material-icons-round">auto_awesome</span>Optimize load</button>
+    <button type="button" class="btn-fill" id="btnOptimizeLoad" data-testid="continue-to-load-plan-button" disabled><span class="material-icons-round">auto_awesome</span>Optimize load</button>
   </div>
 </div>
 
 <!-- ══════════════════════════════════════ -->
 <!-- S5: SLOTS                              -->
 <!-- ══════════════════════════════════════ -->
-<div class="screen" id="s-slots">
+<div class="screen" id="s-slots" data-testid="load-plan-screen">
   <div class="app-bar">
     <div class="app-bar-inner">
       <button type="button" class="icon-btn" onclick="goBack('s-decode')"><span class="material-icons-round">arrow_back</span></button>
@@ -913,47 +918,47 @@ html.pwa-standalone .frame{
     <div class="card-el" style="margin-top:0;" id="planCardList">
       <div class="slot-list-item" data-slot="1">
         <div class="sl-num">1</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry XSE V6</div><div class="sl-vin">4T1G11AK8PU123481</div></div><div class="sl-right"><div class="sl-wt">3,572 lbs</div><div class="sl-reason">Reversed · Cab-over</div></div>
-        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="1">Confirm</button></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-testid="confirm-slot-button" data-slot="1">Confirm</button></div>
         <div class="sl-montar-detail">Lowest roof on the top deck clears the rail. Reversed for cab-over load sequence and tie-down geometry on your Cottrell.</div>
       </div>
       <div class="slot-list-item" data-slot="2">
         <div class="sl-num">2</div><div class="sl-info"><div class="sl-name">2025 Toyota RAV4 XLE Premium</div><div class="sl-vin">2T3P1RFV8PW847263</div></div><div class="sl-right"><div class="sl-wt">4,015 lbs</div><div class="sl-reason">Height clearance ✓</div></div>
-        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="2">Confirm</button></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-testid="confirm-slot-button" data-slot="2">Confirm</button></div>
         <div class="sl-montar-detail">SUV height fits the remaining top-deck envelope after Slot 1, with margin for rail and strap angles.</div>
       </div>
       <div class="slot-list-item" data-slot="3">
         <div class="sl-num">3</div><div class="sl-info"><div class="sl-name">2025 Toyota Tacoma TRD 4x4</div><div class="sl-vin">3TMLB5JN3SM178449</div></div><div class="sl-right"><div class="sl-wt">4,480 lbs</div><div class="sl-reason">Axle weight ✓</div></div>
-        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="3">Confirm</button></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-testid="confirm-slot-button" data-slot="3">Confirm</button></div>
         <div class="sl-montar-detail">Pickup weight split keeps the steer axle under limit with your fifth-wheel and stinger configuration.</div>
       </div>
       <div class="slot-list-item" data-slot="4">
         <div class="sl-num" style="background:var(--surface-container);color:var(--on-surface-var);">4</div><div class="sl-info"><div class="sl-name">2025 Toyota Corolla SE CVT</div><div class="sl-vin">4T1DAACK6SU566558</div></div><div class="sl-right"><div class="sl-wt">3,097 lbs</div><div class="sl-reason">Lightest top deck</div></div>
-        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="4">Confirm</button></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-testid="confirm-slot-button" data-slot="4">Confirm</button></div>
         <div class="sl-montar-detail">Lightest unit forward on the top deck for tongue-weight balance and progressive loading.</div>
       </div>
       <div class="slot-list-item" data-slot="5">
         <div class="sl-num">5</div><div class="sl-info"><div class="sl-name">2025 Toyota RAV4 Adventure</div><div class="sl-vin">2T3P1RFV2SC561402</div></div><div class="sl-right"><div class="sl-wt">4,015 lbs</div><div class="sl-reason">Height clearance ✓</div></div>
-        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="5">Confirm</button></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-testid="confirm-slot-button" data-slot="5">Confirm</button></div>
         <div class="sl-montar-detail">Mirrors Slot 2’s height envelope; sequenced for yard pull order toward T049.</div>
       </div>
       <div class="slot-list-item" data-slot="6">
         <div class="sl-num">6</div><div class="sl-info"><div class="sl-name">2025 Toyota Highlander XLE</div><div class="sl-vin">5TDHZRBH9MS523875</div></div><div class="sl-right"><div class="sl-wt">4,705 lbs</div><div class="sl-reason">Bottom deck ✓</div></div>
-        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="6">Confirm</button></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-testid="confirm-slot-button" data-slot="6">Confirm</button></div>
         <div class="sl-montar-detail">Heavy SUV kept low on the bottom deck for stability, clearance, and tie-down leverage.</div>
       </div>
       <div class="slot-list-item" data-slot="7">
         <div class="sl-num">7</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry LE Hybrid</div><div class="sl-vin">4T1DAACK1SU559372</div></div><div class="sl-right"><div class="sl-wt">3,616 lbs</div><div class="sl-reason">Weight balance ✓</div></div>
-        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="7">Confirm</button></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-testid="confirm-slot-button" data-slot="7">Confirm</button></div>
         <div class="sl-montar-detail">Hybrid battery mass is included in cross-weight so left–right balance stays in target.</div>
       </div>
       <div class="slot-list-item" data-slot="8">
         <div class="sl-num">8</div><div class="sl-info"><div class="sl-name">2025 Toyota Camry XSE AWD</div><div class="sl-vin">4T1DAACK8SU046040</div></div><div class="sl-right"><div class="sl-wt">3,682 lbs</div><div class="sl-reason">Rear axle ✓</div></div>
-        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="8">Confirm</button></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-testid="confirm-slot-button" data-slot="8">Confirm</button></div>
         <div class="sl-montar-detail">AWD bias lines up with bottom-deck tie-downs and drive-axle loading for this deck.</div>
       </div>
       <div class="slot-list-item" data-slot="9">
         <div class="sl-num">9</div><div class="sl-info"><div class="sl-name">2025 Toyota Highlander XSE</div><div class="sl-vin">5TDHZRBH9MS500001</div></div><div class="sl-right"><div class="sl-wt">4,705 lbs</div><div class="sl-reason">Bottom deck ✓</div></div>
-        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-slot="9">Confirm</button></div>
+        <div class="sl-ack-row"><button type="button" class="btn-why-montar"><span class="material-icons-round">help_outline</span>Why this slot?</button><button type="button" class="btn-ack-slot" data-testid="confirm-slot-button" data-slot="9">Confirm</button></div>
         <div class="sl-montar-detail">Paired with Slot 6 for symmetric load; last stop at dealer aligns with unload T073.</div>
       </div>
     </div>
@@ -962,7 +967,7 @@ html.pwa-standalone .frame{
     <p class="plan-foot-short">Trust the full plan, review adjustments, or confirm each row — your call.</p>
     <button type="button" class="btn-outline btn-accept-montar-outline" id="btnAcceptMontarPlan"><span class="material-icons-round">verified</span>Accept MONTAR&rsquo;s plan</button>
     <button type="button" class="btn-outline" id="btnPlanAdjust"><span class="material-icons-round">tune</span>Adjustments &amp; overrides</button>
-    <button type="button" class="btn-fill btn-yContinue" id="btnPlanContinue" disabled><span class="material-icons-round">arrow_forward</span>Continue to yard loading</button>
+    <button type="button" class="btn-fill btn-yContinue" id="btnPlanContinue" data-testid="continue-to-yard-button" disabled><span class="material-icons-round">arrow_forward</span>Continue to yard loading</button>
   </div>
 </div>
 
@@ -1027,7 +1032,7 @@ html.pwa-standalone .frame{
 <!-- ══════════════════════════════════════ -->
 <!-- S7: YARD MAP                           -->
 <!-- ══════════════════════════════════════ -->
-<div class="screen" id="s-map">
+<div class="screen" id="s-map" data-testid="yard-map-screen">
   <div class="app-bar">
     <div class="app-bar-inner">
       <button type="button" class="icon-btn" onclick="goBack('s-slots')"><span class="material-icons-round">arrow_back</span></button>
@@ -1147,7 +1152,7 @@ html.pwa-standalone .frame{
       <div class="sq-chip" data-yi="8"><div class="sqn">9</div><div class="sql">T073</div><div class="sqv">Highlander</div></div>
     </div>
     <div class="map-load-cta">
-      <button type="button" class="btn-fill btn-yard-primary" id="btnYardMarkLoaded">
+      <button type="button" class="btn-fill btn-yard-primary" id="btnYardMarkLoaded" data-testid="load-next-vehicle-button">
         <span style="display:flex;align-items:center;gap:8px;"><span class="material-icons-round" style="font-size:22px;">check_circle</span><span id="btnYardMarkTitle">Strapped &amp; loaded</span></span>
         <span class="btn-yard-sub" id="btnYardMarkSub">Vehicle 1 of 9 · confirm, then continue to next stall</span>
       </button>
@@ -1165,7 +1170,7 @@ html.pwa-standalone .frame{
 <!-- ══════════════════════════════════════ -->
 <!-- S8: LOAD COMPLETE                      -->
 <!-- ══════════════════════════════════════ -->
-<div class="screen" id="s-loadcomplete">
+<div class="screen" id="s-loadcomplete" data-testid="load-confirmation-screen">
   <div class="app-bar">
     <div class="app-bar-inner">
       <button class="icon-btn" onclick="goBack('s-map')"><span class="material-icons-round">arrow_back</span></button>
@@ -1204,7 +1209,7 @@ html.pwa-standalone .frame{
   </div>
   <div class="confirm-bar" style="padding:16px;flex-direction:column;gap:10px;align-items:stretch;">
     <div style="font-size:11px;color:var(--on-surface-var);line-height:1.4;padding:0 4px;text-align:center;">Car-hauler prep for this drop — not a substitute for Google Maps or Trucker Path. Use your nav app on the road.</div>
-    <button type="button" class="btn-fill" id="btnOpenDealerGuide" style="width:100%;justify-content:center;min-height:52px;border-radius:14px;font-size:15px;flex-direction:column;gap:4px;padding:12px 16px;height:auto;">
+    <button type="button" class="btn-fill" id="btnOpenDealerGuide" data-testid="continue-to-delivery-button" style="width:100%;justify-content:center;min-height:52px;border-radius:14px;font-size:15px;flex-direction:column;gap:4px;padding:12px 16px;height:auto;">
       <span style="display:flex;align-items:center;gap:8px;"><span class="material-icons-round">warehouse</span>Dealer arrival guide</span>
       <span style="font-size:12px;font-weight:400;opacity:.92;">Drive-in, parking &amp; handoff notes for Renton Toyota</span>
     </button>
@@ -1214,7 +1219,7 @@ html.pwa-standalone .frame{
 <!-- ══════════════════════════════════════ -->
 <!-- S9: DELIVERY                           -->
 <!-- ══════════════════════════════════════ -->
-<div class="screen" id="s-delivery">
+<div class="screen" id="s-delivery" data-testid="delivery-screen">
   <div class="app-bar">
     <div class="app-bar-inner">
       <button class="icon-btn" onclick="goBack('s-loadcomplete')"><span class="material-icons-round">arrow_back</span></button>
@@ -1326,7 +1331,7 @@ html.pwa-standalone .frame{
     </div>
 
     <div id="deliveryBottomCta" style="padding:16px;">
-      <button type="button" class="btn-fill" id="btnEndDeliverySession" style="width:100%;justify-content:center;min-height:48px;border-radius:14px;font-size:15px;background:var(--green);flex-direction:column;gap:4px;padding:12px 16px;height:auto;">
+      <button type="button" class="btn-fill" id="btnEndDeliverySession" data-testid="wrap-session-button" style="width:100%;justify-content:center;min-height:48px;border-radius:14px;font-size:15px;background:var(--green);flex-direction:column;gap:4px;padding:12px 16px;height:auto;">
         <span style="display:flex;align-items:center;gap:8px;"><span class="material-icons-round">emoji_events</span>Wrap up session</span>
         <span style="font-size:12px;font-weight:400;opacity:.92;">Adds this run to Previous loads on Home for your records. Dealers are not notified from Montar.</span>
       </button>
@@ -1615,6 +1620,16 @@ function handleLoadSheetFile(file, source) {
       const f = e.target.files && e.target.files[0];
       if (f) handleLoadSheetFile(f, 'upload');
       e.target.value = '';
+    });
+  }
+  const sampleBtn = document.getElementById('btnPickSampleSheet');
+  if (sampleBtn) {
+    sampleBtn.addEventListener('click', () => {
+      playSound('tap');
+      haptic(8);
+      revokeScanSheetPreview();
+      closeLoadSheetPicker();
+      goTo('s-scan');
     });
   }
 })();

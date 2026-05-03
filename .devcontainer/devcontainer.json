@@ -8,7 +8,7 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "postCreateCommand": "npm install",
+  "postCreateCommand": "npm install && npx playwright install chromium --with-deps",
   "customizations": {
     "vscode": {
       "extensions": [
