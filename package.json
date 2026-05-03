@@ -11,8 +11,14 @@
     "test:e2e:ui": "playwright test --ui",
     "test:ui-audit": "playwright test tests/e2e/ui-audit.spec.js"
   },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.3"
+  },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
+    "@vitejs/plugin-react": "^4.3.2",
     "vite": "^5.4.0"
   }
 }

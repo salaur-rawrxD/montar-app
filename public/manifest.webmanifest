@@ -1,0 +1,18 @@
+{
+  "name": "MONTAR",
+  "short_name": "MONTAR",
+  "description": "Load Faster. Move more cars.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B1726",
+  "theme_color": "#0B1726",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

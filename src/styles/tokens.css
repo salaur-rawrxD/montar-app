@@ -1,0 +1,38 @@
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+img{max-width:100%;height:auto;display:block;}
+
+:root{
+  --primary:#E8620A;--primary-container:#FFDBC8;--on-primary:#fff;--on-primary-container:#321100;
+  --navy:#0B1726;--navy2:#0F2035;--navy3:#162840;
+  --surface:#FFF8F5;--surface-var:#F5DDD3;--surface-low:#FBF0EB;--surface-container:#F0E0D8;
+  --on-surface:#201A17;--on-surface-var:#53433C;
+  --outline:#85736C;--outline-var:#D8C2BB;
+  --success:#1D6B3E;--success-container:#B7F0CF;
+  --error:#BA1A1A;--error-container:#FFDAD6;
+  --warning:#7B5800;--warning-container:#FFDEA3;
+  --green:#1D9E75;
+  --font:'Google Sans',sans-serif;
+  --mono:'Roboto Mono',monospace;
+  --display:'Google Sans Display',sans-serif;
+  --e1:0 1px 2px rgba(0,0,0,.1),0 1px 3px 1px rgba(0,0,0,.07);
+  --e2:0 1px 2px rgba(0,0,0,.1),0 2px 6px 2px rgba(0,0,0,.07);
+  --e3:0 4px 8px 3px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.1);
+  --app-bar-pad:54px;
+}
+
+html{width:100%;height:100%;height:-webkit-fill-available;-webkit-text-size-adjust:100%;}
+html,body{min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;background:#1A1A2E;display:flex;align-items:stretch;justify-content:center;font-family:var(--font);overflow:hidden;}
+body{width:100%;margin:0;padding:0;box-sizing:border-box;}
+#root{display:flex;width:100%;min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;align-items:stretch;justify-content:center;}
+
+html.pwa-standalone{height:100%;min-height:100%;min-height:-webkit-fill-available;overflow:hidden;}
+html.pwa-standalone body{position:fixed;inset:0;width:100%;height:100%;min-height:100%;min-height:-webkit-fill-available;max-height:100%;max-height:-webkit-fill-available;overflow:hidden;overscroll-behavior:none;-webkit-overflow-scrolling:auto;display:block;}
+html.pwa-standalone .frame{position:absolute;inset:0;width:100%;max-height:none;flex:none;}
+
+@media (max-width:519px),(pointer:coarse),(display-mode:standalone){
+  :root{--app-bar-pad:calc(env(safe-area-inset-top,0px) + 10px);}
+  .frame::before,.home-ind{display:none!important;}
+  #statusBar{display:none!important;}
+  html,body{align-items:stretch;justify-content:flex-start;width:100%;height:100%;min-height:100%;min-height:100dvh;min-height:100svh;min-height:-webkit-fill-available;}
+  .frame{position:fixed;inset:0;flex:none;width:100%;max-width:100%;max-height:none;}
+}
