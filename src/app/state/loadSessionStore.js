@@ -8,6 +8,7 @@ import { buildYardStops } from '../../logic/yardPlanner.js';
 import { buildDeliveryPlan } from '../../logic/deliveryPlanner.js';
 import { saveCompleteSession } from '../../services/loadSessionService.js';
 import { decodeVinBatch } from '../../services/nhtsaService.js';
+import { enrichVehicles } from '../../services/vehicleSpecsService.js';
 
 function haptic(ms) {
   try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) {}
@@ -105,16 +106,19 @@ export const useStore = create((set, get) => ({
   // 'idle'    — no scan started
   // 'loading' — API calls in flight during scan animation
   // 'done'    — identity merged into vehicles (year/make/model updated)
+  //             specs enriched from Auto.dev (weight/dimensions)
   // 'failed'  — all calls failed; vehicles keep seed data with source:'demo'
   nhtsaStatus: 'idle',
 
   async _decodeNhtsa(originalVehicles) {
     const vins = originalVehicles.map((v) => v.vin);
     try {
-      const results = await decodeVinBatch(vins);
+      // Decode vehicle identity from NHTSA
+      const nhtsaResults = await decodeVinBatch(vins);
+      
       // Merge identity-only fields — never overwrite weight, height, stallId
-      const merged = originalVehicles.map((v, i) => {
-        const r = results[i];
+      const nhtsamerged = originalVehicles.map((v, i) => {
+        const r = nhtsaResults[i];
         if (!r || r.source === 'invalid' || r.source === 'nhtsa_fallback') {
           // API failed for this VIN — keep seed data, mark source
           return { ...v, source: r?.source ?? 'nhtsa_fallback' };
@@ -132,7 +136,27 @@ export const useStore = create((set, get) => ({
           confidence:   r.confidence,
         };
       });
-      set({ vehicles: merged, nhtsaStatus: 'done' });
+
+      // Enrich with specs from Auto.dev (parallel, non-blocking)
+      const specs = await enrichVehicles(nhtsamerged);
+      
+      const enriched = nhtsamerged.map((v, i) => {
+        const s = specs[i];
+        return {
+          ...v,
+          weightLb:        s.curbWeightLb    ?? v.weightLb,
+          lengthIn:        s.lengthIn        ?? v.lengthIn,
+          widthIn:         s.widthIn         ?? v.widthIn,
+          heightIn:        s.heightIn        ?? v.heightIn,
+          groundClearanceIn: s.groundClearanceIn ?? null,
+          specsSource:     s.source,
+          specsConfidence: s.confidence,
+          specsNeedsVerification: s.needsVerification,
+          specsFromCache:  s.fromCache,
+        };
+      });
+
+      set({ vehicles: enriched, nhtsaStatus: 'done' });
     } catch (_) {
       // Catastrophic failure — leave vehicles unchanged with 'demo' source
       set({ nhtsaStatus: 'failed' });

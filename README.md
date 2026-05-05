@@ -255,6 +255,168 @@ Start the dev server and run a full session (Splash → Rig → Dashboard → Sa
 
 ---
 
+## Auto.dev Vehicle Specifications Setup
+
+Auto.dev provides real-time vehicle dimensions and curb weight for load planning and 14 ft height checks. The API is called server-side via a Supabase Edge Function so the API key never reaches the browser.
+
+### Prerequisites
+
+- Supabase project already configured (see [Supabase Setup](#supabase-setup-optional) above)
+- Active Auto.dev API account with a valid API key
+
+### 1. Create or rotate your Auto.dev API key
+
+Go to [auto.dev](https://auto.dev), log in, and go to **API Keys** in your dashboard. Create a new key or copy an existing one. You'll use this in the next step.
+
+### 2. Set the Supabase secret
+
+In your Supabase project:
+
+1. Go to **Settings → Secrets and Vault** (left sidebar)
+2. Click **+ New secret**
+3. Name: `AUTO_DEV_API_KEY`
+4. Value: Paste your Auto.dev API key
+5. Click **Save**
+
+> **Security note:** Secrets are never visible in logs or to the browser. Only Supabase Edge Functions can read them via `Deno.env.get()`.
+
+### 3. Deploy the Edge Function
+
+The Edge Function is already in `supabase/functions/decode-vehicle-specs/index.ts`. Deploy it:
+
+```bash
+supabase functions deploy decode-vehicle-specs
+```
+
+If you don't have the Supabase CLI installed:
+
+```bash
+npm install -g supabase
+supabase login
+# (select your Supabase project when prompted)
+supabase functions deploy decode-vehicle-specs
+```
+
+### 4. Update the vehicle_specs table schema
+
+Run this SQL in the Supabase **SQL Editor** to add new columns for Auto.dev specs:
+
+```sql
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS trim text;
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS body_style text;
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS vehicle_type text;
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS curb_weight_lb numeric;
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS length_in numeric;
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS width_in numeric;
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS height_in numeric;
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS ground_clearance_in numeric;
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS source text DEFAULT 'mock';
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS confidence text;
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS needs_verification boolean DEFAULT false;
+ALTER TABLE vehicle_specs ADD COLUMN IF NOT EXISTS raw_response jsonb;
+```
+
+### 5. Test the integration
+
+```bash
+npm run test:auto-dev
+```
+
+**Success output:**
+```
+══════════════════════════════════════════════════
+Auto.dev Specs via Supabase Edge Function
+══════════════════════════════════════════════════
+Supabase URL: https://your-project-id.supabase.co
+Function: decode-vehicle-specs
+
+──────────────────────────────────────────────────
+Testing: 5TDJKRFH6LS123456
+──────────────────────────────────────────────────
+
+✓ Status: auto.dev
+✓ Confidence: provider
+✓ Needs verification: NO
+✓ From cache: NO
+✓ Time: 342ms
+
+  Year: 2020
+  Make: Toyota
+  Model: Highlander
+  Curb weight: 4860 lbs
+  Length: 194"
+  Width: 76"
+  Height: 68"
+  Ground clearance: 9"
+
+══════════════════════════════════════════════════
+Results: 1 passed, 0 failed
+══════════════════════════════════════════════════
+```
+
+### How it works
+
+1. **VIN decode** — NHTSA vPIC API provides year/make/model/body class
+2. **Specs lookup** — Auto.dev provides curb weight, length, width, height, ground clearance
+3. **Caching** — Both NHTSA and Auto.dev results are cached in Supabase so you're never querying the same VIN twice
+4. **Load planning** — Load planner prefers provider values (curb weight, height, width, length) and falls back to estimated values
+5. **Operator verification** — When specs are incomplete or from cache, the driver still verifies each vehicle visually before load planning
+
+### What Auto.dev provides vs. what it doesn't
+
+**Auto.dev provides:**
+- Curb weight (lbs)
+- Overall length (inches)
+- Overall width (inches)
+- Overall height (inches)
+- Ground clearance (inches)
+- Body style (Sedan, SUV, Truck, etc.)
+- Trim level
+
+**NHTSA vPIC API provides:**
+- Year
+- Make
+- Model
+- Body class (not the same as body style)
+- Vehicle type
+- Manufacturer
+- Plant country
+
+**Montar provides:**
+- Operator verification (driver confirms each vehicle visually)
+- Load plan scoring and optimization
+- DOT compliance checking (14 ft bridge height, weight distribution)
+- Delivery routing and yard guides
+
+### If Auto.dev fails
+
+The app never crashes:
+
+1. If the Auto.dev API key is missing or invalid → the function returns an error, the app falls back to estimated specs
+2. If Auto.dev times out → the app marks the vehicle as **"Needs verification"** and uses estimated values
+3. If a VIN is not found in Auto.dev → local mock data is used and confidence is marked as **"none"**
+4. If Supabase is offline → the app works fully with localStorage and no specs
+
+**Example fallback behavior:**
+
+```js
+// If Auto.dev fails
+{
+  vin: "5TDJKRFH6LS123456",
+  curbWeightLb: 3800,          // estimated
+  heightIn: 60,                // estimated
+  lengthIn: 180,               // estimated
+  widthIn: 72,                 // estimated
+  source: "estimated",
+  confidence: "none",
+  needsVerification: true
+}
+```
+
+The driver is prompted to verify all dimensions before the load plan is locked in.
+
+
+
 ## What works without Supabase
 
 Everything. Supabase is strictly additive — if the env vars are missing, the app:

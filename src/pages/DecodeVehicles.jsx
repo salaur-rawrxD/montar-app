@@ -1,7 +1,7 @@
 import { useStore } from '../app/state/loadSessionStore.js';
 import { vehicleDisplayName, weightBadgeClass } from '../data/mockVehicles.js';
 
-/* Maps v.source → badge config */
+/* Maps v.source → badge config (for VIN identity) */
 const SOURCE_BADGE = {
   nhtsa:          { cls: 'vbadge-nhtsa',     icon: 'verified_user', label: 'NHTSA' },
   identity_only:  { cls: 'vbadge-nhtsa',     icon: 'verified_user', label: 'NHTSA' },
@@ -14,8 +14,36 @@ const SOURCE_BADGE = {
   demo:           { cls: 'vbadge-demo',      icon: 'science',       label: 'Demo data' },
 };
 
+/* Maps v.specsSource → badge config (for vehicle specs: weight, dimensions) */
+const SPECS_BADGE = {
+  'auto.dev':   { cls: 'vbadge-autodev',     icon: 'bolt',          label: 'Auto.dev specs' },
+  'estimated':  { cls: 'vbadge-estimated',   icon: 'calculate',     label: 'Estimated specs' },
+  'fallback':   { cls: 'vbadge-review',      icon: 'error_outline', label: 'Needs verification' },
+  'mock':       { cls: 'vbadge-demo',        icon: 'science',       label: 'Demo specs' },
+};
+
 function VerificationBadge({ source }) {
   const cfg = SOURCE_BADGE[source] ?? SOURCE_BADGE.demo;
+  return (
+    <span className={`vbadge ${cfg.cls}`}>
+      <span className="material-icons-round">{cfg.icon}</span>
+      {cfg.label}
+    </span>
+  );
+}
+
+function SpecsBadge({ specsSource, specsNeedsVerification }) {
+  // If needs verification, always show that regardless of source
+  if (specsNeedsVerification) {
+    const cfg = SPECS_BADGE['fallback'];
+    return (
+      <span className={`vbadge ${cfg.cls}`}>
+        <span className="material-icons-round">{cfg.icon}</span>
+        {cfg.label}
+      </span>
+    );
+  }
+  const cfg = SPECS_BADGE[specsSource] ?? SPECS_BADGE.estimated;
   return (
     <span className={`vbadge ${cfg.cls}`}>
       <span className="material-icons-round">{cfg.icon}</span>
@@ -120,7 +148,8 @@ export default function DecodeVehicles() {
                 <div className="veh-name">{vehicleDisplayName(v)}</div>
                 <div className="veh-vin vin-text">{v.vin}</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 7 }}>
-                  <VerificationBadge source="demo" />
+                  <VerificationBadge source={v.source || 'demo'} />
+                  {v.specsSource && <SpecsBadge specsSource={v.specsSource} specsNeedsVerification={v.specsNeedsVerification} />}
                   {v.weightLb && (
                     <span className={`badge ${weightBadgeClass(v.weightLb)}`}>
                       {v.weightLb?.toLocaleString()} lbs

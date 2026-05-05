@@ -10,7 +10,9 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui": "playwright test --ui",
     "test:ui-audit": "playwright test tests/e2e/ui-audit.spec.js",
-    "test:supabase": "node scripts/test-supabase.js"
+    "test:supabase": "node scripts/test-supabase.js",
+    "test:nhtsa": "node scripts/test-nhtsa.js",
+    "test:auto-dev": "node scripts/test-auto-dev-specs.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
