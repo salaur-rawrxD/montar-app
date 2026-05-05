@@ -294,9 +294,12 @@ export async function saveCompleteSession(storeState) {
   const rigName = rig?.name ?? null;
 
   // 1. Create the load record
+  const d = new Date();
+  const fallbackRef = `MNT-${String(d.getFullYear()).slice(2)}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}-SAVED`;
+
   const loadRes = await insertLoad({
-    loadRef:      '041625-09',
-    origin:       'BNSF Orillia',
+    loadRef:      storeState.sessionLoadRef ?? fallbackRef,
+    origin:       storeState.sessionOrigin  ?? 'Unassigned yard',
     rigId,
     rigName,
     vehicleCount: loadPlan?.slots?.length ?? vehicles.length,

@@ -338,6 +338,56 @@ montar-app/
 
 ---
 
+## Installing as a PWA
+
+Montar is a fully installable Progressive Web App. Once installed it launches full-screen (no browser chrome), works from the home screen like a native app, and loads instantly from cache even with no signal.
+
+### Android (Chrome)
+
+1. Open Montar in **Chrome for Android**.
+2. After a few seconds Chrome shows a banner at the bottom: **"Add MONTAR to Home screen"** — tap it, then tap **Add**.
+3. If the banner doesn't appear automatically, tap the **⋮ menu → Add to Home screen**.
+4. The MONTAR icon appears on your home screen. Tap it to launch in standalone mode.
+
+> Chrome requires HTTPS for the install prompt. Use the production URL or a tunnelled Codespaces port (the forwarded `https://` URL works; `http://localhost` does not trigger the prompt).
+
+### iOS (Safari)
+
+iOS does not show an automatic install prompt. Use the Share sheet:
+
+1. Open Montar in **Safari** (must be Safari — Chrome on iOS cannot install PWAs).
+2. Tap the **Share button** (box with arrow pointing up) in the bottom toolbar.
+3. Scroll down and tap **Add to Home Screen**.
+4. Confirm the name (MONTAR) and tap **Add**.
+5. The icon appears on your home screen and opens in full-screen standalone mode.
+
+> **Icon note:** iOS requires a PNG `apple-touch-icon` for a custom home-screen icon. Until a PNG is generated from `icon.svg`, iOS will use a screenshot of the page instead of the logo. The app still installs and runs correctly.
+
+---
+
+## What works offline
+
+After the first load, the service worker caches the entire app shell. The following work with **no internet connection**:
+
+- Splash, rig picker, and dashboard screens
+- Load plan generation and slot confirmation (pure in-browser logic)
+- DOT weight/height compliance checks
+- Yard guide map (SVG — no network needed)
+- Delivery page layout and approach notes
+- All previously saved session data (localStorage)
+- The session wrap flow (data is saved locally and synced when back online)
+
+Google Fonts are cached on first load (StaleWhileRevalidate for CSS, CacheFirst for font files) so the full typography renders offline after initial use.
+
+## What still requires internet
+
+- **Supabase sync** — completed session data uploads to the cloud. If offline, data stays in localStorage and there is no data loss. The sync status indicator will show the state.
+- **Google Fonts** — on the very first load before the cache is populated, the app falls back to system sans-serif and monospace fonts. This is cosmetic only.
+- **NHTSA VIN decode** (future) — real VIN decode requires the NHTSA public API.
+- **OCR** (future) — load sheet scanning will require a cloud or on-device OCR call.
+
+---
+
 ## Saving your work with Git
 
 ```bash

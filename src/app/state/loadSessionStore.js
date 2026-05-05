@@ -7,11 +7,21 @@ import { calculateDotCompliance } from '../../logic/dotCompliance.js';
 import { buildYardStops } from '../../logic/yardPlanner.js';
 import { buildDeliveryPlan } from '../../logic/deliveryPlanner.js';
 import { saveCompleteSession } from '../../services/loadSessionService.js';
+import { decodeVinBatch } from '../../services/nhtsaService.js';
 
 function haptic(ms) {
   try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) {}
 }
 function hapticSuccess() { haptic([15, 45, 15]); }
+
+function generateLoadRef() {
+  const d = new Date();
+  const yy = String(d.getFullYear()).slice(2);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const rnd = Math.random().toString(36).slice(2, 7).toUpperCase();
+  return `MNT-${yy}${mm}${dd}-${rnd}`;
+}
 
 export const useStore = create((set, get) => ({
   // ── Navigation ──────────────────────────────────────────────────
@@ -55,30 +65,78 @@ export const useStore = create((set, get) => ({
   initScanFromFile(source, objectUrl) {
     const prev = get().scanSheetObjectUrl;
     if (prev) URL.revokeObjectURL(prev);
+    const vehicles = SEED_VEHICLES.map((v) => ({ ...v }));
     set({
       scanSheetSource: source,
       scanSheetObjectUrl: objectUrl,
-      vehicles: SEED_VEHICLES.map((v) => ({ ...v })),
+      vehicles,
       acceptedIdxs: [],
       loadSheetPickerOpen: false,
+      sessionLoadRef: generateLoadRef(),
+      nhtsaStatus: 'loading',
     });
     const { currentScreen } = get();
     set({ prevScreen: currentScreen, currentScreen: 'scan', navDir: 'forward' });
+    // Fire-and-forget: decode VINs during the scan animation
+    setTimeout(() => get()._decodeNhtsa(vehicles), 0);
   },
 
   initScanSample() {
     haptic(8);
     const prev = get().scanSheetObjectUrl;
     if (prev) URL.revokeObjectURL(prev);
+    const vehicles = SEED_VEHICLES.map((v) => ({ ...v }));
     set({
       scanSheetSource: 'sample',
       scanSheetObjectUrl: null,
-      vehicles: SEED_VEHICLES.map((v) => ({ ...v })),
+      vehicles,
       acceptedIdxs: [],
       loadSheetPickerOpen: false,
+      sessionLoadRef: generateLoadRef(),
+      nhtsaStatus: 'loading',
     });
     const { currentScreen } = get();
     set({ prevScreen: currentScreen, currentScreen: 'scan', navDir: 'forward' });
+    // Fire-and-forget: decode VINs during the scan animation
+    setTimeout(() => get()._decodeNhtsa(vehicles), 0);
+  },
+
+  // ── NHTSA background decode ──────────────────────────────────────
+  // 'idle'    — no scan started
+  // 'loading' — API calls in flight during scan animation
+  // 'done'    — identity merged into vehicles (year/make/model updated)
+  // 'failed'  — all calls failed; vehicles keep seed data with source:'demo'
+  nhtsaStatus: 'idle',
+
+  async _decodeNhtsa(originalVehicles) {
+    const vins = originalVehicles.map((v) => v.vin);
+    try {
+      const results = await decodeVinBatch(vins);
+      // Merge identity-only fields — never overwrite weight, height, stallId
+      const merged = originalVehicles.map((v, i) => {
+        const r = results[i];
+        if (!r || r.source === 'invalid' || r.source === 'nhtsa_fallback') {
+          // API failed for this VIN — keep seed data, mark source
+          return { ...v, source: r?.source ?? 'nhtsa_fallback' };
+        }
+        return {
+          ...v,
+          year:         r.year         ?? v.year,
+          make:         r.make         ?? v.make,
+          model:        r.model        ?? v.model,
+          bodyClass:    r.bodyClass    ?? null,
+          vehicleType:  r.vehicleType  ?? null,
+          manufacturer: r.manufacturer ?? null,
+          plantCountry: r.plantCountry ?? null,
+          source:       r.source,       // 'nhtsa' or 'nhtsa_fallback'
+          confidence:   r.confidence,
+        };
+      });
+      set({ vehicles: merged, nhtsaStatus: 'done' });
+    } catch (_) {
+      // Catastrophic failure — leave vehicles unchanged with 'demo' source
+      set({ nhtsaStatus: 'failed' });
+    }
   },
 
   // ── Vehicles ────────────────────────────────────────────────────
@@ -160,16 +218,20 @@ export const useStore = create((set, get) => ({
   sessionEndData: null,
 
   endSession() {
-    const { yardStartTs } = get();
+    const { yardStartTs, acceptedIdxs, sessionLoadRef, sessionOrigin } = get();
     const yardMin   = yardStartTs
       ? Math.max(1, Math.round((Date.now() - yardStartTs) / 60000))
       : (36 + Math.floor(Math.random() * 28));
     const dealerMin    = 14 + Math.floor(Math.random() * 26);
     const destination  = SESSION_DEALER_OPTIONS[Math.floor(Math.random() * SESSION_DEALER_OPTIONS.length)];
+    const loadRef      = sessionLoadRef ?? generateLoadRef();
+    const origin       = sessionOrigin  ?? 'Unassigned yard';
+    const vehicleCount = acceptedIdxs.length || 1;
     const entry = {
-      origin:       'BNSF Orillia',
+      loadRef,
+      origin,
       destination,
-      vehicleCount: 9,
+      vehicleCount,
       yardMin,
       dealerMin,
       ts: Date.now(),
@@ -218,6 +280,11 @@ export const useStore = create((set, get) => ({
     const { currentScreen } = get();
     set({ prevScreen: currentScreen, currentScreen: 'home', navDir: 'forward' });
   },
+
+  // ── Session identity ─────────────────────────────────────────────
+  // Generated at scan-start so every Supabase row is unique per run.
+  sessionLoadRef: null,
+  sessionOrigin:  'BNSF Orillia',
 
   // ── Sync status ──────────────────────────────────────────────────
   // 'idle'    — no session started yet

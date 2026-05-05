@@ -12,27 +12,33 @@ export default function DeliveryPage() {
   const dealer = deliveryPlan?.dealer;
 
   return (
-    <div className="screen active" id="s-delivery" data-testid="delivery-screen">
+    <div className="screen active" id="s-delivery" data-testid="delivery-screen"
+      style={{ background: 'var(--surface-var)' }}>
+
+      {/* ── App bar — dark shell ── */}
       <div className="app-bar">
         <div className="app-bar-inner">
-          <button className="icon-btn" onClick={() => goBack('loadcomplete')}>
+          <button className="icon-btn" onClick={() => goBack('loadcomplete')} aria-label="Back">
             <span className="material-icons-round">arrow_back</span>
           </button>
           <div className="app-bar-title">Dealer arrival</div>
-          <button className="icon-btn">
+          <button className="icon-btn" aria-label="More options">
             <span className="material-icons-round">more_vert</span>
           </button>
         </div>
       </div>
 
       <div className="scroll">
-        <div className="delivery-disclaimer">
-          <strong>On-lot &amp; handoff only.</strong> MONTAR does not replace your GPS. Dealer instructions here — drive-in, parking, and handoff — vary by store.
+        {/* On-lot disclaimer */}
+        <div className="delivery-disclaimer" style={{ marginTop: 12 }}>
+          <strong>On-lot &amp; handoff only.</strong> MONTAR does not replace your GPS.
+          Dealer instructions here vary by store — drive-in, parking, and handoff.
         </div>
 
+        {/* Dealer map + info */}
         <DeliveryMap dealer={dealer} />
 
-        {/* Approach — prominent, operational */}
+        {/* Approach steps — dark operational card */}
         <div className="approach-card" style={{ margin: '12px 16px 0' }}>
           <div className="ac-title">
             <span className="material-icons-round">fork_right</span>
@@ -41,11 +47,13 @@ export default function DeliveryPage() {
           {(dealer?.approach || []).map((step) => (
             <div key={step.step} className="ac-step">
               <div className="ac-num">{step.step}</div>
+              {/* dangerouslySetInnerHTML is safe here: content is a hardcoded constant */}
               <div className="ac-text" dangerouslySetInnerHTML={{ __html: step.text }} />
             </div>
           ))}
         </div>
 
+        {/* Handoff notes */}
         <div className="section-lbl" style={{ paddingTop: 14 }}>Handoff notes</div>
         {(dealer?.notes || []).map((note, i) => (
           <div key={i} className="note-card">
@@ -59,38 +67,44 @@ export default function DeliveryPage() {
           </div>
         ))}
 
-        <div style={{ margin: '8px 16px 0', fontSize: 12, color: 'var(--on-surface-var)', lineHeight: 1.5 }}>
+        {/* Unload sequence note */}
+        <div style={{
+          margin: '8px 16px 0',fontSize: 12,
+          color: 'var(--muted)',lineHeight: 1.55,
+          padding: '10px 14px',background: 'var(--surface)',
+          borderRadius: 'var(--card-r-sm)',border: '1px solid var(--outline-var)',
+        }}>
           Single-dealer drop: follow your trailer unload order. A step-by-step unload list appears here for multi-stop deliveries.
         </div>
 
-        {/* Wrap session — orange, consistent with brand */}
+        {/* Wrap session CTA */}
         <div style={{ padding: '16px 16px 4px' }}>
           <button
-            type="button"
-            className="btn-fill"
+            type="button" className="btn-fill"
             id="btnEndDeliverySession"
             data-testid="wrap-session-button"
             style={{
-              width: '100%', justifyContent: 'center',
-              height: 'auto', minHeight: 'var(--btn-h)',
+              width: '100%',justifyContent: 'center',
+              height: 'auto',minHeight: 'var(--btn-h)',
               borderRadius: 'var(--btn-r)',
-              flexDirection: 'column', gap: 4,
-              padding: '14px 20px',
+              flexDirection: 'column',gap: 4,padding: '14px 20px',
+              boxShadow: 'var(--e-orange)',
             }}
             onClick={endSession}
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span className="material-icons-round">emoji_events</span>
+              <span className="material-icons-round">flag</span>
               Wrap up session
             </span>
-            <span style={{ fontSize: 12, fontWeight: 400, opacity: 0.85 }}>
-              Saves this run to Previous loads · dealers not notified
+            <span style={{ fontSize: 12, fontWeight: 400, opacity: 0.8, fontFamily: 'var(--mono)' }}>
+              Saves this run · dealers not notified
             </span>
           </button>
         </div>
+        <div style={{ height: 8 }} />
       </div>
 
-      {/* Session end overlay */}
+      {/* ── Session end overlay ── */}
       <div
         id="sessionEndOverlay"
         className={`session-end-overlay${sessionEndVisible ? ' visible' : ''}`}
@@ -101,26 +115,34 @@ export default function DeliveryPage() {
             <span className="material-icons-round">close</span>
           </button>
           <div className="session-end-icon">
-            <span className="material-icons-round">emoji_events</span>
+            <span className="material-icons-round">check_circle</span>
           </div>
           <div className="session-end-banner">
             <div className="session-hdr" id="sessionDialogTitle">Session saved</div>
-            <div style={{ fontSize: 13, color: 'var(--on-surface-var)', marginBottom: 8 }}>
+            <div style={{ fontSize: 13, color: 'var(--on-surface-var)', marginBottom: 8, marginTop: 4 }}>
               {sessionEndData?.destination && (
-                <span style={{ fontWeight: 600, color: 'var(--on-surface)' }}>BNSF Orillia → {sessionEndData.destination}</span>
+                <span style={{ fontWeight: 700, color: 'var(--on-surface)', fontFamily: 'var(--mono)' }}>
+                  BNSF Orillia → {sessionEndData.destination}
+                </span>
               )}
             </div>
             <div className="session-time-grid">
               <div className="session-time-cell">
                 <div className="stl-lbl">Yard · loading</div>
-                <div className="stl-val">~{sessionEndData?.yardMin ?? '—'}<span style={{ fontSize: 14, fontWeight: 500 }}>m</span></div>
+                <div className="stl-val">
+                  ~{sessionEndData?.yardMin ?? '—'}
+                  <span style={{ fontSize: 14, fontWeight: 500 }}>m</span>
+                </div>
               </div>
               <div className="session-time-cell">
                 <div className="stl-lbl">Dealer · unload</div>
-                <div className="stl-val">~{sessionEndData?.dealerMin ?? '—'}<span style={{ fontSize: 14, fontWeight: 500 }}>m</span></div>
+                <div className="stl-val">
+                  ~{sessionEndData?.dealerMin ?? '—'}
+                  <span style={{ fontSize: 14, fontWeight: 500 }}>m</span>
+                </div>
               </div>
             </div>
-            <div className="sub" style={{ marginTop: 10, fontSize: 13, color: 'var(--on-surface-var)' }}>
+            <div style={{ marginTop: 12, fontSize: 13, color: 'var(--muted)', lineHeight: 1.5 }}>
               Saved to Previous loads with {sessionEndData?.loadDate || 'today'}'s date.
             </div>
           </div>

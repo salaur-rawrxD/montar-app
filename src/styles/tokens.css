@@ -1,48 +1,95 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 img{max-width:100%;height:auto;display:block;}
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   INDUSTRIAL COMMAND — Design Token System
+   Montar · Field Operations UI for Car Haulers
+   ═══════════════════════════════════════════════════════════════════════════ */
 :root{
-  /* Brand */
-  --primary:#E8620A;--primary-dark:#C45208;--primary-container:#FFDBC8;--on-primary:#fff;--on-primary-container:#321100;
+  /* ── BRAND / ACTION ──────────────────────────────────────────────────── */
+  --primary:#E8620A;
+  --primary-dark:#B94B05;
+  --primary-container:#FFE1CC;
+  --on-primary:#fff;
+  --on-primary-container:#5C2000;
 
-  /* Navy (command-center foundation) */
-  --navy:#0B1726;--navy2:#0F2035;--navy3:#162840;--navy4:#1C3050;
+  /* ── CORE SURFACES — Dark Shell ──────────────────────────────────────── */
+  --bg:#08111F;               /* App background */
+  --panel:#0E1B2D;            /* Panel background */
+  --elevated:#13243B;         /* Elevated panel / dark card */
+  --shell-border:rgba(255,255,255,0.08); /* Dark shell dividers */
 
-  /* Surface */
-  --surface:#FFF8F5;--surface-var:#F5DDD3;--surface-low:#FBF0EB;--surface-container:#F0E0D8;
-  --on-surface:#1A1410;--on-surface-var:#52433B;
+  /* Keep navy aliases for backward compat */
+  --navy:#08111F;
+  --navy2:#0E1B2D;
+  --navy3:#13243B;
+  --navy4:#1C3050;
 
-  /* Outline */
-  --outline:#8A776F;--outline-var:#DCC4BB;--outline-strong:#6B5A52;
+  /* ── CORE SURFACES — Light Operational Cards ─────────────────────────── */
+  --surface:#F7F3EE;          /* Primary light card */
+  --surface-var:#ECE5DD;      /* Secondary light card */
+  --surface-low:#F7F3EE;
+  --surface-container:#ECE5DD;
 
-  /* Semantic */
-  --success:#166534;--success-mid:#16A34A;--success-container:#DCFCE7;--on-success:#fff;
-  --error:#991B1B;--error-mid:#DC2626;--error-container:#FEE2E2;--on-error:#fff;
-  --warning:#92400E;--warning-mid:#D97706;--warning-container:#FEF3C7;
+  /* ── TEXT — Dark text (on light cards) ───────────────────────────────── */
+  --on-surface:#101820;       /* Primary dark text */
+  --on-surface-var:#46505A;   /* Secondary dark text */
+  --muted:#667085;            /* Muted text */
 
-  /* Danger (full severity — for operator safety warnings) */
-  --danger:#7F1D1D;--danger-surface:linear-gradient(160deg,#7F1D1D 0%,#991B1B 100%);
+  /* ── TEXT — Light text (on dark shell) ───────────────────────────────── */
+  --text-inv:#F8FAFC;         /* Inverse / light text */
+  --text-soft:#CBD5E1;        /* Soft inverse text */
 
-  /* Typography */
-  --font:'Google Sans',system-ui,sans-serif;
-  --mono:'Roboto Mono',ui-monospace,monospace;
-  --display:'Google Sans Display','Google Sans',system-ui,sans-serif;
+  /* ── BORDERS / DIVIDERS ──────────────────────────────────────────────── */
+  --outline:#A99F96;          /* Strong border */
+  --outline-var:#D8D0C8;      /* Soft border */
+  --outline-strong:#A99F96;
 
-  /* Elevation */
-  --e1:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
-  --e2:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);
-  --e3:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);
-  --e-inset:inset 0 1px 0 rgba(255,255,255,.06);
+  /* ── STATUS — Success ────────────────────────────────────────────────── */
+  --success:#168A5B;
+  --success-mid:#168A5B;
+  --success-container:#DDF8EA;
+  --on-success:#fff;
 
-  /* Component sizes — standardized */
-  --btn-h:52px;          /* primary action */
-  --btn-h-sm:44px;       /* secondary action */
-  --btn-r:14px;          /* button radius */
-  --card-r:14px;         /* hero / standalone cards */
-  --card-r-sm:12px;      /* list items */
-  --sheet-r:20px;        /* bottom sheets */
+  /* ── STATUS — Warning ────────────────────────────────────────────────── */
+  --warning:#B7791F;
+  --warning-mid:#B7791F;
+  --warning-container:#FFF3CD;
 
-  /* App chrome */
+  /* ── STATUS — Danger / Error ─────────────────────────────────────────── */
+  --error:#A11D1D;
+  --error-mid:#C0392B;
+  --error-container:#FFE1E1;
+  --on-error:#fff;
+  --danger:#A11D1D;
+  --danger-surface:linear-gradient(160deg,#7F1313 0%,#A11D1D 100%);
+
+  /* ── STATUS — Info ───────────────────────────────────────────────────── */
+  --info:#2563EB;
+  --info-soft:#DBEAFE;
+
+  /* ── TYPOGRAPHY ──────────────────────────────────────────────────────── */
+  --font:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --display:'IBM Plex Sans',system-ui,sans-serif;
+
+  /* ── ELEVATION / SHADOW ──────────────────────────────────────────────── */
+  --e1:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08);
+  --e2:0 4px 8px -1px rgba(0,0,0,.14),0 2px 4px -1px rgba(0,0,0,.08);
+  --e3:0 12px 20px -3px rgba(0,0,0,.18),0 4px 8px -2px rgba(0,0,0,.08);
+  --e-inset:inset 0 1px 0 rgba(255,255,255,.05);
+  --e-orange:0 4px 16px rgba(232,98,10,.3);
+  --e-green:0 4px 12px rgba(22,138,91,.25);
+
+  /* ── COMPONENT SIZES — 8px grid ─────────────────────────────────────── */
+  --btn-h:52px;               /* Primary action height */
+  --btn-h-sm:44px;            /* Secondary action height */
+  --btn-r:14px;               /* Button radius */
+  --card-r:14px;              /* Hero / standalone card radius */
+  --card-r-sm:12px;           /* List item card radius */
+  --sheet-r:20px;             /* Bottom sheet radius */
+
+  /* ── APP CHROME ──────────────────────────────────────────────────────── */
   --app-bar-pad:54px;
   --bottom-pad:max(20px,env(safe-area-inset-bottom));
 }
@@ -50,9 +97,10 @@ img{max-width:100%;height:auto;display:block;}
 html{width:100%;height:100%;height:-webkit-fill-available;-webkit-text-size-adjust:100%;}
 html,body{
   min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;
-  background:#0B1726;
+  background:var(--bg);
   display:flex;align-items:stretch;justify-content:center;
   font-family:var(--font);overflow:hidden;
+  font-feature-settings:'ss03' 1,'cv08' 1;
 }
 body{width:100%;margin:0;padding:0;box-sizing:border-box;}
 #root{display:flex;width:100%;min-height:100%;min-height:100dvh;min-height:-webkit-fill-available;align-items:stretch;justify-content:center;}

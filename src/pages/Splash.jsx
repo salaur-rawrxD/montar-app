@@ -10,12 +10,12 @@ export default function Splash() {
   }, [goTo]);
 
   return (
-    <div className="screen active" id="s-splash" data-testid="splash-screen" style={{ background: 'var(--navy)' }}>
+    <div className="screen active" id="s-splash" data-testid="splash-screen" style={{ background: 'var(--bg)' }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div className="splash-logo">
-          <div className="splash-m">M</div>
-          <div className="splash-name">MONTAR</div>
+          <div className="splash-m">MONTAR</div>
           <div className="splash-bar" />
+          <div className="splash-name">Field operations · car haulers</div>
           <div className="splash-tag">Load faster. Move more cars.</div>
         </div>
       </div>

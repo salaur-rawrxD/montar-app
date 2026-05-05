@@ -18,22 +18,29 @@ export default function YardMapPage() {
   }
 
   return (
-    <div className="screen active" id="s-map" data-testid="yard-map-screen">
+    <div className="screen active" id="s-map" data-testid="yard-map-screen"
+      style={{ background: 'var(--bg)' }}>
+
+      {/* ── App bar — dark shell ── */}
       <div className="app-bar">
         <div className="app-bar-inner">
-          <button type="button" className="icon-btn" onClick={() => goBack('slots')}>
+          <button type="button" className="icon-btn" onClick={() => goBack('slots')} aria-label="Back">
             <span className="material-icons-round">arrow_back</span>
           </button>
-          <div className="app-bar-title">Yard loading</div>
-          <button type="button" className="icon-btn">
+          <div className="app-bar-title">
+            {allDone ? 'Yard complete' : `Yard loading · ${yardIdx + 1} of ${yardStops.length}`}
+          </div>
+          <button type="button" className="icon-btn" aria-label="Map layers">
             <span className="material-icons-round">layers</span>
           </button>
         </div>
       </div>
 
       <div className="yard-scroll">
+        {/* Map fills the top portion */}
         <YardMap stops={yardStops} activeIdx={yardIdx} />
 
+        {/* ── Bottom sheet — operational context ── */}
         <div className="map-sheet">
           <div className="sheet-handle" />
 
@@ -47,11 +54,17 @@ export default function YardMapPage() {
                 <div className="yard-meta-row">
                   <div className="yard-meta-item">
                     <span className="material-icons-round">straighten</span>
-                    <div><strong>Distance</strong><br /><span id="yardNextDist">{current.dist}</span></div>
+                    <div>
+                      <strong>Distance</strong><br />
+                      <span id="yardNextDist">{current.dist}</span>
+                    </div>
                   </div>
                   <div className="yard-meta-item">
                     <span className="material-icons-round">directions_walk</span>
-                    <div><strong>Walk</strong><br /><span id="yardNextWalkInline">{current.walk}</span></div>
+                    <div>
+                      <strong>Walk</strong><br />
+                      <span id="yardNextWalkInline">{current.walk}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -70,7 +83,7 @@ export default function YardMapPage() {
             </div>
           )}
 
-          {/* Stop chips — scrollable row */}
+          {/* Stop chip queue */}
           <div className="stop-q" id="yardStopQ">
             {yardStops.map((s, i) => {
               const isDone   = i < yardIdx;
@@ -90,12 +103,11 @@ export default function YardMapPage() {
             })}
           </div>
 
-          {/* Primary CTA */}
+          {/* Primary CTA — large, unambiguous */}
           <div className="map-load-cta">
             {allDone ? (
               <button
-                type="button"
-                className="btn-yard-finish"
+                type="button" className="btn-yard-finish"
                 id="btnYardAllDone"
                 data-testid="finish-yard-button"
                 onClick={() => goTo('loadcomplete')}
@@ -116,12 +128,14 @@ export default function YardMapPage() {
                   <span id="btnYardMarkTitle">Strapped &amp; loaded</span>
                 </span>
                 <span className="btn-yard-sub" id="btnYardMarkSub">
-                  Pull {yardIdx + 1} of {yardStops.length} · confirm and move to next stall
+                  Pull {yardIdx + 1} of {yardStops.length} · confirm and advance
                 </span>
               </button>
             )}
           </div>
-          <p className="yard-foot-hint">Active chip highlights your current stall. Tap it or use the button above.</p>
+          <p className="yard-foot-hint">
+            Active chip highlights your current stall. Tap it or use the button above.
+          </p>
         </div>
       </div>
     </div>
