@@ -1,6 +1,6 @@
 import { useStore } from '../app/state/loadSessionStore.js';
 import BottomNav from '../components/shell/BottomNav.jsx';
-import { buildPreviousLoadRows } from '../data/mockLoads.js';
+import { buildPreviousLoadRows } from '../data/mockLoadSheets.js';
 
 export default function LoadHistory() {
   const previousLoads = useStore((s) => s.previousLoads);

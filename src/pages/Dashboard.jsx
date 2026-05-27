@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useStore } from '../app/state/loadSessionStore.js';
 import BottomNav from '../components/shell/BottomNav.jsx';
 import SyncStatus from '../components/common/SyncStatus.jsx';
-import { buildPreviousLoadRows } from '../data/mockLoads.js';
+import { buildPreviousLoadRows } from '../data/mockLoadSheets.js';
 import { RIG_CONFIGS } from '../data/trailerConfigs.js';
 
 export default function Dashboard() {

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { RIG_CONFIGS } from '../../data/trailerConfigs.js';
 import { SEED_VEHICLES } from '../../data/mockVehicles.js';
-import { SESSION_DEALER_OPTIONS, loadPreviousLoads, savePreviousLoad, formatLoadDate } from '../../data/mockLoads.js';
+import { SESSION_DEALER_OPTIONS, loadPreviousLoads, savePreviousLoad, formatLoadDate } from '../../data/mockLoadSheets.js';
 import { runLoadPlanner } from '../../logic/loadPlanner.js';
 import { calculateDotCompliance } from '../../logic/dotCompliance.js';
 import { buildYardStops } from '../../logic/yardPlanner.js';
@@ -308,7 +308,7 @@ export const useStore = create((set, get) => ({
   // ── Session identity ─────────────────────────────────────────────
   // Generated at scan-start so every Supabase row is unique per run.
   sessionLoadRef: null,
-  sessionOrigin:  'BNSF Orillia',
+  sessionOrigin: 'Port of Tacoma — Taylor Way Auto Facility',
 
   // ── Sync status ──────────────────────────────────────────────────
   // 'idle'    — no session started yet
