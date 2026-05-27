@@ -8,6 +8,8 @@ import WarningReview from '../pages/WarningReview.jsx';
 import YardMapPage from '../pages/YardMapPage.jsx';
 import LoadConfirm from '../pages/LoadConfirm.jsx';
 import DeliveryPage from '../pages/DeliveryPage.jsx';
+import LoadHistory from '../pages/LoadHistory.jsx';
+import Settings from '../pages/Settings.jsx';
 
 export const SCREEN_MAP = {
   splash:      Splash,
@@ -20,4 +22,6 @@ export const SCREEN_MAP = {
   map:         YardMapPage,
   loadcomplete: LoadConfirm,
   delivery:    DeliveryPage,
+  history:     LoadHistory,
+  settings:    Settings,
 };

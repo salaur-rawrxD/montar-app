@@ -1,17 +1,8 @@
-// CommonJS — runs directly with Node without any build step.
-const path = require('path');
-const fs = require('fs');
+import { createClient } from '@supabase/supabase-js';
+import * as dotenv from 'dotenv';
 
-// Load .env.local first (takes precedence over .env)
-const root = process.cwd();
-for (const file of ['.env.local', '.env']) {
-  const p = path.resolve(root, file);
-  if (fs.existsSync(p)) {
-    require('dotenv').config({ path: p, override: false });
-  }
-}
-
-const { createClient } = require('@supabase/supabase-js');
+dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY;

@@ -247,6 +247,7 @@
 .nav-item.active .material-icons-round{color:var(--primary);}
 .nav-lbl{font-size:11px;color:rgba(255,255,255,.35);font-weight:500;font-family:var(--font);}
 .nav-item.active .nav-lbl{color:var(--primary);font-weight:700;}
+.nav-item--disabled{cursor:default;opacity:.4;pointer-events:none;}
 
 /* ── LIST ITEMS ──────────────────────────────────────────────────────────── */
 .list-item{display:flex;align-items:center;padding:14px 16px;min-height:60px;cursor:pointer;gap:0;}
