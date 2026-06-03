@@ -102,6 +102,28 @@ export const useStore = create((set, get) => ({
     setTimeout(() => get()._decodeNhtsa(vehicles), 0);
   },
 
+  // ── OCR vehicle override ─────────────────────────────────────────
+  // Called from ScanLoadSheet when the extract-load-sheet edge function
+  // returns successfully. Replaces SEED_VEHICLES with OCR-extracted VINs
+  // and re-triggers NHTSA enrichment in the background.
+  setOcrVehicles(ocrVins) {
+    const vehicles = ocrVins.map((item) => ({
+      vin:     item.vin,
+      stallId: item.bayCode ?? '—',
+      year:    '—',
+      make:    '—',
+      model:   'Decoding…',
+      weightLb: 3800,
+      heightIn: 60,
+      lengthIn: 180,
+      widthIn:  72,
+      type:    'sedan',
+      source:  'ocr',
+    }));
+    set({ vehicles, acceptedIdxs: [], nhtsaStatus: 'loading' });
+    setTimeout(() => get()._decodeNhtsa(vehicles), 0);
+  },
+
   // ── NHTSA background decode ──────────────────────────────────────
   // 'idle'    — no scan started
   // 'loading' — API calls in flight during scan animation

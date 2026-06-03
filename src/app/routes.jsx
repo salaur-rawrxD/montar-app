@@ -22,6 +22,6 @@ export const SCREEN_MAP = {
   map:         YardMapPage,
   loadcomplete: LoadConfirm,
   delivery:    DeliveryPage,
-  history:     LoadHistory,
-  settings:    Settings,
+  LoadHistory: 'LoadHistory',
+  Settings: 'Settings',
 };

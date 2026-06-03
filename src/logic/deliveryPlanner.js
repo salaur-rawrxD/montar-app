@@ -1,11 +1,13 @@
-import { RENTON_TOYOTA } from '../data/sampleDealers.js';
+import { SAMPLE_DEALERS } from '../data/sampleDealers.js';
+
+const DEFAULT_DEALER = SAMPLE_DEALERS[0];
 
 export function buildDeliveryPlan(loadPlan) {
   const vehicleCount = loadPlan?.slots?.length || 9;
   return {
-    dealer: RENTON_TOYOTA,
+    dealer: DEFAULT_DEALER,
     vehicleCount,
     multiStop: false,
-    etaMin: RENTON_TOYOTA.etaMin,
+    etaMin: 45,
   };
 }

@@ -1,10 +1,10 @@
 import { useStore } from '../../app/state/loadSessionStore.js';
 
 const NAV_ITEMS = [
-  { icon: 'home',         label: 'Home',    id: 'home',     screen: 'home' },
-  { icon: 'receipt_long', label: 'Loads',   id: 'loads',    screen: 'history' },
-  { icon: 'map',          label: 'Yards',   id: 'yards',    screen: null },
-  { icon: 'person',       label: 'Profile', id: 'profile',  screen: 'settings' },
+  { id: 'home',    icon: 'home',     label: 'Home',    screen: 'home' },
+  { id: 'scan',    icon: 'document_scanner', label: 'Scan',    screen: 'scan' },
+  { id: 'history', icon: 'history',  label: 'History', screen: 'history' },
+  { id: 'settings',icon: 'settings', label: 'Settings',screen: 'settings' },
 ];
 
 export default function BottomNav({ active = 'home' }) {
