@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from '../app/state/loadSessionStore.js';
 import TrailerMap from '../components/planning/TrailerMap.jsx';
+import { logLoadPlanGeneration, logDataQualityAlert } from '../services/dataSourceLogger.js';
 
 export default function LoadPlan() {
   const goBack           = useStore((s) => s.goBack);
   const goTo             = useStore((s) => s.goTo);
+  const vehicles         = useStore((s) => s.vehicles);
   const loadPlan         = useStore((s) => s.loadPlan);
   const dotStatus        = useStore((s) => s.dotStatus);
   const confirmedSlots   = useStore((s) => s.confirmedSlots);
@@ -13,6 +15,14 @@ export default function LoadPlan() {
   const initYardSession  = useStore((s) => s.initYardSession);
 
   const [openReasonSlot, setOpenReasonSlot] = useState(null);
+
+  // Log data sources on mount
+  useEffect(() => {
+    if (loadPlan && vehicles && dotStatus) {
+      logLoadPlanGeneration(vehicles, loadPlan, dotStatus);
+      logDataQualityAlert(vehicles);
+    }
+  }, [loadPlan, vehicles, dotStatus]);
 
   if (!loadPlan) return null;
 

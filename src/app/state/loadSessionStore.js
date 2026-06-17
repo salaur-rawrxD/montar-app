@@ -9,6 +9,7 @@ import { buildDeliveryPlan } from '../../logic/deliveryPlanner.js';
 import { saveCompleteSession } from '../../services/loadSessionService.js';
 import { decodeVinBatch } from '../../services/nhtsaService.js';
 import { enrichVehicles } from '../../services/vehicleSpecsService.js';
+import { logVehicleEnrichment, logDataQualityAlert } from '../../services/dataSourceLogger.js';
 
 function haptic(ms) {
   try { if (navigator.vibrate) navigator.vibrate(ms); } catch (_) {}
@@ -102,11 +103,12 @@ export const useStore = create((set, get) => ({
     setTimeout(() => get()._decodeNhtsa(vehicles), 0);
   },
 
-  // ── OCR vehicle override ─────────────────────────────────────────
+  // ── OCR / Manual vehicle entry ──────────────────────────────────────
   // Called from ScanLoadSheet when the extract-load-sheet edge function
-  // returns successfully. Replaces SEED_VEHICLES with OCR-extracted VINs
+  // returns successfully (source='ocr') or when manual VINs are entered
+  // (source='manual'). Replaces SEED_VEHICLES with extracted/entered VINs
   // and re-triggers NHTSA enrichment in the background.
-  setOcrVehicles(ocrVins) {
+  setOcrVehicles(ocrVins, entrySource = 'ocr') {
     const vehicles = ocrVins.map((item) => ({
       vin:     item.vin,
       stallId: item.bayCode ?? '—',
@@ -118,7 +120,7 @@ export const useStore = create((set, get) => ({
       lengthIn: 180,
       widthIn:  72,
       type:    'sedan',
-      source:  'ocr',
+      source:  entrySource,
     }));
     set({ vehicles, acceptedIdxs: [], nhtsaStatus: 'loading' });
     setTimeout(() => get()._decodeNhtsa(vehicles), 0);
@@ -179,9 +181,13 @@ export const useStore = create((set, get) => ({
       });
 
       set({ vehicles: enriched, nhtsaStatus: 'done' });
+      // Log enrichment results
+      logVehicleEnrichment(enriched, 'final');
+      logDataQualityAlert(enriched);
     } catch (_) {
       // Catastrophic failure — leave vehicles unchanged with 'demo' source
       set({ nhtsaStatus: 'failed' });
+      console.warn('⚠️ NHTSA decode and enrichment failed');
     }
   },
 

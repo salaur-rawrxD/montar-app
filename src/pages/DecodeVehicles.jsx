@@ -7,6 +7,8 @@ const SOURCE_BADGE = {
   identity_only:  { cls: 'vbadge-nhtsa',     icon: 'verified_user', label: 'NHTSA' },
   nhtsa_fallback: { cls: 'vbadge-estimated', icon: 'calculate',     label: 'Estimated' },
   estimated:      { cls: 'vbadge-estimated', icon: 'calculate',     label: 'Estimated' },
+  ocr:            { cls: 'vbadge-nhtsa',     icon: 'document_scanner', label: 'From scan' },
+  manual:         { cls: 'vbadge-operator',  icon: 'edit',          label: 'Manual entry' },
   operator:       { cls: 'vbadge-operator',  icon: 'how_to_reg',    label: 'Verified' },
   autodev:        { cls: 'vbadge-autodev',   icon: 'bolt',          label: 'Auto.dev' },
   review:         { cls: 'vbadge-review',    icon: 'error_outline', label: 'Needs review' },
@@ -66,6 +68,14 @@ export default function DecodeVehicles() {
   const acceptedCnt = acceptedIdxs.length;
 
   function handleOptimize() {
+    // Log data sources before generating plan
+    if (vehicles && vehicles.length > 0) {
+      const accepted = vehicles.filter((_, i) => acceptedIdxs.includes(i));
+      console.log(`📋 Generating load plan for ${accepted.length} accepted vehicles`);
+      accepted.forEach((v) => {
+        console.log(`  • ${v.vin} (${v.source} • specs: ${v.specsSource})`);
+      });
+    }
     generateLoadPlan();
     goTo('slots');
   }

@@ -109,7 +109,7 @@ export default function ScanLoadSheet() {
       .filter((v) => v.length === 17);
     if (vins.length === 0) return;
     const ocrVins = vins.map((vin) => ({ vin, bayCode: '—' }));
-    setOcrVehicles(ocrVins);
+    setOcrVehicles(ocrVins, 'manual');
     setActiveVins(vins);
     setVisible(vins.length);
     setPhase('ocr-done');
